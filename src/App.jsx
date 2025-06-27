@@ -1,15 +1,13 @@
-import './App.css'
+import "./App.css";
 
 function App() {
-
-
   return (
     <>
-      <div className='text-3xl bg-amber-50 border-1 m-3'>
-        Hello Sobi Final
+      <div className="text-3xl bg-amber-50 border-1 m-3">
+        Hello Sobi Final 123123test
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
