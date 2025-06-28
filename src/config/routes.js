@@ -1,4 +1,5 @@
 import { lazy } from "react"
+import SignUp from "../pages/member/SignUp"
 
 // 페이지 컴포넌트들을 lazy로 불러오기
 const Home = lazy(() => import("../pages/main/Main"))
@@ -43,8 +44,8 @@ export const routes = [
     title: "로그인",
   },
   {
-    path: "/join",
-    element: Join,
+    path: "/SignUp",
+    element: SignUp,
     title: "회원가입",
   },
   {
