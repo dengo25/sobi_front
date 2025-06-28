@@ -10,11 +10,11 @@ function Login() {
         event.preventDefault();// 폼 기본 제출 동작 방지
 
         const data = new FormData(event.target); //폼 요소로부터 데이터 수집
-        const username = data.get("username");
+        const memberId = data.get("memberId");
         const password = data.get("password");
 
         //로그인 API 호출
-        signin({ username: username, password: password });
+        signin({ memberId: memberId, password: password });
     };
 
     //소셜 로그인 버튼 클릭 시 실행되는 함수
@@ -39,10 +39,10 @@ function Login() {
                             variant="outlined"
                             required
                             fullWidth
-                            id="username"
+                            id="memberId"
                             label="아이디"
-                            name="username"
-                            autoComplete="username"
+                            name="memberId"
+                            autoComplete="memberId"
                         />
                     </Grid>
                     <Grid item xs={12}>

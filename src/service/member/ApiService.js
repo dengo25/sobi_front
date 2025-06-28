@@ -49,8 +49,8 @@ export function call(api, method, request) {
 }
 
 // 로그인 함수: userDTO를 post로 전달하여 로그인 시도
-export function signin(userDTO) {
-    return call("/auth/signin", "POST", userDTO).then((response) => {
+export function signin(memberDTO) {
+    return call("/auth/login", "POST", memberDTO).then((response) => {
         //로그인 성공 시 토큰 저장 및 홈으로 이동
         if (response.token) {
             localStorage.setItem("ACCESS_TOKEN", response.token);
@@ -84,4 +84,9 @@ export function socialLogin(provider) {
         provider +
         "?redirect_url=" +
         frontendUrl;
+}
+
+//로그인 후 헤더에서 로그인 삭제 함수
+export function isLoggedIn() {
+  return !!localStorage.getItem("ACCESS_TOKEN");
 }

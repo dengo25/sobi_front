@@ -44,7 +44,7 @@ export const routes = [
     title: "로그인",
   },
   {
-    path: "/SignUp",
+    path: "/signUp",
     element: SignUp,
     title: "회원가입",
   },
@@ -54,6 +54,7 @@ export const routes = [
     title: "마이페이지",
   },
   
+
 
   
   // 동적 라우팅
