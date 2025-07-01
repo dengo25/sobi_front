@@ -89,12 +89,17 @@ export function isLoggedIn() {
   return !!localStorage.getItem("ACCESS_TOKEN");
 }
 
-// 회원 정보 조회 함수
-export function getMemberInfo(memberId) {
-  return call(`/api/mypage/${memberId}`, "GET");
+// 마이페이지 정보 조회 함수
+export function getMypage() {
+  return call("/api/mypage", "GET", null);
 }
 
-// 회원 정보 수정 함수
-export function updateMemberInfo(memberId, memberData) {
-  return call(`/api/mypage/${memberId}`, "PUT", memberData);
+// 마이페이지 정보 수정 함수
+export function updateMypage(memberDTO) {
+  return call("/api/mypage", "PATCH", memberDTO);
+}
+
+// 회원 탈퇴 함수
+export function deleteMypage(password) {
+  return call("/api/mypage", "DELETE", { password: password });
 }
