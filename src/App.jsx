@@ -1,21 +1,9 @@
-<<<<<<< HEAD
-import "./App.css";
-
-function App() {
-  return (
-    <>
-      <div className="text-3xl bg-amber-50 border-1 m-3">
-        Hello Sobi Final 123123test
-      </div>
-    </>
-  );
-=======
-import { Routes, Route } from "react-router-dom"
-import { Suspense } from "react"
-import { routes } from "./config/routes"
-import Header from "./components/Header"
-import Footer from "./components/Footer"
-import LoadingSpinner from "./components/LoadingSpinner"
+import { Routes, Route } from "react-router-dom";
+import { Suspense } from "react";
+import { routes } from "./config/routes";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 function App() {
   return (
@@ -28,15 +16,19 @@ function App() {
               let RoutePath = route.path;
               let RouteElement = route.element;
 
-              return <Route key={index} path={RoutePath} element={<RouteElement />} />
+              return (
+                <Route
+                  key={index}
+                  path={RoutePath}
+                  element={<RouteElement />}
+                />
+              );
             })}
           </Routes>
         </Suspense>
       </main>
       <Footer />
     </div>
-  )
->>>>>>> origin/member-ready
+  );
 }
-
 export default App;
