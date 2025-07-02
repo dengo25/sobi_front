@@ -65,17 +65,27 @@ const DeleteAccountDialog = ({ open, onClose, onDelete }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>회원 탈퇴</DialogTitle>
+      <DialogTitle sx={{ fontSize: "18px", fontWeight: "600" }}>
+        회원 탈퇴
+      </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <Box display="flex" flexDirection="column" gap={2}>
-            {error && <Alert severity="error">{error}</Alert>}
+            {error && (
+              <Alert severity="error" sx={{ fontSize: "14px" }}>
+                {error}
+              </Alert>
+            )}
 
-            <Alert severity="warning">
-              <Typography variant="body2" fontWeight="bold">
+            <Alert severity="warning" sx={{ fontSize: "14px" }}>
+              <Typography
+                variant="body2"
+                fontWeight="bold"
+                sx={{ fontSize: "14px" }}
+              >
                 주의사항
               </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
+              <Typography variant="body2" sx={{ mt: 1, fontSize: "14px" }}>
                 • 회원 탈퇴 시 모든 개인정보가 삭제됩니다.
                 <br />
                 • 작성한 게시글과 댓글은 유지될 수 있습니다.
@@ -90,6 +100,7 @@ const DeleteAccountDialog = ({ open, onClose, onDelete }) => {
               color="error"
               fontWeight="bold"
               textAlign="center"
+              sx={{ fontSize: "14px" }}
             >
               탈퇴하려면 현재 비밀번호를 입력해주세요.
             </Typography>
@@ -104,11 +115,23 @@ const DeleteAccountDialog = ({ open, onClose, onDelete }) => {
               fullWidth
               disabled={loading}
               autoFocus
+              sx={{
+                "& .MuiInputLabel-root": {
+                  fontSize: "14px",
+                },
+                "& .MuiOutlinedInput-root": {
+                  fontSize: "14px",
+                },
+              }}
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>
+          <Button
+            onClick={onClose}
+            disabled={loading}
+            sx={{ fontSize: "14px" }}
+          >
             취소
           </Button>
           <Button
@@ -116,6 +139,7 @@ const DeleteAccountDialog = ({ open, onClose, onDelete }) => {
             variant="contained"
             color="error"
             disabled={loading}
+            sx={{ fontSize: "14px" }}
             startIcon={
               loading ? <CircularProgress size={20} color="inherit" /> : null
             }

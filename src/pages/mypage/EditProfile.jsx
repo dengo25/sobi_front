@@ -221,10 +221,17 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
             {userInfo?.memberName?.charAt(0).toUpperCase() || "U"}
           </Avatar>
 
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 600, mb: 0.5, fontSize: "18px" }}
+          >
             회원정보 수정
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontSize: "14px" }}
+          >
             {userInfo?.memberName || "사용자"}#{userInfo?.id || "N/A"}
           </Typography>
         </Box>
@@ -240,6 +247,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     borderRadius: 2,
                     backgroundColor: "#ffebee",
                     border: "1px solid #ffcdd2",
+                    fontSize: "14px",
                   }}
                 >
                   {error}
@@ -250,7 +258,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mb: 1, fontSize: "14px" }}
+                  sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                 >
                   사용자 ID
                 </Typography>
@@ -263,6 +271,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
                       border: "1px solid rgb(255, 255, 255)",
+                      fontSize: "14px",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -276,7 +285,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mb: 1, fontSize: "14px" }}
+                  sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                 >
                   이름 *
                 </Typography>
@@ -292,6 +301,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
                       border: "1px solid rgb(255, 255, 255)",
+                      fontSize: "14px",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -304,7 +314,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mb: 1, fontSize: "14px" }}
+                  sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                 >
                   이메일 *
                 </Typography>
@@ -321,6 +331,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
                       border: "1px solid rgb(255, 255, 255)",
+                      fontSize: "14px",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -333,7 +344,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mb: 1, fontSize: "14px" }}
+                  sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                 >
                   성별
                 </Typography>
@@ -346,11 +357,18 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     displayEmpty
                     sx={{
                       borderRadius: 2,
+                      fontSize: "14px",
                     }}
                   >
-                    <MenuItem value="">선택</MenuItem>
-                    <MenuItem value="M">남성</MenuItem>
-                    <MenuItem value="F">여성</MenuItem>
+                    <MenuItem value="" sx={{ fontSize: "14px" }}>
+                      선택
+                    </MenuItem>
+                    <MenuItem value="M" sx={{ fontSize: "14px" }}>
+                      남성
+                    </MenuItem>
+                    <MenuItem value="F" sx={{ fontSize: "14px" }}>
+                      여성
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Box>
@@ -359,7 +377,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mb: 1, fontSize: "14px" }}
+                  sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                 >
                   생년월일
                 </Typography>
@@ -375,6 +393,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
                       border: "1px solid rgb(255, 255, 255)",
+                      fontSize: "14px",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -388,7 +407,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mb: 1, fontSize: "14px" }}
+                  sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                 >
                   우편번호
                 </Typography>
@@ -404,6 +423,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
                       border: "1px solid rgb(255, 255, 255)",
+                      fontSize: "14px",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -417,7 +437,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mb: 1, fontSize: "14px" }}
+                  sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                 >
                   주소
                 </Typography>
@@ -432,6 +452,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
                       border: "1px solid rgb(255, 255, 255)",
+                      fontSize: "14px",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -446,7 +467,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                 <Typography
                   variant="body2"
                   color="text.secondary"
-                  sx={{ mb: 1, fontSize: "14px" }}
+                  sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                 >
                   새 비밀번호 (선택사항)
                 </Typography>
@@ -462,6 +483,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
                       border: "1px solid rgb(255, 255, 255)",
+                      fontSize: "14px",
                     },
                     "& .MuiOutlinedInput-notchedOutline": {
                       border: "none",
@@ -476,7 +498,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={{ mb: 1, fontSize: "14px" }}
+                    sx={{ mb: 1, fontSize: "14px", fontWeight: "500" }}
                   >
                     비밀번호 확인
                   </Typography>
@@ -494,6 +516,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 2,
+                        fontSize: "14px",
                       },
                     }}
                     helperText={
@@ -526,6 +549,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                   px: 3,
                   py: 1,
                   color: "#666",
+                  fontSize: "14px",
                   "&:hover": {
                     backgroundColor: "#f8f9fa",
                   },
@@ -542,6 +566,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
                   px: 3,
                   py: 1,
                   backgroundColor: "#4ecdc4",
+                  fontSize: "14px",
                   "&:hover": {
                     backgroundColor: "#26b5a8",
                   },

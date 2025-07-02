@@ -125,7 +125,7 @@ const SendMessage = ({ onMessageSent }) => {
       <Typography
         variant="h6"
         gutterBottom
-        sx={{ mb: 2, color: "#333", fontSize: "18px" }}
+        sx={{ mb: 2, color: "#333", fontSize: "16px", fontWeight: "600" }}
       >
         새 쪽지 보내기
       </Typography>
@@ -137,7 +137,7 @@ const SendMessage = ({ onMessageSent }) => {
               severity="error"
               sx={{
                 borderRadius: 1,
-                fontSize: "13px",
+                fontSize: "14px",
                 py: 0.5,
               }}
             >
@@ -150,7 +150,7 @@ const SendMessage = ({ onMessageSent }) => {
               severity="success"
               sx={{
                 borderRadius: 1,
-                fontSize: "13px",
+                fontSize: "14px",
                 py: 0.5,
               }}
             >
@@ -164,7 +164,7 @@ const SendMessage = ({ onMessageSent }) => {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ mb: 0.5, fontSize: "13px" }}
+                sx={{ mb: 0.5, fontSize: "14px", fontWeight: "500" }}
               >
                 받는 사람 *
               </Typography>
@@ -196,7 +196,7 @@ const SendMessage = ({ onMessageSent }) => {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ mb: 0.5, fontSize: "13px" }}
+                sx={{ mb: 0.5, fontSize: "14px", fontWeight: "500" }}
               >
                 제목 * ({formData.title.length}/100)
               </Typography>
@@ -230,7 +230,7 @@ const SendMessage = ({ onMessageSent }) => {
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ mb: 0.5, fontSize: "13px" }}
+              sx={{ mb: 0.5, fontSize: "14px", fontWeight: "500" }}
             >
               내용 *
             </Typography>
@@ -241,7 +241,7 @@ const SendMessage = ({ onMessageSent }) => {
               required
               fullWidth
               multiline
-              rows={6}
+              rows={4}
               disabled={loading}
               variant="outlined"
               placeholder="쪽지 내용을 입력하세요"
@@ -278,7 +278,7 @@ const SendMessage = ({ onMessageSent }) => {
                 px: 2,
                 py: 0.5,
                 color: "#666",
-                fontSize: "13px",
+                fontSize: "14px",
                 "&:hover": {
                   backgroundColor: "#f8f9fa",
                 },
@@ -300,7 +300,7 @@ const SendMessage = ({ onMessageSent }) => {
                 borderRadius: 1,
                 px: 2,
                 py: 0.5,
-                fontSize: "13px",
+                fontSize: "14px",
                 backgroundColor: "#4ecdc4",
                 "&:hover": {
                   backgroundColor: "#26b5a8",
@@ -324,14 +324,14 @@ const SendMessage = ({ onMessageSent }) => {
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ fontSize: "12px" }}
+          sx={{ fontSize: "13px", fontWeight: "600" }}
         >
           📌 쪽지 전송 안내
         </Typography>
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ fontSize: "11px", mt: 0.5 }}
+          sx={{ fontSize: "12px", mt: 0.5 }}
         >
           • 받는 사람의 아이디를 정확히 입력해주세요.
           <br />

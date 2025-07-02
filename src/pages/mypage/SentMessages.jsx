@@ -11,7 +11,6 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  Chip,
   Button,
   Dialog,
   DialogTitle,
@@ -23,12 +22,11 @@ import {
   Snackbar,
 } from "@mui/material";
 import {
-  getReceivedMessages,
-  markMessageAsRead,
-  deleteMessageByReceiver,
+  getSentMessages,
+  deleteMessageBySender,
 } from "../../service/member/ApiService";
 
-const ReceivedMessages = () => {
+const SentMessages = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,8 +49,8 @@ const ReceivedMessages = () => {
     try {
       setLoading(true);
       setError("");
-      const response = await getReceivedMessages();
-      console.log("받은 쪽지 응답:", response);
+      const response = await getSentMessages();
+      console.log("보낸 쪽지 응답:", response);
 
       if (Array.isArray(response)) {
         setMessages(response);
@@ -60,31 +58,16 @@ const ReceivedMessages = () => {
         setMessages([]);
       }
     } catch (err) {
-      console.error("받은 쪽지 조회 오류:", err);
-      setError("받은 쪽지를 불러오는 중 오류가 발생했습니다.");
+      console.error("보낸 쪽지 조회 오류:", err);
+      setError("보낸 쪽지를 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleMessageClick = async (message) => {
+  const handleMessageClick = (message) => {
     setSelectedMessage(message);
     setDialogOpen(true);
-
-    // 읽지 않은 쪽지인 경우 읽음 처리
-    if (message.isRead === "N") {
-      try {
-        await markMessageAsRead(message.id);
-        // 로컬 상태 업데이트
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === message.id ? { ...msg, isRead: "Y" } : msg
-          )
-        );
-      } catch (err) {
-        console.error("읽음 처리 오류:", err);
-      }
-    }
   };
 
   const handleSelectMessage = (messageId) => {
@@ -116,7 +99,7 @@ const ReceivedMessages = () => {
     if (!messageToDelete) return;
 
     try {
-      await deleteMessageByReceiver(messageToDelete.id);
+      await deleteMessageBySender(messageToDelete.id);
 
       // 메시지 목록에서 삭제된 메시지 제거
       setMessages((prev) =>
@@ -151,7 +134,7 @@ const ReceivedMessages = () => {
     try {
       // 모든 선택된 메시지 삭제
       await Promise.all(
-        selectedMessages.map((messageId) => deleteMessageByReceiver(messageId))
+        selectedMessages.map((messageId) => deleteMessageBySender(messageId))
       );
 
       // 삭제된 메시지들을 목록에서 제거
@@ -244,7 +227,7 @@ const ReceivedMessages = () => {
         }}
       >
         <Typography variant="h6" sx={{ color: "#333", fontSize: "16px" }}>
-          받은 쪽지 ({messages.length})
+          보낸 쪽지 ({messages.length})
         </Typography>
 
         {selectedMessages.length > 0 && (
@@ -263,10 +246,10 @@ const ReceivedMessages = () => {
       {messages.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography variant="h4" sx={{ fontSize: 48, color: "#ccc", mb: 2 }}>
-            📧
+            📤
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            받은 쪽지가 없습니다.
+            보낸 쪽지가 없습니다.
           </Typography>
         </Box>
       ) : (
@@ -303,7 +286,7 @@ const ReceivedMessages = () => {
                   상태
                 </TableCell>
                 <TableCell sx={{ fontSize: "13px", fontWeight: "600" }}>
-                  보낸사람
+                  받는사람
                 </TableCell>
                 <TableCell sx={{ fontSize: "13px", fontWeight: "600" }}>
                   제목
@@ -316,7 +299,7 @@ const ReceivedMessages = () => {
                     fontWeight: "600",
                   }}
                 >
-                  받은시간
+                  보낸시간
                 </TableCell>
                 <TableCell
                   sx={{
@@ -337,11 +320,8 @@ const ReceivedMessages = () => {
                   hover
                   sx={{
                     cursor: "pointer",
-                    backgroundColor:
-                      message.isRead === "N" ? "#f8f9ff" : "transparent",
                     "&:hover": {
-                      backgroundColor:
-                        message.isRead === "N" ? "#f0f2ff" : "#f8f9fa",
+                      backgroundColor: "#f8f9fa",
                     },
                   }}
                 >
@@ -357,36 +337,35 @@ const ReceivedMessages = () => {
                     sx={{ textAlign: "center" }}
                     onClick={() => handleMessageClick(message)}
                   >
-                    {message.isRead === "N" ? (
-                      <Tooltip title="읽지 않음">
-                        <Typography sx={{ fontSize: 18, color: "#1976d2" }}>
-                          ✉️
-                        </Typography>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip title="읽음">
-                        <Typography sx={{ fontSize: 18, color: "#666" }}>
-                          💌
-                        </Typography>
-                      </Tooltip>
-                    )}
+                    <Tooltip
+                      title={
+                        message.isRead === "Y" ? "상대방이 읽음" : "읽지 않음"
+                      }
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: 18,
+                          color: message.isRead === "Y" ? "#4caf50" : "#666",
+                        }}
+                      >
+                        {message.isRead === "Y" ? "✅" : "📨"}
+                      </Typography>
+                    </Tooltip>
                   </TableCell>
                   <TableCell
                     sx={{
                       fontSize: "13px",
-                      fontWeight: message.isRead === "N" ? "600" : "400",
-                      color: message.isRead === "N" ? "#000" : "#666",
+                      color: "#666",
                     }}
                     onClick={() => handleMessageClick(message)}
                   >
-                    {message.senderName}
+                    {message.receiverName}
                     <br />
                   </TableCell>
                   <TableCell
                     sx={{
                       fontSize: "13px",
-                      fontWeight: message.isRead === "N" ? "600" : "400",
-                      color: message.isRead === "N" ? "#000" : "#666",
+                      color: "#666",
                       maxWidth: "300px",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -471,12 +450,20 @@ const ReceivedMessages = () => {
                   color="text.secondary"
                   sx={{ mt: 0.5 }}
                 >
-                  보낸사람: {selectedMessage.senderName} (
-                  {selectedMessage.senderMemberId})
+                  받는사람: {selectedMessage.receiverName} (
+                  {selectedMessage.receiverMemberId})
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  받은시간:{" "}
+                  보낸시간:{" "}
                   {new Date(selectedMessage.sendDate).toLocaleString("ko-KR")}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
+                  읽음 상태:{" "}
+                  {selectedMessage.isRead === "Y" ? "읽음" : "읽지 않음"}
                 </Typography>
               </Box>
               <IconButton onClick={handleCloseDialog} sx={{ color: "#666" }}>
@@ -484,7 +471,7 @@ const ReceivedMessages = () => {
               </IconButton>
             </DialogTitle>
 
-            <DialogContent sx={{ pt: 2 }}>
+            <DialogContent sx={{ pt: 3 }}>
               <Box
                 sx={{
                   minHeight: "200px",
@@ -548,7 +535,7 @@ const ReceivedMessages = () => {
                 제목: {messageToDelete.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                보낸사람: {messageToDelete.senderName}
+                받는사람: {messageToDelete.receiverName}
               </Typography>
             </Box>
           )}
@@ -619,4 +606,4 @@ const ReceivedMessages = () => {
   );
 };
 
-export default ReceivedMessages;
+export default SentMessages;

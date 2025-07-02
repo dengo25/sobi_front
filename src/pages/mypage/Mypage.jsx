@@ -25,6 +25,7 @@ import EditProfile from "./EditProfile";
 import DeleteProfile from "./DeleteProfile";
 import SendMessage from "./SendMessage";
 import ReceivedMessages from "./ReceivedMessages";
+import SentMessages from "./SentMessages";
 
 const Mypage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -119,31 +120,18 @@ const Mypage = () => {
     setShowSuccessAlert(true);
   };
 
-  // // 성별 표시 함수
-  // const getGenderDisplay = (gender) => {
-  //   if (gender === "M") return "남성";
-  //   if (gender === "F") return "여성";
-  //   return "미설정";
-  // };
-
-  // // 생년월일 표시 함수
-  // const getBirthDisplay = (birth) => {
-  //   if (!birth) return "미설정";
-  //   // YYMMDD 형식을 YYYY-MM-DD로 변환
-  //   if (birth.length === 6) {
-  //     const year = "19" + birth.substring(0, 2); // 90년대 가정
-  //     const month = birth.substring(2, 4);
-  //     const day = birth.substring(4, 6);
-  //     return `${year}-${month}-${day}`;
-  //   }
-  //   return birth;
-  // };
-
   const renderTabContent = () => {
     if (selectedTab === 5) {
       // 쪽지 탭
       return (
-        <Box sx={{ p: 4 }}>
+        <Box
+          sx={{
+            p: 4,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           {/* 쪽지 하위 탭 */}
           <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
             <Tabs
@@ -162,32 +150,25 @@ const Mypage = () => {
             sx={{
               border: "1px solid #e0e0e0",
               borderRadius: 2,
-              height: "500px",
               backgroundColor: "#fafafa",
-              overflow: "auto", // 스크롤바 추가
+              overflow: "auto",
+              flex: 1, // 남은 공간 모두 사용
             }}
           >
             {selectedMessageTab === 0 && (
-              <Box sx={{ p: 1 }}>
+              <Box sx={{ p: 1, height: "100%" }}>
                 <ReceivedMessages />
               </Box>
             )}
 
             {selectedMessageTab === 1 && (
-              <Box sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  보낸 쪽지
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  보낸 쪽지 목록이 여기에 표시됩니다.
-                </Typography>
+              <Box sx={{ p: 1, height: "100%" }}>
+                <SentMessages />
               </Box>
             )}
 
             {selectedMessageTab === 2 && (
-              <Box sx={{ p: 2 }}>
-                {" "}
-                {/* 패딩 줄임 */}
+              <Box sx={{ p: 2, height: "100%" }}>
                 <SendMessage onMessageSent={handleMessageSent} />
               </Box>
             )}
@@ -198,7 +179,7 @@ const Mypage = () => {
 
     // 기존 탭 내용
     return (
-      <Box sx={{ p: 4 }}>
+      <Box sx={{ p: 4, height: "100%" }}>
         <Typography variant="h5" gutterBottom>
           콘텐츠 영역
         </Typography>
@@ -208,8 +189,9 @@ const Mypage = () => {
             border: "1px solid #e0e0e0",
             borderRadius: 2,
             p: 4,
-            height: "100%",
+            height: "calc(100% - 60px)", // 제목 높이 제외
             backgroundColor: "#fafafa",
+            overflow: "auto",
           }}
         >
           <Typography variant="h6" gutterBottom>
@@ -291,7 +273,7 @@ const Mypage = () => {
     <Box
       sx={{
         width: "100%",
-        height: "100%",
+        minHeight: "100vh",
         display: "flex",
         justifyContent: "center",
         alignItems: "flex-start",
@@ -302,9 +284,9 @@ const Mypage = () => {
       <Box
         sx={{
           width: "100%",
-          height: "100%",
           display: "flex",
           gap: 2,
+          minHeight: "calc(100vh - 32px)", // padding 제외한 높이
         }}
       >
         {/* 왼쪽 사이드바 */}
@@ -314,9 +296,14 @@ const Mypage = () => {
               borderRadius: 2,
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               overflow: "visible",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <CardContent sx={{ p: 0 }}>
+            <CardContent
+              sx={{ p: 0, flex: 1, display: "flex", flexDirection: "column" }}
+            >
               {/* 프로필 섹션 */}
               <Box
                 sx={{
@@ -361,7 +348,7 @@ const Mypage = () => {
               </Box>
 
               {/* 메뉴 섹션 */}
-              <Box sx={{ p: 2 }}>
+              <Box sx={{ p: 2, flex: 1 }}>
                 <Typography
                   variant="body2"
                   color="text.secondary"
@@ -506,9 +493,18 @@ const Mypage = () => {
               borderRadius: 2,
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               height: "100%",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <CardContent sx={{ p: 0 }}>
+            <CardContent
+              sx={{
+                p: 0,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               {/* 상단 탭 메뉴 */}
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                 <Tabs
@@ -526,7 +522,9 @@ const Mypage = () => {
               </Box>
 
               {/* 콘텐츠 영역 */}
-              {renderTabContent()}
+              <Box sx={{ flex: 1, overflow: "hidden" }}>
+                {renderTabContent()}
+              </Box>
             </CardContent>
           </Card>
         </Box>

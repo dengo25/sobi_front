@@ -44,7 +44,7 @@ export function call(api, method, request) {
       } else if (response.status === 403) {
         //403오류시 로그인 페이지로 리다이렉트
         console.error("인증 오류 - 로그인 페이지로 이동");
-        window.location.href = "/login";
+        // window.location.href = "/login";
         return Promise.reject("Authentication failed");
       } else {
         // 에러 응답도 JSON으로 파싱해서 확인
