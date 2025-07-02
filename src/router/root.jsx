@@ -5,7 +5,6 @@ import BasicLayout from "../layout/BasicLayout";
 import ReviewRouter from "./ReviewRouter";
 import AdminRouter from "./AdminRouter.jsx";
 import NoticeRouter from "./NoticeRouter.jsx";
-import MyPageTest from "../pages/mypage/MyPageTest.jsx";
 import MypageRouter from "./MypageRouter.jsx";
 import LoginRouter from "./LoginRouter.jsx";
 import JoinRouter from "./JoinRouter.jsx";
