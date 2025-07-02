@@ -18,19 +18,6 @@ const JoinRouter = () => {
                     </Suspense>
                 ),
             },
-            // {
-            //   //아무것도 없는 경로로 들어오면 review의 list로 이동시켜
-            //   path: "",
-            //   element: <Navigate to={"/review/list"}></Navigate>,
-            // },
-            //   {
-            //     path: "list",
-            //     element: (
-            //       <Suspense fallback={<LoadingSpinner />}>
-            //         <ReviewList />
-            //       </Suspense>
-            //     ),
-            //   },
         ],
     };
 };
