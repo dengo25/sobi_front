@@ -2,7 +2,10 @@ import { lazy, Suspense } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { createBrowserRouter } from "react-router-dom";
 import BasicLayout from "../layout/BasicLayout";
-import reviewRouter from "./ReviewRouter";
+import ReviewRouter from "./ReviewRouter";
+import AdminRouter from "./AdminRouter.jsx";
+import NoticeRouter from "./NoticeRouter.jsx";
+import MyPageTest from "../pages/mypage/MyPageTest.jsx";
 
 const Loading = () => LoadingSpinner();
 
@@ -22,8 +25,12 @@ const router = createBrowserRouter([
           </Suspense>
         ), //경로가 로딩하는 동안 Loading페이지를 보여줄거야. Suspense의미
       },
-      reviewRouter(),
-      //    ReviewRouter(),  //구조 분리로 reviewRouter.jsx를 갖고옴
+      ReviewRouter(),
+      //    ReviewRouter(),  //구조 분리로 ReviewRouter.jsx를 갖고옴
+      AdminRouter(),
+      NoticeRouter(),
+        MyPageTest(),
+
     ],
   },
 ]);
