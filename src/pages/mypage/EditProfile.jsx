@@ -96,7 +96,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
       return false;
     }
 
-    // 생년월일 형식 검증 (YYYYMM 또는 YYMMDD)
+    // 생년월일 형식 검증
     if (formData.memberBirth && !/^\d{6}$/.test(formData.memberBirth)) {
       setError("생년월일은 6자리 숫자(YYMMDD)로 입력해주세요.");
       return false;

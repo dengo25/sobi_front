@@ -13,21 +13,18 @@ import {
   CircularProgress,
   Tabs,
   Tab,
-  Grid,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
   ListItemIcon,
 } from "@mui/material";
-import {
-  getMypage,
-  signout,
-  isLoggedIn,
-} from "../../service/member/ApiService";
+import { getMypage, isLoggedIn } from "../../service/member/ApiService";
 import { useNavigate } from "react-router-dom";
 import EditProfile from "./EditProfile";
 import DeleteProfile from "./DeleteProfile";
+import SendMessage from "./SendMessage";
+import ReceivedMessages from "./ReceivedMessages";
 
 const Mypage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -38,6 +35,7 @@ const Mypage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedMessageTab, setSelectedMessageTab] = useState(0); // 쪽지 하위 탭
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,6 +69,14 @@ const Mypage = () => {
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
+    // 쪽지 탭이 아닌 다른 탭으로 이동할 때 쪽지 하위 탭 초기화
+    if (newValue !== 5) {
+      setSelectedMessageTab(0);
+    }
+  };
+
+  const handleMessageTabChange = (event, newValue) => {
+    setSelectedMessageTab(newValue);
   };
 
   const handleSidebarItemClick = (index) => {
@@ -107,24 +113,136 @@ const Mypage = () => {
     setSuccessMessage("");
   };
 
-  // 성별 표시 함수
-  const getGenderDisplay = (gender) => {
-    if (gender === "M") return "남성";
-    if (gender === "F") return "여성";
-    return "미설정";
+  // 쪽지 전송 성공 핸들러
+  const handleMessageSent = (sentMessage) => {
+    setSuccessMessage("쪽지가 성공적으로 전송되었습니다!");
+    setShowSuccessAlert(true);
   };
 
-  // 생년월일 표시 함수
-  const getBirthDisplay = (birth) => {
-    if (!birth) return "미설정";
-    // YYMMDD 형식을 YYYY-MM-DD로 변환
-    if (birth.length === 6) {
-      const year = "19" + birth.substring(0, 2); // 90년대 가정
-      const month = birth.substring(2, 4);
-      const day = birth.substring(4, 6);
-      return `${year}-${month}-${day}`;
+  // // 성별 표시 함수
+  // const getGenderDisplay = (gender) => {
+  //   if (gender === "M") return "남성";
+  //   if (gender === "F") return "여성";
+  //   return "미설정";
+  // };
+
+  // // 생년월일 표시 함수
+  // const getBirthDisplay = (birth) => {
+  //   if (!birth) return "미설정";
+  //   // YYMMDD 형식을 YYYY-MM-DD로 변환
+  //   if (birth.length === 6) {
+  //     const year = "19" + birth.substring(0, 2); // 90년대 가정
+  //     const month = birth.substring(2, 4);
+  //     const day = birth.substring(4, 6);
+  //     return `${year}-${month}-${day}`;
+  //   }
+  //   return birth;
+  // };
+
+  const renderTabContent = () => {
+    if (selectedTab === 5) {
+      // 쪽지 탭
+      return (
+        <Box sx={{ p: 4 }}>
+          {/* 쪽지 하위 탭 */}
+          <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+            <Tabs
+              value={selectedMessageTab}
+              onChange={handleMessageTabChange}
+              aria-label="message tabs"
+            >
+              <Tab label="받은쪽지" />
+              <Tab label="보낸쪽지" />
+              <Tab label="쪽지보내기" />
+            </Tabs>
+          </Box>
+
+          {/* 쪽지 탭별 내용 */}
+          <Box
+            sx={{
+              border: "1px solid #e0e0e0",
+              borderRadius: 2,
+              height: "500px",
+              backgroundColor: "#fafafa",
+              overflow: "auto", // 스크롤바 추가
+            }}
+          >
+            {selectedMessageTab === 0 && (
+              <Box sx={{ p: 1 }}>
+                <ReceivedMessages />
+              </Box>
+            )}
+
+            {selectedMessageTab === 1 && (
+              <Box sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  보낸 쪽지
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  보낸 쪽지 목록이 여기에 표시됩니다.
+                </Typography>
+              </Box>
+            )}
+
+            {selectedMessageTab === 2 && (
+              <Box sx={{ p: 2 }}>
+                {" "}
+                {/* 패딩 줄임 */}
+                <SendMessage onMessageSent={handleMessageSent} />
+              </Box>
+            )}
+          </Box>
+        </Box>
+      );
     }
-    return birth;
+
+    // 기존 탭 내용
+    return (
+      <Box sx={{ p: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          콘텐츠 영역
+        </Typography>
+
+        <Box
+          sx={{
+            border: "1px solid #e0e0e0",
+            borderRadius: 2,
+            p: 4,
+            height: "100%",
+            backgroundColor: "#fafafa",
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            선택된 탭 별 리스트/테이블 출력
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            - 내 글: 작성한 후기 목록
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            - 내 댓글: 내가 작성한 댓글 목록
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            - 포인트: 히스토리 테이블
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            - 뱃지: 획득 조건 안내 카드
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            - 체험단: ?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            - 쪽지: 수신/발신 리스트 + 팝업
+          </Typography>
+
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="body1" color="text.secondary">
+              이 영역에 실제 탭별 콘텐츠가 표시됩니다.
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+    );
   };
 
   if (loading) {
@@ -408,74 +526,7 @@ const Mypage = () => {
               </Box>
 
               {/* 콘텐츠 영역 */}
-              <Box sx={{ p: 4 }}>
-                <Typography variant="h5" gutterBottom>
-                  콘텐츠 영역
-                </Typography>
-
-                <Box
-                  sx={{
-                    border: "1px solid #e0e0e0",
-                    borderRadius: 2,
-                    p: 4,
-                    height: "100%",
-                    backgroundColor: "#fafafa",
-                  }}
-                >
-                  <Typography variant="h6" gutterBottom>
-                    선택된 탭 별 리스트/테이블 출력
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    - 내 글: 작성한 후기 목록
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    - 내 댓글: 내가 작성한 댓글 목록
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    - 포인트: 히스토리 테이블
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    - 뱃지: 획득 조건 안내 카드
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    - 체험단: ?
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    - 쪽지: 수신/발신 리스트 + 팝업
-                  </Typography>
-
-                  <Box sx={{ mt: 4 }}>
-                    <Typography variant="body1" color="text.secondary">
-                      이 영역에 실제 탭별 콘텐츠가 표시됩니다.
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
+              {renderTabContent()}
             </CardContent>
           </Card>
         </Box>
