@@ -2,6 +2,10 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 const BasicEditor = ({value, onChange, theme="snow", customModels={}, customFormats=[]}) => {
+    const editorStyle = {
+        height: 'auto', // 원하는 높이로 설정
+    };
+    
     const defaultModules = {
         toolbar: [
         [{ 'header': [1, 2, false] }],
@@ -21,8 +25,9 @@ const BasicEditor = ({value, onChange, theme="snow", customModels={}, customForm
     
     return (
         <>
-            <div data-gramm="false">
-                <ReactQuill 
+            <div data-gramm="false" className="editor-area">
+                <ReactQuill
+                    style={editorStyle}
                     value={value} 
                     onChange={onChange} 
                     theme={theme}

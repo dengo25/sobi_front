@@ -144,7 +144,7 @@ input[type="url"],
 input[type="week"],
 select,
 textarea,
-.form-control{width:100%;margin:0;/*padding:12px 20px;*/background-color:#fff;border:solid 1px #aaadae;border-radius:22px;box-shadow:none;color:#555;/*font-family:'NotoSansKrBold';*/font-size:14px;line-height:20px;}/* padding:0 10px; */
+.form-control{width:100%;margin:0;/*padding:12px 20px;*/background-color:#fff;/*border:solid 1px #aaadae;border-radius:22px;*/box-shadow:none;color:#555;/*font-family:'NotoSansKrBold';*/font-size:14px;line-height:20px;}/* padding:0 10px; */
 input:hover,input:focus,input:focus-visible,
 .form-control:hover,.form-control:focus,.form-control:focus-visible,
 .form-select:hover,.form-select:focus,.form-select:focus-visible{background-color:#fff;border-color:#4c4c4c;outline:0;box-shadow:none;color:#4c4c4c;}

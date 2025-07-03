@@ -4,6 +4,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import faqIconQ from "../../assets/icons/ico-faq-q.svg";
 import faqIconA from "../../assets/icons/ico-faq-a.svg";
+import CustomCheckbox from "../input/CustomCheckbox"
 
 const ControlledAccordions = ({name, title, content, expanded, handleChange, faqNo, isChecked, onCheckToggle}) => {
   return (
@@ -13,16 +14,12 @@ const ControlledAccordions = ({name, title, content, expanded, handleChange, faq
           aria-controls={`${name}bh-content`}
           id={`${name}bh-header`}
         >
-          <label htmlFor={`${name}-check`} className="input-check">
-              <input 
-                type="checkbox" 
-                id={`${name}-check`} 
-                className="form-control" 
-                checked={isChecked}
-                onChange={() => onCheckToggle(faqNo)}
-              />
-              <span className="checkMark"></span>
-          </label>
+          <CustomCheckbox
+            checked={isChecked}
+            onChange={() => onCheckToggle(faqNo)}
+            size="medium"
+            color='success'
+          />
           <img src={faqIconQ}/>{title}
         </AccordionSummary>
         <AccordionDetails>

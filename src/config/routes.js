@@ -9,6 +9,7 @@ const Admin = lazy(() => import("../pages/admin/Admin"))
 const Login = lazy(() => import("../pages/member/Login"))
 const Join = lazy(() => import("../pages/member/Join"))
 const Mypage = lazy(() => import("../pages/mypage/Mypage"))
+const Common = lazy(() => import("../pages/common/Common"))
 
 // 라우팅 설정을 배열로 관리
 export const routes = [
@@ -52,7 +53,11 @@ export const routes = [
     element: Mypage,
     title: "마이페이지",
   },
-  
+  {
+    path: "/common",
+    element: Common,
+    title: "공통페이지",
+  },
 
   
   // 동적 라우팅

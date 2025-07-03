@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import BasicEditor from '../../components/editor/BasicEditor';
 import CNTAccordion from '../../components/list/ControlledAccordions';
-import AdminFaq from '../../components/list/AdminFaq';
 import axios from "axios";
 
 const Faq = () =>{
@@ -57,6 +56,17 @@ const Faq = () =>{
         });
     }
 
+    const editFaq = async () => {
+            console.log("수정")
+
+            const faqNo = selectedFaqs[0];
+            const selectedItem = list.find(faq => faq.faqNo === faqNo);
+
+            // 기존 내용을 입력창에 세팅
+            setFaqQuestion(selectedItem.faqQuestion);
+            setValue(selectedItem.faqAnswer);
+    }
+//selectedFaqs
     const deleteFaq = async (faqNo) => {
         if(confirm("해당 게시글을 정말 삭제 하시겠습니까?") == false){
             return;
@@ -111,7 +121,7 @@ const Faq = () =>{
                     onChange={setValue}
                     />
                 <button>등록</button>
-                <button type="button">수정</button>
+                <button type="button" onClick={editFaq}>수정</button>
                 <button type="button" onClick={deleteFaq}>삭제</button>
             </form>
 
