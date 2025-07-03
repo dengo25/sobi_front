@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "./api-config";
+import jwtAxios from "../util/JwtUtil.jsx";
 
 
 //API 호출을 위한 공통 함수 정의
@@ -91,3 +92,14 @@ export function isLoggedIn() {
     return !!localStorage.getItem("ACCESS_TOKEN");
 }
 
+
+export const getList = async (pageParam) => {
+    const res = await jwtAxios.get("http://localhost:8080/api/review/list", { params: pageParam });
+    return res.data;
+};
+
+
+// export const getList = async (pageParam) => {
+//     const res = await jwtAxios.get(`${prefix}/list`, { params: pageParam });
+//     return res.data;
+// };

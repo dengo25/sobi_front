@@ -1,41 +1,35 @@
 import {useEffect, useState} from "react";
+import {getList} from "../../service/member/ApiService.js";
+import useCustomMove from "../../UseCustomMove.jsx";
 
 
-function ListComponent(){
+function ListComponent() {
+    const { page, size,   } = useCustomMove();
 
-
-    const{page,size,moveToRead,moveToList}=useCustomMove()
-    const[serverData, setServerData] = useState();
+    const [serverData, setServerData] = useState();
 
     useEffect(() => {
-
-        getList({page,size}).then(data => {
-            console.log(data)
-            setServerData(data)
-        })
-
-    },[page,size])
+        getList({ page, size }).then((data) => {
+            console.log(data);
+            setServerData(data);
+        });
+    }, [page, size ]);
 
     return (
         <div>
             {serverData && (
                 <>
-                    {/*<div>*/}
-                    {/*    {serverData.rtoList.map((todo) => (*/}
-                    {/*        <div key={todo.tno} onClick={() => moveToRead(todo.tno)}>*/}
-                    {/*            <div>*/}
-                    {/*                <div>{todo.tno}</div>*/}
-                    {/*                <div>{todo.title}</div>*/}
-                    {/*                <div>{todo.dueDate}</div>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*    ))}*/}
-                    {/*</div>*/}
-
-                    <PageComponent
-                        serverData={serverData}
-                        movePage={moveToList}
-                    />
+                    <div>
+                        {serverData.rnoList.map((review) => (
+                            <div key={review.rno}>
+                                <div>
+                                    <div>{review.rno}</div>
+                                    <div>{review.title}</div>
+                                    <div>{review.content}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </>
             )}
         </div>
