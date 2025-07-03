@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {getList} from "../../service/member/ApiService.js";
-import useCustomMove from "../../UseCustomMove.jsx";
+import useCustomMove from "../../hooks/review/UseCustomMove.jsx";
 
 
 function ListComponent() {
