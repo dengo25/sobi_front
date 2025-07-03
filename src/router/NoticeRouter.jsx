@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
 import NoticeTest from "../pages/notice/NoticeTest.jsx";
 

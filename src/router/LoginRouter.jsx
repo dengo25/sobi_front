@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 import LoginPage from "../pages/login/LoginPage.jsx";
 

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { createBrowserRouter } from "react-router-dom";
 import BasicLayout from "../layout/BasicLayout";
 import ReviewRouter from "./ReviewRouter";
