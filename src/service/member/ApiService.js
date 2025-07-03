@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "./api-config";
+import { API_BASE_URL } from "../util/api-config.js";
 import jwtAxios from "../util/JwtUtil.jsx";
 
 
