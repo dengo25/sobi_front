@@ -90,3 +90,4 @@ export function socialLogin(provider) {
 export function isLoggedIn() {
     return !!localStorage.getItem("ACCESS_TOKEN");
 }
+
