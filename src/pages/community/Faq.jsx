@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import BasicEditor from '../../components/editor/BasicEditor';
 import CNTAccordion from '../../components/list/ControlledAccordions';
 import axios from "axios";
+import React from 'react'
+
 
 const Faq = () =>{
     const [faqQuestion, setFaqQuestion] = useState('');

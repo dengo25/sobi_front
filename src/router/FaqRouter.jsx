@@ -1,18 +1,18 @@
 import { Suspense } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
-import Notice from "../pages/community/Notice.jsx";
+import FaqList from "../pages/community/Faq.jsx";
 
 
-const NoticeRouter = () => {
+const FaqRouter = () => {
     return {
-        path: "notice",
+        path: "faq",
         children: [
             {
                 path: "",
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
-                        <Notice />
+                        <FaqList />
                     </Suspense>
                 ),
             },
@@ -37,4 +37,4 @@ const NoticeRouter = () => {
     };
 };
 
-export default NoticeRouter;
+export default FaqRouter;

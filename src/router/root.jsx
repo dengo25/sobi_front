@@ -5,6 +5,7 @@ import BasicLayout from "../layout/BasicLayout";
 import ReviewRouter from "./ReviewRouter";
 import AdminRouter from "./AdminRouter.jsx";
 import NoticeRouter from "./NoticeRouter.jsx";
+import FaqRouter from "./FaqRouter.jsx";
 import MypageRouter from "./MypageRouter.jsx";
 import LoginRouter from "./LoginRouter.jsx";
 import JoinRouter from "./JoinRouter.jsx";
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       ReviewRouter(), //    ReviewRouter(),  //구조 분리로 ReviewRouter.jsx를 갖고옴
       AdminRouter(),
       NoticeRouter(),
+      FaqRouter(),
       MypageRouter(),
       LoginRouter(),
       JoinRouter(),
