@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+/*========================================================
+ MUI : Input
+========================================================*/
+.MuiTextField-root,
+.MuiInputBase-formControl,
+.MuiOutlinedInput-root,
+.css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root{border-radius:22px !important;}
+.MuiInputBase-input{border-radius:0 !important;}
+
+
+/*========================================================
+ MUI : Accordion
+========================================================*/
+.css-yfrx4k-MuiAccordionSummary-content{align-items:center;}
+.css-yfrx4k-MuiAccordionSummary-content img{margin:0 5px;}
+
+
+/*========================================================
+ Quill : editor-area
+========================================================*/
+.editor-area{margin-bottom:30px;}
+.editor-area ~ .MuiStack-root{margin-bottom:70px;}
+.editor-area .ql-container{height:350px;display:flex;flex-direction:column;}
+.editor-area .ql-editor{flex:1;overflow-y:auto;}
