@@ -166,7 +166,7 @@ export function getUnreadMessageCount() {
 }
 
 export const getList = async (pageParam) => {
-  const res = await jwtAxios.get("http://localhost:8080/api/review/list", {
+  const res = await jwtAxios.get(`${API_BASE_URL}/api/review/list`, {
     params: pageParam,
   });
   return res.data;
