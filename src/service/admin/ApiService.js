@@ -46,57 +46,16 @@ export function call(api, method, request) {
       console.log(error);
     });
 }
-
-// 로그인 함수: userDTO를 post로 전달하여 로그인 시도
-export function signin(memberDTO) {
-  return call("/auth/login", "POST", memberDTO).then((response) => {
-    //로그인 성공 시 토큰 저장 및 홈으로 이동
-    if (response.token) {
-      localStorage.setItem("ACCESS_TOKEN", response.token);
-      window.location.href = "/";
-    }
-  });
-}
-
-//로그아웃 함수: 토큰 제거 후 로그인 페이지로 이동
-export function signout() {
-  localStorage.setItem("ACCESS_TOKEN", null);
-  window.location.href = "/login";
-}
-
-//회원가입 함수: userDTO를 post로 전달
-export function signup(userDTO) {
-  return call("/auth/signup", "POST", userDTO);
-}
-
-// 소셜 로그인 함수: provider에 따라 OAuth2 인증시작
-export function socialLogin(provider) {
-  //현재 프론트엔드 url을 구성
-  const frontendUrl = window.location.protocol + "//" + window.location.host;
-  console.log("frontendUrl = " + frontendUrl);
-
-  //소셜 로그인 url로 리다이렉트 (OAuth2 인증 시작)
-  //프론트엔드에서 처리하지않고 백엔드에서 처리하도록 위임하는 구조
-  window.location.href =
-    API_BASE_URL +
-    "/oauth2/authorization/" +
-    provider +
-    "?redirect_url=" +
-    frontendUrl;
-}
-
-//로그인 후 헤더에서 로그인 삭제 함수
-export function isLoggedIn() {
-  return !!localStorage.getItem("ACCESS_TOKEN");
-}
-
-export const getList = async (pageParam) => {
-  const res = await jwtAxios.get("http://localhost:8080/api/review/list", {
-    params: pageParam,
-  });
+export const getList = async () => {
+  const res = await jwtAxios.get("http://localhost:8080/api/admin/member");
   return res.data;
 };
-
+export const getMember = async (memberId) => {
+  const res = await jwtAxios.get(
+    `http://localhost:8080/api/admin/member/${memberId}`
+  );
+  return res.data;
+};
 // export const getList = async (pageParam) => {
 //     const res = await jwtAxios.get(`${prefix}/list`, { params: pageParam });
 //     return res.data;
