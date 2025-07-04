@@ -5,7 +5,7 @@ import {
   deleteMessageByReceiver,
 } from "../../service/member/ApiService";
 
-const ReceivedMessages = () => {
+const ReceivedMessages = ({ onMessageAction }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -20,6 +20,7 @@ const ReceivedMessages = () => {
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [batchDeleteConfirmOpen, setBatchDeleteConfirmOpen] = useState(false);
 
+  // ... (이전의 모든 styles 객체는 동일하게 유지)
   const styles = {
     container: {
       padding: "16px",
@@ -348,6 +349,11 @@ const ReceivedMessages = () => {
             msg.id === message.id ? { ...msg, isRead: "Y" } : msg
           )
         );
+
+        // 부모 컴포넌트에 변경 사항 알림
+        if (onMessageAction) {
+          onMessageAction();
+        }
       } catch (err) {
         console.error("읽음 처리 오류:", err);
       }
@@ -399,6 +405,11 @@ const ReceivedMessages = () => {
       // 성공 메시지 표시
       setSuccessMessage("쪽지가 삭제되었습니다.");
       setShowSuccessAlert(true);
+
+      // 부모 컴포넌트에 변경 사항 알림
+      if (onMessageAction) {
+        onMessageAction();
+      }
     } catch (err) {
       console.error("쪽지 삭제 오류:", err);
       setError("쪽지 삭제 중 오류가 발생했습니다.");
@@ -434,6 +445,11 @@ const ReceivedMessages = () => {
         `${selectedMessages.length}개의 쪽지가 삭제되었습니다.`
       );
       setShowSuccessAlert(true);
+
+      // 부모 컴포넌트에 변경 사항 알림
+      if (onMessageAction) {
+        onMessageAction();
+      }
     } catch (err) {
       console.error("선택 쪽지 삭제 오류:", err);
       setError("쪽지 삭제 중 오류가 발생했습니다.");

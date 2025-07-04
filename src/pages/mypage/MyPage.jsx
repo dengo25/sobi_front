@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
-import { getMypage, isLoggedIn } from "../../service/member/ApiService";
+import {
+  getMypage,
+  isLoggedIn,
+  getReceivedMessages,
+} from "../../service/member/ApiService";
 import { useNavigate } from "react-router-dom";
 import EditProfile from "./EditProfile";
 import DeleteProfile from "./DeleteProfile";
 import SendMessage from "./SendMessage";
 import ReceivedMessages from "./ReceivedMessages";
 import SentMessages from "./SentMessages";
+import MyReviews from "./MyReviews";
 
 const Mypage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -17,6 +22,7 @@ const Mypage = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedMessageTab, setSelectedMessageTab] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0); // 읽지 않은 쪽지 수
   const navigate = useNavigate();
 
   const styles = {
@@ -118,6 +124,7 @@ const Mypage = () => {
       fontSize: "12px",
       color: "#999",
     },
+
     divider: {
       height: "1px",
       backgroundColor: "#e0e0e0",
@@ -295,6 +302,23 @@ const Mypage = () => {
     fetchUserInfo();
   }, [navigate]);
 
+  // 읽지 않은 쪽지 수를 가져오는 함수
+  const fetchUnreadMessageCount = async () => {
+    try {
+      const messages = await getReceivedMessages();
+      if (Array.isArray(messages)) {
+        const unreadCount = messages.filter(
+          (message) => message.isRead === "N"
+        ).length;
+        setUnreadMessageCount(unreadCount);
+      }
+    } catch (err) {
+      console.error("읽지 않은 쪽지 수 조회 오류:", err);
+      // 에러가 발생해도 0으로 설정
+      setUnreadMessageCount(0);
+    }
+  };
+
   const fetchUserInfo = async () => {
     try {
       setLoading(true);
@@ -302,6 +326,8 @@ const Mypage = () => {
       const response = await getMypage();
       if (response) {
         setUserInfo(response);
+        // 사용자 정보를 가져온 후 읽지 않은 쪽지 수도 가져옴
+        await fetchUnreadMessageCount();
       } else {
         setError("사용자 정보를 불러올 수 없습니다.");
       }
@@ -318,10 +344,20 @@ const Mypage = () => {
     if (tabIndex !== 5) {
       setSelectedMessageTab(0);
     }
+
+    // 쪽지 탭을 선택했을 때 읽지 않은 쪽지 수를 다시 가져옴
+    if (tabIndex === 5) {
+      fetchUnreadMessageCount();
+    }
   };
 
   const handleMessageTabChange = (tabIndex) => {
     setSelectedMessageTab(tabIndex);
+
+    // 받은쪽지 탭을 선택했을 때 읽지 않은 쪽지 수를 다시 가져옴
+    if (tabIndex === 0) {
+      fetchUnreadMessageCount();
+    }
   };
 
   const handleSidebarItemClick = (index) => {
@@ -363,7 +399,22 @@ const Mypage = () => {
     setShowSuccessAlert(true);
   };
 
+  // 쪽지 관련 작업 후 읽지 않은 쪽지 수를 업데이트하는 함수
+  const handleMessageAction = () => {
+    fetchUnreadMessageCount();
+  };
+
   const renderTabContent = () => {
+    // 내가 쓴 후기 탭
+    if (selectedTab === 0) {
+      return (
+        <div style={{ height: "100%", backgroundColor: "#f8f9fa" }}>
+          <MyReviews />
+        </div>
+      );
+    }
+
+    // 쪽지 탭
     if (selectedTab === 5) {
       return (
         <div
@@ -391,7 +442,7 @@ const Mypage = () => {
           <div style={styles.messageContent}>
             {selectedMessageTab === 0 && (
               <div style={{ height: "100%" }}>
-                <ReceivedMessages />
+                <ReceivedMessages onMessageAction={handleMessageAction} />
               </div>
             )}
 
@@ -420,12 +471,10 @@ const Mypage = () => {
               선택된 탭별 리스트/테이블 출력
             </h3>
             <div style={styles.defaultList}>
-              <p>- 내가 쓴 후기: 작성한 후기 목록</p>
               <p>- 내가 쓴 댓글: 내가 작성한 댓글 목록</p>
               <p>- 포인트: 히스토리 테이블</p>
               <p>- 뱃지: 획득 조건 안내 카드</p>
               <p>- 체험단: ?</p>
-              <p>- 쪽지: 수신/발신 리스트 + 팝업</p>
             </div>
             <div style={styles.defaultNote}>
               <p>이 영역에 실제 탭별 콘텐츠가 표시됩니다.</p>
@@ -537,7 +586,13 @@ const Mypage = () => {
                     { text: "포인트", count: "0P" },
                     { text: "뱃지", count: "0개" },
                     { text: "체험단", count: "0건?" },
-                    { text: "쪽지", count: "미확인 0건" },
+                    {
+                      text: "쪽지",
+                      count:
+                        unreadMessageCount > 0
+                          ? `미확인 ${unreadMessageCount}건`
+                          : "미확인 0건",
+                    },
                   ].map((item, index) => (
                     <li key={index} style={styles.menuItem}>
                       <button
