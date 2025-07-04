@@ -3,7 +3,8 @@ import BasicEditor from '../../components/editor/BasicEditor';
 import CNTAccordion from '../../components/list/ControlledAccordions';
 import axios from "axios";
 import React from 'react'
-
+import { getFaqList, insertFaqList } from '../../service/community/FaqApiService';
+import { data } from 'react-router-dom';
 
 const Faq = () =>{
     const [faqQuestion, setFaqQuestion] = useState('');
@@ -30,12 +31,18 @@ const Faq = () =>{
         }
     }
 
+    // useEffect(()=>{
+    //     axios.get("http://localhost:8080/api/faq").then((res) => {
+    //         setList(res.data);
+    //         console.log("api 통신 데이터 : ",res.data)
+    //     });
+    // },[]);
     useEffect(()=>{
-        axios.get("http://localhost:8080/api/faq").then((res) => {
-            setList(res.data);
-            console.log("api 통신 데이터 : ",res.data)
-        });
-    },[]);
+        getFaqList().then((data) => {
+            setList(data);
+            console.log("api 통신 데이터 : ",data);
+        })
+    },[])
 
 
     const updateInput = (e) => {
@@ -53,9 +60,20 @@ const Faq = () =>{
             faqAnswer: value
         }
 
-        axios.post("http://localhost:8080/api/faq", dto, axiosConfig).then((res) => {
-            console.log("api post : ",res.data)
-        });
+        try{
+            insertFaqList().then((data) => {
+                console.log("api 신규 데이터 : ",data);
+            });
+
+            // 새로고침 나중에 추가
+            
+            // axios.post("http://localhost:8080/api/faq", dto, axiosConfig).then((res) => {
+            //     console.log("api post : ",res.data)
+            // });
+        }catch(err){
+            console.error("등록에 실패 하였습니다.")
+        }
+
     }
 
     const editFaq = async () => {
@@ -68,7 +86,7 @@ const Faq = () =>{
             setFaqQuestion(selectedItem.faqQuestion);
             setValue(selectedItem.faqAnswer);
     }
-//selectedFaqs
+    //selectedFaqs
     const deleteFaq = async (faqNo) => {
         if(confirm("해당 게시글을 정말 삭제 하시겠습니까?") == false){
             return;

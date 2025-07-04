@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_BASE_URL } from "./api-config";
 
 // 먼저 beforeReq 정의
 const beforeReq = (config) => {
@@ -15,7 +16,9 @@ const beforeReq = (config) => {
 };
 
 //  다음에 jwtAxios 만들고 인터셉터 등록
-const jwtAxios = axios.create();
+const jwtAxios = axios.create({
+    baseURL: API_BASE_URL
+});
 jwtAxios.interceptors.request.use(beforeReq);
 
 export default jwtAxios;
