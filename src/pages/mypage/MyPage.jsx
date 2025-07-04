@@ -416,8 +416,8 @@ const Mypage = () => {
               선택된 탭별 리스트/테이블 출력
             </h3>
             <div style={styles.defaultList}>
-              <p>- 내 글: 작성한 후기 목록</p>
-              <p>- 내 댓글: 내가 작성한 댓글 목록</p>
+              <p>- 내가 쓴 후기: 작성한 후기 목록</p>
+              <p>- 내가 쓴 댓글: 내가 작성한 댓글 목록</p>
               <p>- 포인트: 히스토리 테이블</p>
               <p>- 뱃지: 획득 조건 안내 카드</p>
               <p>- 체험단: ?</p>
@@ -528,8 +528,8 @@ const Mypage = () => {
 
                 <ul style={styles.menuList}>
                   {[
-                    { text: "내 글", count: "0건" },
-                    { text: "내 댓글", count: "0건" },
+                    { text: "내가 쓴 후기", count: "0건" },
+                    { text: "내가 쓴 댓글", count: "0건" },
                     { text: "포인트", count: "0P" },
                     { text: "뱃지", count: "0개" },
                     { text: "체험단", count: "0건?" },
@@ -608,30 +608,35 @@ const Mypage = () => {
               {/* 상단 탭 메뉴 */}
               <div style={styles.tabsContainer}>
                 <div style={styles.tabs}>
-                  {["내 글", "내 댓글", "포인트", "뱃지", "체험단", "쪽지"].map(
-                    (tab, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleTabChange(index)}
-                        style={{
-                          ...styles.tab,
-                          ...(selectedTab === index ? styles.tabActive : {}),
-                        }}
-                        onMouseEnter={(e) => {
-                          if (selectedTab !== index) {
-                            e.target.style.color = "#333";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (selectedTab !== index) {
-                            e.target.style.color = "#666";
-                          }
-                        }}
-                      >
-                        {tab}
-                      </button>
-                    )
-                  )}
+                  {[
+                    "내가 쓴 후기",
+                    "내가 쓴 댓글",
+                    "포인트",
+                    "뱃지",
+                    "체험단",
+                    "쪽지",
+                  ].map((tab, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleTabChange(index)}
+                      style={{
+                        ...styles.tab,
+                        ...(selectedTab === index ? styles.tabActive : {}),
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedTab !== index) {
+                          e.target.style.color = "#333";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedTab !== index) {
+                          e.target.style.color = "#666";
+                        }
+                      }}
+                    >
+                      {tab}
+                    </button>
+                  ))}
                 </div>
               </div>
 
