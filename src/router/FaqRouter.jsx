@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
 import FaqList from "../pages/community/Faq.jsx";
+import FaqForm from "../pages/community/FaqForm.jsx";
 
 
 const FaqRouter = () => {
@@ -13,6 +14,22 @@ const FaqRouter = () => {
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <FaqList />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "insert",
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <FaqForm />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "update/:faqNo",
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <FaqForm />
                     </Suspense>
                 ),
             },

@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react';
-import BasicEditor from '../../components/editor/BasicEditor';
+import { useNavigate } from 'react-router-dom';
+import { Stack } from '@mui/material';
+
 import CNTAccordion from '../../components/list/ControlledAccordions';
-import axios from "axios";
-import React from 'react'
-import { getFaqList, insertFaqList } from '../../service/community/FaqApiService';
-import { data } from 'react-router-dom';
+import CustomButton from '../../components/input/CustomButton';
+import { getFaqList, deleteFaq } from '../../service/community/FaqApiService';
+import { getUserRoleFromToken } from "../../service/util/auth";
 
 const Faq = () =>{
-    const [faqQuestion, setFaqQuestion] = useState('');
     const [selectedFaqs, setSelectedFaqs] = useState([]);
-    const [value, setValue] = useState('');
     const [list, setList] = useState([]);
     const [expanded, setExpanded] = useState(false);
-    
+    const navigate = useNavigate();
+    // const user = JSON.parse(localStorage.getItem("loginUser"));
+    // const userRole = user?.role;  // ex: "ROLE_ADMIN"
+    const userRole = getUserRoleFromToken();
+    console.log("현재 유저 권한:", userRole);
+
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : false);
     };
@@ -25,18 +29,6 @@ const Faq = () =>{
         );
     };
 
-    const axiosConfig = {
-        headers:{
-            "Content-Type" : "application/json"
-        }
-    }
-
-    // useEffect(()=>{
-    //     axios.get("http://localhost:8080/api/faq").then((res) => {
-    //         setList(res.data);
-    //         console.log("api 통신 데이터 : ",res.data)
-    //     });
-    // },[]);
     useEffect(()=>{
         getFaqList().then((data) => {
             setList(data);
@@ -44,66 +36,46 @@ const Faq = () =>{
         })
     },[])
 
-
-    const updateInput = (e) => {
-        const{ name, value } = e.target;
-        console.log(e);
-        if(name === "faqQuestion"){
-            setFaqQuestion(value);
-        }
-    }
-
-    const submitEditor = async (e) => {
-        e.preventDefault();
-        const dto = {
-            faqQuestion : faqQuestion,
-            faqAnswer: value
-        }
-
-        try{
-            insertFaqList().then((data) => {
-                console.log("api 신규 데이터 : ",data);
-            });
-
-            // 새로고침 나중에 추가
-            
-            // axios.post("http://localhost:8080/api/faq", dto, axiosConfig).then((res) => {
-            //     console.log("api post : ",res.data)
-            // });
-        }catch(err){
-            console.error("등록에 실패 하였습니다.")
-        }
-
-    }
-
-    const editFaq = async () => {
-            console.log("수정")
-
+    const handleClick = (e) => {
+        if (e === "insert"){
+            navigate("/faq/insert");
+        }else if(e === "update"){
+            // console.log(e);
+            if (selectedFaqs.length === 0) {
+                alert("수정할 항목을 선택해 주세요.");
+                return;
+            }
+            if (selectedFaqs.length > 1) {
+                alert("하나의 항목만 선택해 주세요.");
+                return;
+            }
             const faqNo = selectedFaqs[0];
             const selectedItem = list.find(faq => faq.faqNo === faqNo);
 
-            // 기존 내용을 입력창에 세팅
-            setFaqQuestion(selectedItem.faqQuestion);
-            setValue(selectedItem.faqAnswer);
-    }
-    //selectedFaqs
-    const deleteFaq = async (faqNo) => {
-        if(confirm("해당 게시글을 정말 삭제 하시겠습니까?") == false){
-            return;
-        }
-
-        try {
-            for (let faqNo of selectedFaqs) {
-                    axios.delete(`http://localhost:8080/api/faq/${faqNo}`, axiosConfig).then((res) => {
-                    console.log("api delete : ", res.data);
-                });
+            navigate(`/faq/update/${faqNo}`,{
+                state: {faqData : selectedItem}
+            });
+        }else if(e === "delete"){
+            if(confirm("해당 게시글을 정말 삭제 하시겠습니까?") == false){
+                return;
             }
-        } catch (err) {
-            console.error("삭제 실패:", err);
-            alert("삭제 중 오류가 발생했습니다.");
+
+            try {
+                for (let faqNo of selectedFaqs) {
+                        deleteFaq(faqNo).then(() => {
+                        console.log("삭제완료 : ", faqNo);
+                        getFaqList().then(data => {
+                            setList(data);
+                            setSelectedFaqs([]); // 선택 초기화도 함께
+                        });
+                    });
+                }
+            } catch (err) {
+                console.error("삭제 실패:", err);
+                alert("삭제 중 오류가 발생했습니다.");
+            }
         }
     }
-
 
     let dataList = list.map((faq,index) => {
         console.log(`FAQ ${index}:`, faq);
@@ -120,6 +92,7 @@ const Faq = () =>{
                 faqNo={faq.faqNo}
                 isChecked={selectedFaqs.includes(faq.faqNo)}
                 onCheckToggle={toggleSelect}
+                isAdmin={userRole === "ROLE_ADMIN"}
                 ></CNTAccordion>
         )
     });
@@ -128,23 +101,34 @@ const Faq = () =>{
         <>
             <h2>FAQ</h2>
             {dataList}
-            {/* <AdminFaq></AdminFaq> */}
-            <form onSubmit={submitEditor}>
-                <input 
-                    type="text" 
-                    name="faqQuestion" 
-                    value={faqQuestion}
-                    onChange={updateInput}
-                    placeholder="제목을 입력해 주세요"/>
-                <BasicEditor
-                    value={value}
-                    onChange={setValue}
-                    />
-                <button>등록</button>
-                <button type="button" onClick={editFaq}>수정</button>
-                <button type="button" onClick={deleteFaq}>삭제</button>
-            </form>
-
+            {userRole === "ROLE_ADMIN" && (
+            <Stack direction="row" spacing={1} sx={{justifyContent:"right"}}>
+                <CustomButton
+                    type="button"
+                    onClick={()=>{handleClick("insert")}}
+                    size='medium'
+                    variant="contained"
+                    color="success"
+                    text='새글 등록'
+                />
+                <CustomButton
+                    type="button"
+                    onClick={()=>{handleClick("update")}}
+                    size='medium'
+                    variant="contained"
+                    color="default"
+                    text='수정'
+                />
+                <CustomButton
+                    type="button"
+                    onClick={()=>{handleClick("delete")}}
+                    size='medium'
+                    variant="contained"
+                    color="danger"
+                    text='삭제'
+                />
+            </Stack>
+            )}
         </>
     )
 }
