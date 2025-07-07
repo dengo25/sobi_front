@@ -9,7 +9,7 @@ function Login() {
     const handleSubmit = (event) => {
         event.preventDefault();// 폼 기본 제출 동작 방지
 
-        const data = new FormData(event.target); //폼 요소로부터 데이터 수집
+        const data = new FormData(event.target); //폼 요소로부터 데이터 수집np
         const memberId = data.get("memberId");
         const password = data.get("password");
 
