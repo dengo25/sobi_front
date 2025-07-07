@@ -1,20 +1,38 @@
 import React from "react";
 import { Container, Grid, Typography, TextField, Button } from "@mui/material";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {signin, socialLogin} from "../../service/member/ApiService.js";
+import {useDispatch} from "react-redux";
+import {login} from "../../slice/memberSlice.jsx";
 
 function Login() {
+    const dispatch=useDispatch();
+    const navigate=useNavigate();
 
     //일반 로그인 시 실행되는 함수
-    const handleSubmit = (event) => {
+    const handleSubmit =async (event) => {
         event.preventDefault();// 폼 기본 제출 동작 방지
 
-        const data = new FormData(event.target); //폼 요소로부터 데이터 수집
+        const data = new FormData(event.target); //폼 요소로부터 데이터 수집np
         const memberId = data.get("memberId");
         const password = data.get("password");
 
         //로그인 API 호출
-        signin({ memberId: memberId, password: password });
+        try {
+            const response = await signin({ memberId, password });
+
+            // 토큰 저장
+            localStorage.setItem("ACCESS_TOKEN", response.token);
+
+            // Redux에 로그인 정보 저장
+            dispatch(login(response));
+
+
+            // 로그인 후 메인 페이지로 이동
+            navigate("/");
+        } catch (err) {
+            alert("로그인 실패");
+        }
     };
 
     //소셜 로그인 버튼 클릭 시 실행되는 함수
