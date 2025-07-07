@@ -1,23 +1,18 @@
 import React from "react";
 import { Container, Grid, Typography, TextField, Button } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { signin, socialLogin } from "../../service/member/ApiService.js";
+
 function Login() {
   //일반 로그인 시 실행되는 함수
-
-  //완빈 추가
-  const login = useAuthStore((state) => state.login);
-  const setRole = useAuthStore((state) => state.setRole);
-  const navigate = useNavigate();
-  //끝
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault(); // 폼 기본 제출 동작 방지
 
     const data = new FormData(event.target); //폼 요소로부터 데이터 수집
     const memberId = data.get("memberId");
     const password = data.get("password");
 
-    // //로그인 API 호출
+    //로그인 API 호출
     signin({ memberId: memberId, password: password });
   };
 

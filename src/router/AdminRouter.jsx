@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 import AdminMain from "../pages/admin/AdminMain.jsx";
 import UnSolvedReport from "../pages/admin/UnSolvedReport.jsx";
 import AdminMemberRouter from "./AdminMemberRouter.jsx";
+import AdminRoute from "../components/common/AdminRoute.jsx";
 const AdminRouter = () => {
   return {
     path: "admin",
@@ -12,17 +13,21 @@ const AdminRouter = () => {
       {
         path: "",
         element: (
+          //<AdminRoute>
           <Suspense fallback={<LoadingSpinner />}>
             <AdminMain />
           </Suspense>
+          //</AdminRoute>
         ),
       },
       {
         path: "report",
         element: (
+          //<AdminRoute>
           <Suspense fallback={<LoadingSpinner />}>
             <UnSolvedReport />
           </Suspense>
+          //</AdminRoute>
         ),
       },
       AdminMemberRouter,

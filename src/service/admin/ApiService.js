@@ -46,13 +46,18 @@ export function call(api, method, request) {
       console.log(error);
     });
 }
+// export const getList = async () => {
+//   const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/member`, {});
+//   return res.data;
+// };
+
 export const getList = async () => {
   const res = await jwtAxios.get("http://localhost:8080/api/admin/member");
   return res.data;
 };
 export const getMember = async (memberId) => {
   const res = await jwtAxios.get(
-    `http://localhost:8080/api/admin/member/${memberId}`
+    API_BASE_URL + `/api/admin/member/${memberId}`
   );
   return res.data;
 };
