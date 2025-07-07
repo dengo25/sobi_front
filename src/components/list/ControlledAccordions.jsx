@@ -1,8 +1,5 @@
 import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-
-// import Accordion from '@mui/material/Accordion';
-// import AccordionDetails from '@mui/material/AccordionDetails';
-// import AccordionSummary from '@mui/material/AccordionSummary';
+import { useSelector } from 'react-redux';
 
 import CustomCheckbox from "../input/CustomCheckbox"
 
@@ -19,7 +16,7 @@ const ControlledAccordions = ({
   faqNo, 
   isChecked, 
   onCheckToggle,
-  isAdmin
+  // isAdmin
 }) => {
   return (
     <div>
@@ -28,7 +25,7 @@ const ControlledAccordions = ({
           aria-controls={`${name}bh-content`}
           id={`${name}bh-header`}
         >
-          {isAdmin && (
+          {/* {isAdmin && ( */}
             <CustomCheckbox
               checked={isChecked}
               onChange={() => onCheckToggle(faqNo)}
@@ -37,7 +34,7 @@ const ControlledAccordions = ({
               size="medium"
               color='success'
             />
-          )}
+          {/* )} */}
           <img src={faqIconQ}/>{title}
         </AccordionSummary>
         <AccordionDetails>
