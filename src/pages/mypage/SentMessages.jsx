@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { CircularProgress, Tooltip } from "@mui/material";
 import {
   getSentMessages,
   deleteMessageBySender,
 } from "../../service/member/ApiService";
+import CustomButton from "../../components/input/CustomButton";
+import CustomCheckbox from "../../components/input/CustomCheckbox";
+import CustomAlert from "../../components/input/CustomAlert";
+import CustomTypography from "../../components/input/CustomTypography";
+import CustomLayout from "../../components/input/CustomLayout";
+import CustomTable from "../../components/input/CustomTable";
+import CustomDialog from "../../components/input/CustomDialog";
 
 const SentMessages = () => {
   const [messages, setMessages] = useState([]);
@@ -44,7 +52,7 @@ const SentMessages = () => {
   };
 
   const handleMessageClick = (message) => {
-    setSelectedMessage(message);
+    setSelectedMessage(message.originalData);
     setDialogOpen(true);
   };
 
@@ -68,7 +76,7 @@ const SentMessages = () => {
 
   // 개별 쪽지 삭제 확인 다이얼로그 열기
   const handleDeleteMessageConfirm = (message) => {
-    setMessageToDelete(message);
+    setMessageToDelete(message.originalData || message);
     setDeleteConfirmOpen(true);
   };
 
@@ -169,691 +177,334 @@ const SentMessages = () => {
     setSelectedMessage(null);
   };
 
-  // 스타일 객체 (ReceivedMessages와 동일)
-  const styles = {
-    container: {
-      padding: "16px",
-    },
-    header: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: "16px",
-    },
-    title: {
-      fontSize: "16px",
-      fontWeight: "600",
-      color: "#333",
-      margin: 0,
-    },
-    batchDeleteButton: {
-      padding: "6px 12px",
-      fontSize: "12px",
-      border: "1px solid #dc3545",
-      backgroundColor: "transparent",
-      color: "#dc3545",
-      borderRadius: "4px",
-      cursor: "pointer",
-      transition: "all 0.2s",
-    },
-    emptyState: {
-      textAlign: "center",
-      padding: "32px",
-    },
-    emptyIcon: {
-      fontSize: "48px",
-      color: "#ccc",
-      marginBottom: "8px",
-    },
-    emptyText: {
-      color: "#666",
-      fontSize: "14px",
-    },
-    tableContainer: {
-      backgroundColor: "white",
-      border: "1px solid #e0e0e0",
-      borderRadius: "4px",
-      overflow: "hidden",
-    },
-    table: {
-      width: "100%",
-      borderCollapse: "collapse",
-      fontSize: "13px",
-    },
-    tableHead: {
-      backgroundColor: "#f5f5f5",
-    },
-    tableHeaderCell: {
-      padding: "12px 8px",
-      textAlign: "left",
-      fontSize: "13px",
-      fontWeight: "600",
-      color: "#333",
-      borderBottom: "1px solid #e0e0e0",
-    },
-    tableHeaderCellCenter: {
-      textAlign: "center",
-    },
-    tableRow: {
-      cursor: "pointer",
-      transition: "background-color 0.1s",
-    },
-    tableRowUnread: {
-      backgroundColor: "#f8f9ff",
-    },
-    tableRowHover: {
-      backgroundColor: "#f8f9fa",
-    },
-    tableCell: {
-      padding: "12px 8px",
-      borderBottom: "1px solid #f0f0f0",
-      fontSize: "13px",
-    },
-    tableCellCenter: {
-      textAlign: "center",
-    },
-    statusIcon: {
-      fontSize: "18px",
-    },
-    unreadText: {
-      fontWeight: "600",
-      color: "#000",
-    },
-    readText: {
-      fontWeight: "400",
-      color: "#666",
-    },
-    titleCell: {
-      maxWidth: "300px",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-    },
-    timeText: {
-      fontSize: "12px",
-      color: "#666",
-    },
-    deleteButton: {
-      padding: "4px 8px",
-      fontSize: "12px",
-      color: "#999",
-      backgroundColor: "transparent",
-      border: "none",
-      borderRadius: "3px",
-      cursor: "pointer",
-      transition: "all 0.2s",
-    },
-    checkbox: {
-      margin: 0,
-    },
-    // 다이얼로그 스타일
-    dialogOverlay: {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
-    },
-    dialogContainer: {
-      backgroundColor: "white",
-      borderRadius: "8px",
-      boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-      maxWidth: "600px",
-      width: "90%",
-      maxHeight: "80vh",
-      overflow: "hidden",
-      margin: "16px",
-    },
-    dialogHeader: {
-      padding: "20px",
-      borderBottom: "1px solid #e0e0e0",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-    },
-    dialogTitle: {
-      fontSize: "18px",
-      fontWeight: "600",
-      color: "#333",
-      margin: "0 0 8px 0",
-    },
-    dialogMeta: {
-      fontSize: "14px",
-      color: "#666",
-      lineHeight: "1.4",
-    },
-    closeButton: {
-      backgroundColor: "transparent",
-      border: "none",
-      fontSize: "20px",
-      color: "#666",
-      cursor: "pointer",
-      padding: "4px",
-      borderRadius: "4px",
-    },
-    dialogContent: {
-      padding: "20px",
-    },
-    messageContent: {
-      minHeight: "200px",
-      padding: "16px",
-      backgroundColor: "#fafafa",
-      borderRadius: "4px",
-      border: "1px solid #e0e0e0",
-      fontSize: "14px",
-      lineHeight: "1.6",
-      whiteSpace: "pre-wrap",
-    },
-    dialogActions: {
-      padding: "16px 20px",
-      borderTop: "1px solid #e0e0e0",
-      display: "flex",
-      justifyContent: "flex-end",
-      gap: "8px",
-    },
-    dialogButton: {
-      padding: "8px 16px",
-      fontSize: "14px",
-      border: "none",
-      borderRadius: "4px",
-      cursor: "pointer",
-      transition: "all 0.2s",
-    },
-    cancelButton: {
-      backgroundColor: "transparent",
-      color: "#666",
-      border: "1px solid transparent",
-    },
-    deleteDialogButton: {
-      backgroundColor: "#dc3545",
-      color: "white",
-    },
-    // 확인 다이얼로그 스타일
-    confirmDialog: {
-      maxWidth: "400px",
-    },
-    confirmContent: {
-      padding: "20px",
-    },
-    confirmText: {
-      fontSize: "14px",
-      marginBottom: "16px",
-      color: "#333",
-    },
-    messagePreview: {
-      padding: "12px",
-      backgroundColor: "#f5f5f5",
-      borderRadius: "4px",
-      border: "1px solid #e0e0e0",
-      marginBottom: "16px",
-    },
-    previewText: {
-      fontSize: "12px",
-      color: "#666",
-    },
-    warningText: {
-      fontSize: "12px",
-      color: "#dc3545",
-      fontWeight: "500",
-    },
-    // 성공 알림 스타일
-    successAlert: {
-      position: "fixed",
-      bottom: "16px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      zIndex: 1001,
-      backgroundColor: "#d4edda",
-      border: "1px solid #c3e6cb",
-      color: "#155724",
-      padding: "12px 16px",
-      borderRadius: "4px",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-      display: "flex",
-      alignItems: "center",
-    },
-    alertCloseButton: {
-      marginLeft: "16px",
-      backgroundColor: "transparent",
-      border: "none",
-      color: "#155724",
-      cursor: "pointer",
-      fontSize: "16px",
-    },
-    // 로딩 스타일
-    loadingContainer: {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "200px",
-    },
-    spinner: {
-      width: "32px",
-      height: "32px",
-      border: "3px solid #f3f3f3",
-      borderTop: "3px solid #1976d2",
-      borderRadius: "50%",
-      animation: "spin 1s linear infinite",
-    },
-    // 에러 스타일
-    errorAlert: {
-      backgroundColor: "#f8d7da",
-      border: "1px solid #f5c6cb",
-      color: "#721c24",
-      padding: "12px 16px",
-      borderRadius: "4px",
-      margin: "16px",
-      fontSize: "14px",
-    },
-    retryButton: {
-      marginLeft: "8px",
-      textDecoration: "underline",
-      background: "none",
-      border: "none",
-      color: "#721c24",
-      cursor: "pointer",
-    },
+  // 스타일 정의
+  const loadingContainerSx = {
+    height: "200px",
   };
+
+  const errorContainerSx = {
+    p: 2,
+  };
+
+  const containerSx = {
+    p: 2,
+  };
+
+  const headerSx = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    mb: 2,
+  };
+
+  const titleSx = {
+    fontSize: "16px",
+    fontWeight: 600,
+    color: "#333",
+  };
+
+  const statusIconSx = {
+    fontSize: 18,
+  };
+
+  const readStatusSx = {
+    ...statusIconSx,
+    color: "#4caf50",
+  };
+
+  const unreadStatusSx = {
+    ...statusIconSx,
+    color: "#666",
+  };
+
+  const deleteButtonSx = {
+    minWidth: "auto",
+    fontSize: "12px",
+    p: 0.5,
+  };
+
+  const dialogTitleSx = {
+    fontSize: "18px",
+    fontWeight: 600,
+    mb: 1,
+  };
+
+  const receiverInfoSx = {
+    fontSize: "14px",
+    color: "#666",
+    mb: 0.5,
+  };
+
+  const sentTimeInfoSx = {
+    fontSize: "14px",
+    color: "#666",
+    mb: 0.5,
+  };
+
+  const readStatusInfoSx = {
+    fontSize: "14px",
+    color: "#666",
+  };
+
+  const contentContainerSx = {
+    minHeight: "200px",
+    p: 2,
+    backgroundColor: "#fafafa",
+    borderRadius: 1,
+    border: "1px solid #e0e0e0",
+  };
+
+  const contentTextSx = {
+    whiteSpace: "pre-wrap",
+    lineHeight: 1.6,
+    fontSize: "14px",
+  };
+
+  const deleteInfoContainerSx = {
+    p: 2,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 1,
+    border: "1px solid #e0e0e0",
+    mb: 2,
+  };
+
+  const warningTextSx = {
+    fontWeight: 500,
+    color: "#dc2626",
+  };
+
+  // 테이블용 데이터 변환
+  const transformedMessages = messages.map((message) => ({
+    id: message.id,
+    checkboxComponent: (
+      <CustomCheckbox
+        checked={selectedMessages.includes(message.id)}
+        onChange={() => handleSelectMessage(message.id)}
+        size="small"
+        color="success"
+        onClick={(e) => e.stopPropagation()}
+      />
+    ),
+    statusIcon: (
+      <Tooltip title={message.isRead === "Y" ? "상대방이 읽음" : "읽지 않음"}>
+        <CustomTypography
+          sx={message.isRead === "Y" ? readStatusSx : unreadStatusSx}
+        >
+          {message.isRead === "Y" ? "✅" : "📨"}
+        </CustomTypography>
+      </Tooltip>
+    ),
+    name: message.receiverName,
+    title: message.title,
+    date: formatDate(message.sendDate),
+    deleteButton: (
+      <CustomButton
+        text="삭제"
+        size="small"
+        variant="text"
+        color="danger"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDeleteMessageConfirm(message);
+        }}
+        sx={deleteButtonSx}
+      />
+    ),
+    originalData: message,
+  }));
 
   if (loading) {
     return (
-      <div style={styles.loadingContainer}>
-        <div style={styles.spinner}></div>
-        <style>
-          {`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}
-        </style>
-      </div>
+      <CustomLayout.Center sx={loadingContainerSx}>
+        <CircularProgress size={32} />
+      </CustomLayout.Center>
     );
   }
 
   if (error) {
     return (
-      <div style={styles.errorAlert}>
-        {error}
-        <button onClick={fetchMessages} style={styles.retryButton}>
-          다시 시도
-        </button>
-      </div>
+      <CustomLayout sx={errorContainerSx}>
+        <CustomAlert.Error
+          message={error}
+          action={
+            <CustomButton
+              text="다시 시도"
+              onClick={fetchMessages}
+              size="small"
+              variant="outlined"
+              color="error"
+            />
+          }
+        />
+      </CustomLayout>
     );
   }
 
   return (
-    <div style={styles.container}>
+    <CustomLayout sx={containerSx}>
       {/* 헤더 영역 */}
-      <div style={styles.header}>
-        <h3 style={styles.title}>보낸 쪽지 ({messages.length})</h3>
+      <CustomLayout sx={headerSx}>
+        <CustomTypography sx={titleSx}>
+          보낸 쪽지 ({messages.length})
+        </CustomTypography>
 
         {selectedMessages.length > 0 && (
-          <button
+          <CustomButton
+            text={`선택 삭제 (${selectedMessages.length})`}
             onClick={handleBatchDeleteConfirm}
-            style={styles.batchDeleteButton}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#dc3545";
-              e.target.style.color = "white";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "transparent";
-              e.target.style.color = "#dc3545";
-            }}
-          >
-            선택 삭제 ({selectedMessages.length})
-          </button>
+            variant="outlined"
+            color="danger"
+            size="small"
+          />
         )}
-      </div>
+      </CustomLayout>
 
-      {messages.length === 0 ? (
-        <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}>📤</div>
-          <p style={styles.emptyText}>보낸 쪽지가 없습니다.</p>
-        </div>
-      ) : (
-        <div style={styles.tableContainer}>
-          <table style={styles.table}>
-            <thead style={styles.tableHead}>
-              <tr>
-                <th style={styles.tableHeaderCell}>
-                  <input
-                    type="checkbox"
-                    checked={
-                      selectedMessages.length === messages.length &&
-                      messages.length > 0
-                    }
-                    onChange={handleSelectAll}
-                    style={styles.checkbox}
-                  />
-                </th>
-                <th
-                  style={{
-                    ...styles.tableHeaderCell,
-                    ...styles.tableHeaderCellCenter,
-                  }}
-                >
-                  상태
-                </th>
-                <th style={styles.tableHeaderCell}>받는사람</th>
-                <th style={styles.tableHeaderCell}>제목</th>
-                <th
-                  style={{
-                    ...styles.tableHeaderCell,
-                    ...styles.tableHeaderCellCenter,
-                  }}
-                >
-                  보낸시간
-                </th>
-                <th
-                  style={{
-                    ...styles.tableHeaderCell,
-                    ...styles.tableHeaderCellCenter,
-                  }}
-                >
-                  삭제
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {messages.map((message) => (
-                <tr
-                  key={message.id}
-                  style={{
-                    ...styles.tableRow,
-                    ...(message.isRead === "Y" ? styles.tableRowUnread : {}),
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      message.isRead === "Y" ? "#f0f2ff" : "#f8f9fa";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      message.isRead === "Y" ? "#f8f9ff" : "transparent";
-                  }}
-                >
-                  <td style={styles.tableCell}>
-                    <input
-                      type="checkbox"
-                      checked={selectedMessages.includes(message.id)}
-                      onChange={() => handleSelectMessage(message.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      style={styles.checkbox}
-                    />
-                  </td>
-                  <td
-                    style={{ ...styles.tableCell, ...styles.tableCellCenter }}
-                    onClick={() => handleMessageClick(message)}
-                  >
-                    {message.isRead === "Y" ? (
-                      <span
-                        title="상대방이 읽음"
-                        style={{ ...styles.statusIcon, color: "#1976d2" }}
-                      >
-                        ✅
-                      </span>
-                    ) : (
-                      <span
-                        title="읽지 않음"
-                        style={{ ...styles.statusIcon, color: "#666" }}
-                      >
-                        📨
-                      </span>
-                    )}
-                  </td>
-                  <td
-                    style={{
-                      ...styles.tableCell,
-                      ...(message.isRead === "Y"
-                        ? styles.unreadText
-                        : styles.readText),
-                    }}
-                    onClick={() => handleMessageClick(message)}
-                  >
-                    {message.receiverName}
-                  </td>
-                  <td
-                    style={{
-                      ...styles.tableCell,
-                      ...styles.titleCell,
-                      ...(message.isRead === "Y"
-                        ? styles.unreadText
-                        : styles.readText),
-                    }}
-                    onClick={() => handleMessageClick(message)}
-                  >
-                    {message.title}
-                  </td>
-                  <td
-                    style={{
-                      ...styles.tableCell,
-                      ...styles.tableCellCenter,
-                      ...styles.timeText,
-                    }}
-                    onClick={() => handleMessageClick(message)}
-                  >
-                    {formatDate(message.sendDate)}
-                  </td>
-                  <td
-                    style={{ ...styles.tableCell, ...styles.tableCellCenter }}
-                  >
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteMessageConfirm(message);
-                      }}
-                      style={styles.deleteButton}
-                      onMouseEnter={(e) => {
-                        e.target.style.color = "#dc3545";
-                        e.target.style.backgroundColor = "#ffebee";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.color = "#999";
-                        e.target.style.backgroundColor = "transparent";
-                      }}
-                    >
-                      삭제
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* 테이블 */}
+      <CustomTable.Message
+        messages={transformedMessages}
+        onMessageClick={handleMessageClick}
+        emptyIcon="📤"
+        emptyMessage="보낸 쪽지가 없습니다."
+      />
 
       {/* 쪽지 상세 다이얼로그 */}
-      {dialogOpen && selectedMessage && (
-        <div style={styles.dialogOverlay} onClick={handleCloseDialog}>
-          <div
-            style={styles.dialogContainer}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={styles.dialogHeader}>
-              <div>
-                <h3 style={styles.dialogTitle}>{selectedMessage.title}</h3>
-                <div style={styles.dialogMeta}>
-                  <p>
-                    받는사람: {selectedMessage.receiverName} (
-                    {selectedMessage.receiverMemberId})
-                  </p>
-                  <p>
-                    보낸시간:{" "}
-                    {new Date(selectedMessage.sendDate).toLocaleString("ko-KR")}
-                  </p>
-                  <p>
-                    읽음 상태:{" "}
-                    {selectedMessage.isRead === "Y" ? "읽음" : "읽지 않음"}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleCloseDialog}
-                style={styles.closeButton}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#f0f0f0";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div style={styles.dialogContent}>
-              <div style={styles.messageContent}>
-                <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>
-                  {selectedMessage.content}
-                </p>
-              </div>
-            </div>
-
-            <div style={styles.dialogActions}>
-              <button
-                onClick={handleCloseDialog}
-                style={{ ...styles.dialogButton, ...styles.cancelButton }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#f8f9fa";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-              >
-                닫기
-              </button>
-              <button
-                onClick={() => handleDeleteMessageConfirm(selectedMessage)}
-                style={{ ...styles.dialogButton, ...styles.deleteDialogButton }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#c82333";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "#dc3545";
-                }}
-              >
-                삭제
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CustomDialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        title={
+          selectedMessage && (
+            <CustomLayout>
+              <CustomTypography sx={dialogTitleSx}>
+                {selectedMessage.title}
+              </CustomTypography>
+              <CustomLayout.Stack spacing={0.5}>
+                <CustomTypography sx={receiverInfoSx}>
+                  받는사람: {selectedMessage.receiverName} (
+                  {selectedMessage.receiverMemberId})
+                </CustomTypography>
+                <CustomTypography sx={sentTimeInfoSx}>
+                  보낸시간:{" "}
+                  {new Date(selectedMessage.sendDate).toLocaleString("ko-KR")}
+                </CustomTypography>
+                <CustomTypography sx={readStatusInfoSx}>
+                  읽음 상태:{" "}
+                  {selectedMessage.isRead === "Y" ? "읽음" : "읽지 않음"}
+                </CustomTypography>
+              </CustomLayout.Stack>
+            </CustomLayout>
+          )
+        }
+        showCloseButton={true}
+        actions={
+          <CustomLayout.Row spacing={1}>
+            <CustomButton
+              text="닫기"
+              onClick={handleCloseDialog}
+              variant="outlined"
+              color="default"
+              size="medium"
+            />
+            <CustomButton
+              text="삭제"
+              onClick={() => handleDeleteMessageConfirm(selectedMessage)}
+              variant="outlined"
+              color="danger"
+              size="medium"
+            />
+          </CustomLayout.Row>
+        }
+      >
+        {selectedMessage && (
+          <CustomLayout sx={contentContainerSx}>
+            <CustomTypography sx={contentTextSx}>
+              {selectedMessage.content}
+            </CustomTypography>
+          </CustomLayout>
+        )}
+      </CustomDialog>
 
       {/* 개별 쪽지 삭제 확인 다이얼로그 */}
-      {deleteConfirmOpen && messageToDelete && (
-        <div
-          style={styles.dialogOverlay}
-          onClick={() => setDeleteConfirmOpen(false)}
-        >
-          <div
-            style={{ ...styles.dialogContainer, ...styles.confirmDialog }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={styles.dialogHeader}>
-              <h3 style={styles.dialogTitle}>쪽지 삭제 확인</h3>
-              <button
-                onClick={() => setDeleteConfirmOpen(false)}
-                style={styles.closeButton}
-              >
-                ✕
-              </button>
-            </div>
-            <div style={styles.confirmContent}>
-              <p style={styles.confirmText}>정말 이 쪽지를 삭제하시겠습니까?</p>
-
-              <div style={styles.messagePreview}>
-                <p style={styles.previewText}>제목: {messageToDelete.title}</p>
-                <p style={styles.previewText}>
-                  받는사람: {messageToDelete.receiverName}
-                </p>
-              </div>
-
-              <p style={styles.warningText}>
-                삭제된 쪽지는 복구할 수 없습니다.
-              </p>
-            </div>
-            <div style={styles.dialogActions}>
-              <button
-                onClick={() => setDeleteConfirmOpen(false)}
-                style={{ ...styles.dialogButton, ...styles.cancelButton }}
-              >
-                취소
-              </button>
-              <button
-                onClick={handleDeleteMessageExecute}
-                style={{ ...styles.dialogButton, ...styles.deleteDialogButton }}
-              >
-                삭제하기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CustomDialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        title="쪽지 삭제 확인"
+        maxWidth="sm"
+        actions={
+          <CustomLayout.Row spacing={1}>
+            <CustomButton
+              text="취소"
+              onClick={() => setDeleteConfirmOpen(false)}
+              variant="outlined"
+              color="default"
+            />
+            <CustomButton
+              text="삭제하기"
+              onClick={handleDeleteMessageExecute}
+              variant="contained"
+              color="danger"
+            />
+          </CustomLayout.Row>
+        }
+      >
+        <CustomLayout.Stack spacing={2}>
+          <CustomTypography>정말 이 쪽지를 삭제하시겠습니까?</CustomTypography>
+          {messageToDelete && (
+            <CustomLayout sx={deleteInfoContainerSx}>
+              <CustomTypography preset="bodySecondary">
+                제목: {messageToDelete.title}
+              </CustomTypography>
+              <CustomTypography preset="bodySecondary">
+                받는사람: {messageToDelete.receiverName}
+              </CustomTypography>
+            </CustomLayout>
+          )}
+          <CustomTypography sx={warningTextSx}>
+            삭제된 쪽지는 복구할 수 없습니다.
+          </CustomTypography>
+        </CustomLayout.Stack>
+      </CustomDialog>
 
       {/* 일괄 삭제 확인 다이얼로그 */}
-      {batchDeleteConfirmOpen && (
-        <div
-          style={styles.dialogOverlay}
-          onClick={() => setBatchDeleteConfirmOpen(false)}
-        >
-          <div
-            style={{ ...styles.dialogContainer, ...styles.confirmDialog }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={styles.dialogHeader}>
-              <h3 style={styles.dialogTitle}>선택된 쪽지 삭제 확인</h3>
-              <button
-                onClick={() => setBatchDeleteConfirmOpen(false)}
-                style={styles.closeButton}
-              >
-                ✕
-              </button>
-            </div>
-            <div style={styles.confirmContent}>
-              <p style={styles.confirmText}>
-                선택된 {selectedMessages.length}개의 쪽지를 모두
-                삭제하시겠습니까?
-              </p>
-              <p style={styles.warningText}>
-                삭제된 쪽지는 복구할 수 없습니다.
-              </p>
-            </div>
-            <div style={styles.dialogActions}>
-              <button
-                onClick={() => setBatchDeleteConfirmOpen(false)}
-                style={{ ...styles.dialogButton, ...styles.cancelButton }}
-              >
-                취소
-              </button>
-              <button
-                onClick={handleBatchDeleteExecute}
-                style={{ ...styles.dialogButton, ...styles.deleteDialogButton }}
-              >
-                모두 삭제하기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CustomDialog
+        open={batchDeleteConfirmOpen}
+        onClose={() => setBatchDeleteConfirmOpen(false)}
+        title="선택된 쪽지 삭제 확인"
+        maxWidth="sm"
+        actions={
+          <CustomLayout.Row spacing={1}>
+            <CustomButton
+              text="취소"
+              onClick={() => setBatchDeleteConfirmOpen(false)}
+              variant="outlined"
+              color="default"
+            />
+            <CustomButton
+              text="모두 삭제하기"
+              onClick={handleBatchDeleteExecute}
+              variant="contained"
+              color="danger"
+            />
+          </CustomLayout.Row>
+        }
+      >
+        <CustomLayout.Stack spacing={2}>
+          <CustomTypography>
+            선택된 {selectedMessages.length}개의 쪽지를 모두 삭제하시겠습니까?
+          </CustomTypography>
+          <CustomTypography sx={warningTextSx}>
+            삭제된 쪽지는 복구할 수 없습니다.
+          </CustomTypography>
+        </CustomLayout.Stack>
+      </CustomDialog>
 
-      {/* 성공 메시지 스낵바 */}
-      {showSuccessAlert && (
-        <div style={styles.successAlert}>
-          <span style={{ fontSize: "14px" }}>{successMessage}</span>
-          <button
-            onClick={handleCloseSuccessAlert}
-            style={styles.alertCloseButton}
-          >
-            ✕
-          </button>
-        </div>
-      )}
-    </div>
+      {/* 성공 메시지 토스트 */}
+      <CustomAlert.SuccessToast
+        open={showSuccessAlert}
+        onClose={handleCloseSuccessAlert}
+        message={successMessage}
+      />
+    </CustomLayout>
   );
 };
 
