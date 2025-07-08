@@ -8,6 +8,7 @@ import NoticeRouter from "./NoticeRouter.jsx";
 import MypageRouter from "./MypageRouter.jsx";
 import LoginRouter from "./LoginRouter.jsx";
 import JoinRouter from "./JoinRouter.jsx";
+import SocialRouter from "./SocialRouter.jsx";
 
 const Loading = () => LoadingSpinner();
 
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
       MypageRouter(),
       LoginRouter(),
       JoinRouter(),
+      SocialRouter()
 
     ],
   },
