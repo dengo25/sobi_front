@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
-import Notice from "../pages/community/Notice.jsx";
-
+import NoticeList from "../pages/community/Notice.jsx";
+import NoticeDetail from "../pages/community/NoticeDetail.jsx";
+import NoticeForm from "../pages/community/NoticeForm.jsx";
 
 const NoticeRouter = () => {
     return {
@@ -12,7 +13,31 @@ const NoticeRouter = () => {
                 path: "",
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
-                        <Notice />
+                        <NoticeList />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "insert",
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <NoticeForm />
+                    </Suspense>
+                ),
+            },
+            {
+                path: ":noticeNo",
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <NoticeDetail />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "update/:noticeNo",
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <NoticeForm />
                     </Suspense>
                 ),
             },
