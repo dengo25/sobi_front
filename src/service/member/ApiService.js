@@ -160,9 +160,14 @@ export function getUnreadMessageCount() {
   return call("/api/messages/unread-count", "GET", null);
 }
 
+//-------------------------------------------------------------------
 export const getList = async (pageParam) => {
   const res = await jwtAxios.get(`${API_BASE_URL}/api/review/list`, {
     params: pageParam,
   });
   return res.data;
 };
+
+export function getCategoryList() {
+  return call("/api/category", "GET", null);
+}

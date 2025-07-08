@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const Header = () => {
-  const member = useSelector((state) => state.memberSlice);
+  const member = useSelector((state) => state.member);
   const role = member?.role;
-
+  console.log("role", role);
   return (
     <header>
       <div className="wrap">

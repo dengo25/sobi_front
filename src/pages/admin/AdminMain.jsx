@@ -1,75 +1,98 @@
 import { useState, useEffect } from "react";
 import AdminSidebar from "./AdminSidebar";
-import jwtAxios from "../../service/util/JwtUtil";
 import { useNavigate } from "react-router-dom";
+import { getStatus } from "../../service/admin/ApiService";
+
 const AdminMain = () => {
   const navigate = useNavigate();
 
   const [memberCount, setMemberCount] = useState(0);
-  const [todayJoinCount, setTodayJoinCount] = useState(0);
   const [blockedCount, setBlockedCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [unresolvedReports, setUnresolvedReports] = useState(0);
   const [memberLogList, setMemberLogList] = useState([]);
-  useEffect(() => {
-    const token = localStorage.getItem("ACCESS_TOKEN");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    jwtAxios
-      .get("http://localhost:8080/api/admin/main")
-      .then((res) => {
-        setMemberCount(res.data.totalMemberCount);
-        setTodayJoinCount(res.data.todayJoinCount);
-        setBlockedCount(res.data.blockedCount);
-        setReviewCount(res.data.reviewCount);
-        setUnresolvedReports(res.data.unSolvedReportCount);
-        setMemberLogList(res.data.memberLogs);
-      })
-      .catch((err) => {
+  useEffect(() => {
+    const fetchAdminStatus = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await getStatus();
+
+        setMemberCount(res.totalMemberCount);
+        setBlockedCount(res.blockedCount);
+        setReviewCount(res.reviewCount);
+        setUnresolvedReports(res.unSolvedReportCount);
+        setMemberLogList(res.memberLogs);
+      } catch (err) {
         console.error("admin main fetch error", err);
-      });
+        setError("데이터를 불러오는데 실패했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdminStatus();
   }, []);
+
+  // Handler functions for card clicks
+  const handleMemberClick = () => navigate("/admin/member");
+  const handleTodayJoinClick = () => navigate("/admin/today-join"); // Add appropriate route
+  const handleBlockedClick = () => navigate("/admin/blocked"); // Add appropriate route
+  const handleReviewClick = () => navigate("/admin/reviews"); // Add appropriate route
+
+  if (loading) {
+    return (
+      <main className="admin">
+        <div className="admin-header">
+          <h3 className="main-header">메인</h3>
+          <AdminSidebar />
+        </div>
+        <div className="loading">데이터를 불러오는 중...</div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="admin">
+        <div className="admin-header">
+          <h3 className="main-header">메인</h3>
+          <AdminSidebar />
+        </div>
+        <div className="error">{error}</div>
+      </main>
+    );
+  }
 
   return (
     <main className="admin">
       <div className="admin-header">
         <h3 className="main-header">메인</h3>
-        {/* 사이드바 컴포넌트로 따로 분리 가능 */}
         <AdminSidebar />
       </div>
 
       {/* 요약 통계 */}
       <div className="stats">
-        <div className="card" onClick={() => navigate("/admin/member")}>
-          <h3>전체 회원 수</h3>
-          <p>{memberCount}</p>
+        <div className="card" onClick={handleMemberClick}>
+          <h3>회원 관리</h3>
+          <p>{memberCount.toLocaleString()}</p>
         </div>
-        <div className="card" onClick={() => (window.location.href = "")}>
-          <h3>오늘 가입자</h3>
-          <p>{todayJoinCount}</p>
+        <div className="card" onClick={handleTodayJoinClick}>
+          <h3>신고 관리</h3>
+          <p>{unresolvedReports.toLocaleString()}</p>
         </div>
-        <div className="card" onClick={() => (window.location.href = "")}>
+        <div className="card" onClick={handleBlockedClick}>
           <h3>블랙리스트</h3>
-          <p>{blockedCount}</p>
+          <p>{blockedCount.toLocaleString()}</p>
         </div>
-        <div className="card" onClick={() => (window.location.href = "")}>
-          <h3>총 후기 수</h3>
-          <p>{reviewCount}</p>
+        <div className="card" onClick={handleReviewClick}>
+          <h3>후기 관리</h3>
+          <p>{reviewCount.toLocaleString()}</p>
         </div>
-      </div>
-
-      {/* 미처리 신고 */}
-      <div className="alert-box">
-        {unresolvedReports > 0 ? (
-          <>
-            🚨 미처리 신고가
-            <strong onClick={() => navigate("/admin/report")}>
-              {unresolvedReports}
-            </strong>
-            건 있습니다. 빠르게 확인해주세요!
-          </>
-        ) : (
-          <>✅ 현재 미처리 신고가 없습니다.</>
-        )}
       </div>
 
       {/* 최근 활동 */}
@@ -87,11 +110,11 @@ const AdminMain = () => {
           <tbody>
             {memberLogList && memberLogList.length > 0 ? (
               memberLogList.map((log, index) => (
-                <tr key={index}>
+                <tr key={log.id || index}>
                   <td>{log.memberId}</td>
                   <td>{log.accessedMenu}</td>
                   <td>{log.memberActionType}</td>
-                  <td>{log.memberLogCreated}</td>
+                  <td>{new Date(log.memberLogCreated).toLocaleString()}</td>
                 </tr>
               ))
             ) : (
