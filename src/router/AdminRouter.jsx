@@ -13,21 +13,21 @@ const AdminRouter = () => {
       {
         path: "",
         element: (
-          //<AdminRoute>
-          <Suspense fallback={<LoadingSpinner />}>
-            <AdminMain />
-          </Suspense>
-          //</AdminRoute>
+          <AdminRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AdminMain />
+            </Suspense>
+          </AdminRoute>
         ),
       },
       {
         path: "report",
         element: (
-          //<AdminRoute>
-          <Suspense fallback={<LoadingSpinner />}>
-            <UnSolvedReport />
-          </Suspense>
-          //</AdminRoute>
+          <AdminRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <UnSolvedReport />
+            </Suspense>
+          </AdminRoute>
         ),
       },
       AdminMemberRouter,

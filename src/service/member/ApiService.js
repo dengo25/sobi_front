@@ -71,14 +71,9 @@ export function call(api, method, request) {
 }
 
 // 로그인 함수: userDTO를 post로 전달하여 로그인 시도
-export function signin(memberDTO) {
-  return call("/auth/login", "POST", memberDTO).then((response) => {
-    //로그인 성공 시 토큰 저장 및 홈으로 이동
-    if (response.token) {
-      localStorage.setItem("ACCESS_TOKEN", response.token);
-      window.location.href = "/";
-    }
-  });
+export async function signin(memberDTO) {
+  const response = await call("/auth/login", "POST", memberDTO);
+  return response;
 }
 
 //로그아웃 함수: 토큰 제거 후 로그인 페이지로 이동
