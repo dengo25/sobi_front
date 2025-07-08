@@ -1,13 +1,70 @@
-import React, { useState, useEffect } from "react";
-import { FormControl, InputLabel, Select, MenuItem, Grid } from "@mui/material";
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Box,
+  Avatar,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { Close as CloseIcon, Save as SaveIcon } from "@mui/icons-material";
 import { updateMypage } from "../../service/member/ApiService";
-import CustomDialog from "../../components/input/CustomDialog";
-import CustomInput from "../../components/input/CustomInput";
-import CustomButton from "../../components/input/CustomButton";
-import CustomAlert from "../../components/input/CustomAlert";
-import CustomTypography from "../../components/input/CustomTypography";
-import CustomLayout from "../../components/input/CustomLayout";
-import CustomAvatar from "../../components/input/CustomAvatar";
+
+// 스타일드 컴포넌트
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialog-paper": {
+    borderRadius: theme.spacing(1),
+    maxWidth: 600,
+    width: "100%",
+  },
+}));
+
+const HeaderBox = styled(Box)(({ theme }) => ({
+  position: "relative",
+  padding: theme.spacing(3, 3, 2, 3),
+  textAlign: "center",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  background: `linear-gradient(135deg, ${theme.palette.primary.light}20, ${theme.palette.primary.main}10)`,
+}));
+
+const CloseButton = styled(IconButton)(({ theme }) => ({
+  position: "absolute",
+  right: theme.spacing(2),
+  top: theme.spacing(2),
+  color: theme.palette.grey[500],
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: 64,
+  height: 64,
+  margin: "0 auto 16px",
+  backgroundColor: theme.palette.primary.main,
+  fontSize: 24,
+  fontWeight: "bold",
+}));
+
+const ContentBox = styled(DialogContent)(({ theme }) => ({
+  padding: theme.spacing(4),
+}));
+
+const ActionsBox = styled(DialogActions)(({ theme }) => ({
+  padding: theme.spacing(2, 4),
+  borderTop: `1px solid ${theme.palette.divider}`,
+  gap: theme.spacing(1.5),
+}));
 
 const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -65,6 +122,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
       [name]: value,
     }));
 
+    // 에러 메시지 초기화
     if (error) setError("");
   };
 
@@ -79,22 +137,26 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
       return false;
     }
 
+    // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.memberEmail)) {
       setError("올바른 이메일 형식을 입력해주세요.");
       return false;
     }
 
+    // 생년월일 형식 검증
     if (formData.memberBirth && !/^\d{6}$/.test(formData.memberBirth)) {
       setError("생년월일은 6자리 숫자(YYMMDD)로 입력해주세요.");
       return false;
     }
 
+    // 우편번호 형식 검증 (5자리 숫자)
     if (formData.memberZip && !/^\d{5}$/.test(formData.memberZip)) {
       setError("우편번호는 5자리 숫자로 입력해주세요.");
       return false;
     }
 
+    // 비밀번호가 입력된 경우에만 검증
     if (formData.password) {
       if (formData.password.length < 4) {
         setError("비밀번호는 4자 이상이어야 합니다.");
@@ -121,6 +183,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
     setError("");
 
     try {
+      // 수정할 데이터 준비
       const updateData = {
         memberName: formData.memberName,
         memberEmail: formData.memberEmail,
@@ -130,6 +193,7 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
         memberZip: formData.memberZip,
       };
 
+      // 비밀번호가 입력된 경우에만 포함
       if (formData.password.trim()) {
         updateData.password = formData.password;
       }
@@ -137,7 +201,10 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
       const response = await updateMypage(updateData);
 
       if (response) {
+        // 부모 컴포넌트에 업데이트된 정보 전달 및 성공 메시지 표시
         onUpdate(response, "회원정보가 성공적으로 수정되었습니다!");
+
+        // 바로 다이얼로그 닫기
         onClose();
       }
     } catch (err) {
@@ -148,192 +215,90 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
     }
   };
 
-  // 스타일 정의
-  const dialogPaperSx = {
-    maxHeight: "90vh",
-  };
-
-  const closeButtonSx = {
-    position: "absolute",
-    right: 16,
-    top: 16,
-    minWidth: 32,
-    width: 32,
-    height: 32,
-    fontSize: "18px",
-    fontWeight: "bold",
-    "&:hover": {
-      backgroundColor: "#f0f0f0",
-    },
-  };
-
-  const profileSectionSx = {
-    p: 4,
-    pb: 2,
-    textAlign: "center",
-    borderBottom: "1px solid #f0f0f0",
-    position: "relative",
-  };
-
-  const avatarSx = {
-    width: 64,
-    height: 64,
-    mx: "auto",
-    mb: 2,
-    bgcolor: "#4ecdc4",
-    fontSize: "24px",
-    color: "white",
-  };
-
-  const titleSx = {
-    fontWeight: 600,
-    mb: 0.5,
-    fontSize: "18px",
-  };
-
-  const subtitleSx = {
-    fontSize: "14px",
-    color: "#666",
-  };
-
-  const disabledInputSx = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
-      fontSize: "14px",
-      backgroundColor: "#f9fafb",
-      color: "#6b7280",
-    },
-  };
-
-  const selectSx = {
-    borderRadius: 2,
-    fontSize: "14px",
-  };
-
-  const dividerSx = {
-    my: 1,
-  };
-
-  const actionsSx = {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 2,
-    mt: 4,
-    pt: 3,
-    borderTop: "1px solid #f0f0f0",
-  };
-
-  const dialogTitle = (
-    <CustomLayout sx={profileSectionSx}>
-      <CustomButton
-        text="✕"
-        onClick={onClose}
-        variant="text"
-        color="default"
-        size="small"
-        sx={closeButtonSx}
-      />
-
-      <CustomAvatar name={userInfo?.memberName} sx={avatarSx} />
-
-      <CustomTypography sx={titleSx}>회원정보 수정</CustomTypography>
-
-      <CustomTypography sx={subtitleSx}>
-        {userInfo?.memberName || "사용자"}#{userInfo?.id || "N/A"}
-      </CustomTypography>
-    </CustomLayout>
-  );
+  const isPasswordMismatch =
+    formData.password !== formData.confirmPassword &&
+    formData.confirmPassword !== "";
 
   return (
-    <CustomDialog
-      open={open}
-      onClose={onClose}
-      title={dialogTitle}
-      maxWidth="sm"
-      PaperProps={{ sx: dialogPaperSx }}
-      actions={
-        <CustomLayout sx={actionsSx}>
-          <CustomButton
-            text="취소"
-            onClick={onClose}
-            disabled={loading}
-            variant="outlined"
-            color="default"
-            size="medium"
-          />
-          <CustomButton
-            text={loading ? "수정 중..." : "수정"}
-            type="submit"
-            form="edit-profile-form"
-            variant="contained"
-            color="success"
-            disabled={loading}
-            size="medium"
-          />
-        </CustomLayout>
-      }
-    >
-      <CustomLayout
-        component="form"
-        id="edit-profile-form"
-        onSubmit={handleSubmit}
-      >
-        <CustomLayout.Stack spacing={3}>
-          {error && <CustomAlert.Error message={error} />}
+    <StyledDialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      {/* 헤더 */}
+      <HeaderBox>
+        <CloseButton onClick={onClose} disabled={loading}>
+          <CloseIcon />
+        </CloseButton>
 
-          {/* 사용자 ID (읽기 전용) */}
-          <CustomInput
-            label="사용자 ID"
-            value={userInfo?.memberId || ""}
-            disabled
-            fullWidth
-            size="small"
-            helperText="사용자 ID는 변경할 수 없습니다."
-            sx={disabledInputSx}
-          />
+        <StyledAvatar>
+          {userInfo?.memberName?.charAt(0).toUpperCase() || "U"}
+        </StyledAvatar>
 
-          {/* 이름과 이메일 */}
-          <Grid container spacing={2}>
+        <Typography variant="h6" component="h2" fontWeight={600} gutterBottom>
+          회원정보 수정
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {userInfo?.memberName || "사용자"}#{userInfo?.id || "N/A"}
+        </Typography>
+      </HeaderBox>
+
+      {/* 컨텐츠 */}
+      <ContentBox>
+        <Box component="form" onSubmit={handleSubmit}>
+          {/* 에러 알림 */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
+
+          <Grid container spacing={2.5}>
+            {/* 사용자 ID (읽기 전용) */}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="사용자 ID"
+                value={userInfo?.memberId || ""}
+                disabled
+                helperText="사용자 ID는 변경할 수 없습니다."
+                size="small"
+              />
+            </Grid>
+
+            {/* 이름과 이메일 */}
             <Grid item xs={12} sm={6}>
-              <CustomInput
-                label="이름 *"
+              <TextField
+                fullWidth
+                label="이름"
                 name="memberName"
                 value={formData.memberName}
                 onChange={handleChange}
                 required
-                fullWidth
                 disabled={loading}
                 size="small"
               />
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <CustomInput
-                label="이메일 *"
-                name="memberEmail"
+              <TextField
+                fullWidth
                 type="email"
+                label="이메일"
+                name="memberEmail"
                 value={formData.memberEmail}
                 onChange={handleChange}
                 required
-                fullWidth
                 disabled={loading}
                 size="small"
               />
             </Grid>
-          </Grid>
 
-          {/* 성별과 생년월일 */}
-          <Grid container spacing={2}>
+            {/* 성별과 생년월일 */}
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth variant="outlined" size="small">
+              <FormControl fullWidth size="small" disabled={loading}>
                 <InputLabel>성별</InputLabel>
                 <Select
                   name="memberGender"
                   value={formData.memberGender}
                   onChange={handleChange}
-                  disabled={loading}
                   label="성별"
-                  sx={selectSx}
                 >
                   <MenuItem value="">선택</MenuItem>
                   <MenuItem value="M">남성</MenuItem>
@@ -343,90 +308,135 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <CustomInput
+              <TextField
+                fullWidth
                 label="생년월일"
                 name="memberBirth"
                 value={formData.memberBirth}
                 onChange={handleChange}
-                fullWidth
                 disabled={loading}
-                size="small"
                 placeholder="YYMMDD (예: 901225)"
                 helperText="6자리 숫자로 입력해주세요 (예: 901225)"
+                size="small"
               />
             </Grid>
-          </Grid>
 
-          {/* 우편번호와 주소 */}
-          <Grid container spacing={2}>
+            {/* 우편번호와 주소 */}
             <Grid item xs={12} sm={6}>
-              <CustomInput
+              <TextField
+                fullWidth
                 label="우편번호"
                 name="memberZip"
                 value={formData.memberZip}
                 onChange={handleChange}
-                fullWidth
                 disabled={loading}
-                size="small"
                 placeholder="12345"
                 helperText="5자리 숫자로 입력해주세요"
+                size="small"
               />
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <CustomInput
+              <TextField
+                fullWidth
                 label="주소"
                 name="memberAddr"
                 value={formData.memberAddr}
                 onChange={handleChange}
-                fullWidth
                 disabled={loading}
                 size="small"
               />
             </Grid>
+
+            {/* 구분선 */}
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  my: 2,
+                  "&::before, &::after": {
+                    content: '""',
+                    flex: 1,
+                    height: "1px",
+                    backgroundColor: "divider",
+                  },
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ px: 2, fontWeight: 500 }}
+                >
+                  비밀번호 변경 (선택사항)
+                </Typography>
+              </Box>
+            </Grid>
+
+            {/* 새 비밀번호 */}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="password"
+                label="새 비밀번호 (선택사항)"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                disabled={loading}
+                helperText="비밀번호를 변경하지 않으려면 비워두세요."
+                size="small"
+              />
+            </Grid>
+
+            {/* 비밀번호 확인 */}
+            {formData.password && (
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  type="password"
+                  label="비밀번호 확인"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  disabled={loading}
+                  error={isPasswordMismatch}
+                  helperText={
+                    isPasswordMismatch ? "비밀번호가 일치하지 않습니다." : ""
+                  }
+                  size="small"
+                />
+              </Grid>
+            )}
           </Grid>
+        </Box>
+      </ContentBox>
 
-          <CustomLayout.Divider sx={dividerSx} />
-
-          {/* 새 비밀번호 */}
-          <CustomInput
-            label="새 비밀번호 (선택사항)"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            fullWidth
-            disabled={loading}
-            size="small"
-            helperText="비밀번호를 변경하지 않으려면 비워두세요."
-          />
-
-          {/* 비밀번호 확인 */}
-          {formData.password && (
-            <CustomInput
-              label="비밀번호 확인"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              fullWidth
-              disabled={loading}
-              size="small"
-              error={
-                formData.password !== formData.confirmPassword &&
-                formData.confirmPassword !== ""
-              }
-              helperText={
-                formData.password !== formData.confirmPassword &&
-                formData.confirmPassword !== ""
-                  ? "비밀번호가 일치하지 않습니다."
-                  : ""
-              }
-            />
-          )}
-        </CustomLayout.Stack>
-      </CustomLayout>
-    </CustomDialog>
+      {/* 액션 버튼들 */}
+      <ActionsBox>
+        <Button
+          onClick={onClose}
+          disabled={loading}
+          variant="outlined"
+          color="inherit"
+        >
+          취소
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={loading}
+          variant="contained"
+          startIcon={
+            loading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <SaveIcon />
+            )
+          }
+        >
+          {loading ? "수정 중..." : "수정"}
+        </Button>
+      </ActionsBox>
+    </StyledDialog>
   );
 };
 

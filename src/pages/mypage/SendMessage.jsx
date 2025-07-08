@@ -1,11 +1,68 @@
-import React, { useState } from "react";
-import { Paper, Grid } from "@mui/material";
+"use client";
+
+import { useState } from "react";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  Grid,
+  CircularProgress,
+  Card,
+  CardContent,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Container,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import {
+  Send as SendIcon,
+  Refresh as RefreshIcon,
+  Info as InfoIcon,
+} from "@mui/icons-material";
 import { sendMessage } from "../../service/member/ApiService";
-import CustomInput from "../../components/input/CustomInput";
-import CustomButton from "../../components/input/CustomButton";
-import CustomAlert from "../../components/input/CustomAlert";
-import CustomTypography from "../../components/input/CustomTypography";
-import CustomLayout from "../../components/input/CustomLayout";
+
+// SOBI 정확한 브랜드 색상
+const sobiTheme = createTheme({
+  palette: {
+    primary: {
+      main: "#44C3AA", // SOBI 연한색
+      light: "#6FD4BB", // 더 밝은 버전
+      dark: "#045242", // SOBI 진한색
+      contrastText: "#ffffff",
+    },
+    secondary: {
+      main: "#045242", // SOBI 진한색을 보조색으로
+      light: "#44C3AA",
+      dark: "#033A30", // 더 어두운 버전
+      contrastText: "#ffffff",
+    },
+  },
+});
+
+// 스타일드 컴포넌트
+const StyledCard = styled(Card)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  marginTop: theme.spacing(2),
+  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  borderRadius: theme.spacing(1.5),
+}));
+
+const InfoCard = styled(Card)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+  color: theme.palette.primary.contrastText,
+  marginTop: theme.spacing(3),
+  boxShadow: "0 4px 12px rgba(68,195,170,0.3)",
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  minWidth: 120,
+}));
 
 const SendMessage = ({ onMessageSent }) => {
   const [formData, setFormData] = useState({
@@ -113,156 +170,172 @@ const SendMessage = ({ onMessageSent }) => {
     setSuccess("");
   };
 
-  // 스타일 정의
-  const paperContainerSx = {
-    p: 2,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 2,
-    border: "1px solid #e0e0e0",
-  };
-
-  const titleSx = {
-    mb: 2,
-    color: "#333",
-    fontSize: "16px",
-    fontWeight: 600,
-  };
-
-  const buttonAreaSx = {
-    display: "flex",
-    justifyContent: "flex-end",
-    gap: 1.5,
-    mt: 1,
-    pt: 1.5,
-    borderTop: "1px solid #e0e0e0",
-  };
-
-  const infoAlertSx = {
-    mt: 2,
-    backgroundColor: "#f0f8ff",
-    border: "1px solid #b8daff",
-  };
-
-  const infoTitleSx = {
-    fontSize: "13px",
-    fontWeight: 600,
-    color: "#333",
-    mb: 0.5,
-    display: "flex",
-    alignItems: "center",
-    gap: 0.5,
-  };
-
-  const infoContentSx = {
-    fontSize: "12px",
-    lineHeight: 1.5,
-    color: "#666",
-  };
+  const isFormValid =
+    formData.receiverMemberId && formData.title && formData.content;
 
   return (
-    <Paper sx={paperContainerSx}>
-      <CustomTypography sx={titleSx}>새 쪽지 보내기</CustomTypography>
+    <ThemeProvider theme={sobiTheme}>
+      <Container maxWidth="md" sx={{ p: 2 }}>
+        <StyledCard>
+          <CardContent>
+            <Typography
+              variant="h6"
+              component="h3"
+              gutterBottom
+              fontWeight={600}
+            >
+              새 쪽지 보내기
+            </Typography>
 
-      <CustomLayout component="form" onSubmit={handleSubmit}>
-        <CustomLayout.Stack spacing={2}>
-          {error && <CustomAlert.Error message={error} />}
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+              {/* 에러 알림 */}
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
 
-          {success && <CustomAlert.Success message={success} />}
+              {/* 성공 알림 */}
+              {success && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                  {success}
+                </Alert>
+              )}
 
-          {/* 받는 사람과 제목을 한 줄에 배치 */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <CustomInput
-                label="받는 사람 *"
-                name="receiverMemberId"
-                value={formData.receiverMemberId}
+              {/* 받는 사람과 제목 */}
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    fullWidth
+                    label="받는 사람"
+                    name="receiverMemberId"
+                    value={formData.receiverMemberId}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                    placeholder="받는 사람 아이디"
+                    size="small"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <TextField
+                    fullWidth
+                    label={`제목 (${formData.title.length}/100)`}
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                    placeholder="쪽지 제목"
+                    inputProps={{ maxLength: 100 }}
+                    size="small"
+                  />
+                </Grid>
+              </Grid>
+
+              {/* 내용 */}
+              <TextField
+                fullWidth
+                label="내용"
+                name="content"
+                value={formData.content}
                 onChange={handleChange}
                 required
-                fullWidth
                 disabled={loading}
-                placeholder="받는 사람 아이디"
-                size="small"
+                placeholder="쪽지 내용을 입력하세요"
+                multiline
+                rows={4}
+                helperText="전달하고 싶은 메시지를 작성해주세요."
+                sx={{ mb: 3 }}
               />
-            </Grid>
 
-            <Grid item xs={12} sm={8}>
-              <CustomInput
-                label={`제목 * (${formData.title.length}/100)`}
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                fullWidth
-                disabled={loading}
-                placeholder="쪽지 제목"
-                size="small"
-                inputProps={{ maxLength: 100 }}
-              />
-            </Grid>
-          </Grid>
+              {/* 버튼 영역 */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 2,
+                  pt: 3,
+                  borderTop: 1,
+                  borderColor: "divider",
+                  mt: 2,
+                }}
+              >
+                <StyledButton
+                  type="button"
+                  onClick={handleReset}
+                  disabled={loading}
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                >
+                  초기화
+                </StyledButton>
+                <StyledButton
+                  type="submit"
+                  disabled={loading || !isFormValid}
+                  variant="contained"
+                  startIcon={
+                    loading ? <CircularProgress size={16} /> : <SendIcon />
+                  }
+                >
+                  {loading ? "전송 중..." : "쪽지 보내기"}
+                </StyledButton>
+              </Box>
+            </Box>
+          </CardContent>
+        </StyledCard>
 
-          <CustomInput
-            label="내용 *"
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            required
-            fullWidth
-            multiline
-            rows={4}
-            disabled={loading}
-            placeholder="쪽지 내용을 입력하세요"
-            size="small"
-            helperText="전달하고 싶은 메시지를 작성해주세요."
-          />
-
-          {/* 버튼 영역 */}
-          <CustomLayout sx={buttonAreaSx}>
-            <CustomButton
-              text="초기화"
-              type="button"
-              onClick={handleReset}
-              disabled={loading}
-              variant="outlined"
-              color="default"
-              size="small"
-            />
-            <CustomButton
-              text={loading ? "전송 중..." : "쪽지 보내기"}
-              type="submit"
-              variant="contained"
-              color="success"
-              disabled={
-                loading ||
-                !formData.receiverMemberId ||
-                !formData.title ||
-                !formData.content
-              }
-              size="small"
-            />
-          </CustomLayout>
-        </CustomLayout.Stack>
-      </CustomLayout>
-
-      {/* 안내 메시지 */}
-      <CustomAlert.Info
-        title={
-          <CustomTypography sx={infoTitleSx}>
-            📌 쪽지 전송 안내
-          </CustomTypography>
-        }
-        sx={infoAlertSx}
-      >
-        <CustomTypography sx={infoContentSx}>
-          • 받는 사람의 아이디를 정확히 입력해주세요.
-          <br />
-          • 자기 자신에게도 쪽지를 보낼 수 있습니다. (메모 기능)
-          <br />
-          • 제목은 최대 100자까지 입력 가능합니다.
-          <br />• 전송된 쪽지는 수정할 수 없으니 신중히 작성해주세요.
-        </CustomTypography>
-      </CustomAlert.Info>
-    </Paper>
+        {/* 안내 메시지 */}
+        <InfoCard>
+          <CardContent>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <InfoIcon sx={{ mr: 1, fontSize: 20 }} />
+              <Typography variant="subtitle2" fontWeight={600}>
+                쪽지 전송 안내
+              </Typography>
+            </Box>
+            <List dense>
+              <ListItem sx={{ py: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 20 }}>
+                  <Typography variant="body2">•</Typography>
+                </ListItemIcon>
+                <ListItemText
+                  primary="받는 사람의 아이디를 정확히 입력해주세요."
+                  primaryTypographyProps={{ variant: "body2" }}
+                />
+              </ListItem>
+              <ListItem sx={{ py: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 20 }}>
+                  <Typography variant="body2">•</Typography>
+                </ListItemIcon>
+                <ListItemText
+                  primary="자기 자신에게도 쪽지를 보낼 수 있습니다. (메모 기능)"
+                  primaryTypographyProps={{ variant: "body2" }}
+                />
+              </ListItem>
+              <ListItem sx={{ py: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 20 }}>
+                  <Typography variant="body2">•</Typography>
+                </ListItemIcon>
+                <ListItemText
+                  primary="제목은 최대 100자까지 입력 가능합니다."
+                  primaryTypographyProps={{ variant: "body2" }}
+                />
+              </ListItem>
+              <ListItem sx={{ py: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 20 }}>
+                  <Typography variant="body2">•</Typography>
+                </ListItemIcon>
+                <ListItemText
+                  primary="전송된 쪽지는 수정할 수 없으니 신중히 작성해주세요."
+                  primaryTypographyProps={{ variant: "body2" }}
+                />
+              </ListItem>
+            </List>
+          </CardContent>
+        </InfoCard>
+      </Container>
+    </ThemeProvider>
   );
 };
 

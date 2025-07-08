@@ -1,12 +1,56 @@
-import React, { useState, useEffect } from "react";
-import { Chip, CircularProgress } from "@mui/material";
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  CircularProgress,
+  Alert,
+  Chip,
+  Container,
+  Card,
+  CardContent,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { getMyReviews } from "../../service/mypage/ApiService";
-import CustomButton from "../../components/input/CustomButton";
-import CustomAlert from "../../components/input/CustomAlert";
-import CustomTypography from "../../components/input/CustomTypography";
-import CustomLayout from "../../components/input/CustomLayout";
-import CustomTable from "../../components/input/CustomTable";
-import CustomDialog from "../../components/input/CustomDialog";
+
+// 스타일드 컴포넌트
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: "pointer",
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const EmptyStateBox = styled(Box)(({ theme }) => ({
+  textAlign: "center",
+  padding: theme.spacing(4),
+  color: theme.palette.text.secondary,
+}));
+
+const LoadingBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: 200,
+}));
 
 const MyReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -74,175 +118,173 @@ const MyReviews = () => {
 
   const getStatusChip = (confirmed) => {
     if (confirmed === "Y") {
-      return <Chip label="승인됨" size="small" sx={approvedChipSx} />;
+      return (
+        <Chip label="승인됨" color="success" size="small" variant="filled" />
+      );
     } else {
-      return <Chip label="대기중" size="small" sx={pendingChipSx} />;
+      return (
+        <Chip label="대기중" color="warning" size="small" variant="filled" />
+      );
     }
   };
 
-  // 스타일 정의
-  const loadingContainerSx = {
-    height: "200px",
-  };
-
-  const errorContainerSx = {
-    p: 2,
-  };
-
-  const containerSx = {
-    p: 2,
-  };
-
-  const headerSx = {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    mb: 2,
-  };
-
-  const titleSx = {
-    fontSize: "16px",
-    fontWeight: 600,
-    color: "#333",
-  };
-
-  const approvedChipSx = {
-    backgroundColor: "#e8f5e8",
-    color: "#2e7d32",
-    fontSize: "11px",
-    fontWeight: 500,
-  };
-
-  const pendingChipSx = {
-    backgroundColor: "#fff3e0",
-    color: "#f57c00",
-    fontSize: "11px",
-    fontWeight: 500,
-  };
-
-  const dialogTitleSx = {
-    fontSize: "18px",
-    fontWeight: 600,
-    color: "#333",
-    mb: 1,
-  };
-
-  const dateTextSx = {
-    fontSize: "14px",
-    color: "#666",
-    lineHeight: 1.4,
-    mb: 0.5,
-  };
-
-  const contentContainerSx = {
-    minHeight: "200px",
-    p: 2,
-    backgroundColor: "#fafafa",
-    borderRadius: 1,
-    border: "1px solid #e0e0e0",
-  };
-
-  const contentTextSx = {
-    whiteSpace: "pre-wrap",
-    fontSize: "14px",
-    lineHeight: 1.6,
-  };
-
-  // 테이블용 데이터 변환
-  const transformedReviews = reviews.map((review, index) => ({
-    id: review.tno,
-    number: reviews.length - index,
-    title: review.title,
-    statusChip: getStatusChip(review.confirmed),
-    date: formatDate(review.createdAt),
-    originalData: review,
-  }));
-
   if (loading) {
     return (
-      <CustomLayout.Center sx={loadingContainerSx}>
-        <CircularProgress size={32} />
-      </CustomLayout.Center>
+      <LoadingBox>
+        <CircularProgress />
+      </LoadingBox>
     );
   }
 
   if (error) {
     return (
-      <CustomLayout sx={errorContainerSx}>
-        <CustomAlert.Error
-          message={error}
+      <Box sx={{ p: 2 }}>
+        <Alert
+          severity="error"
           action={
-            <CustomButton
-              text="다시 시도"
-              onClick={fetchMyReviews}
-              size="small"
-              variant="outlined"
-              color="error"
-            />
+            <Button color="inherit" size="small" onClick={fetchMyReviews}>
+              다시 시도
+            </Button>
           }
-        />
-      </CustomLayout>
+        >
+          {error}
+        </Alert>
+      </Box>
     );
   }
 
   return (
-    <CustomLayout sx={containerSx}>
-      {/* 헤더 영역 */}
-      <CustomLayout sx={headerSx}>
-        <CustomTypography sx={titleSx}>
+    <Container maxWidth="lg" sx={{ p: 2 }}>
+      {/* 헤더 */}
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h6" component="h3" fontWeight={600}>
           내가 쓴 후기 ({reviews.length})
-        </CustomTypography>
-      </CustomLayout>
+        </Typography>
+      </Box>
 
-      {/* 테이블 */}
-      <CustomTable.Review
-        reviews={transformedReviews}
-        onReviewClick={(review) => handleReviewClick(review.originalData)}
-      />
+      {reviews.length === 0 ? (
+        <Card>
+          <CardContent>
+            <EmptyStateBox>
+              <Typography variant="h1" sx={{ fontSize: 48, mb: 1 }}>
+                📝
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                작성한 후기가 없습니다.
+              </Typography>
+            </EmptyStateBox>
+          </CardContent>
+        </Card>
+      ) : (
+        <StyledTableContainer component={Paper}>
+          <Table size="small">
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "grey.50" }}>
+                <TableCell>번호</TableCell>
+                <TableCell>제목</TableCell>
+                <TableCell align="center">상태</TableCell>
+                <TableCell align="center">작성일</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {reviews.map((review, index) => (
+                <StyledTableRow
+                  key={review.tno}
+                  onClick={() => handleReviewClick(review)}
+                >
+                  <TableCell>{reviews.length - index}</TableCell>
+                  <TableCell
+                    sx={{
+                      maxWidth: 300,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {review.title}
+                  </TableCell>
+                  <TableCell align="center">
+                    {getStatusChip(review.confirmed)}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="body2" color="text.secondary">
+                      {formatDate(review.createdAt)}
+                    </Typography>
+                  </TableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </StyledTableContainer>
+      )}
 
       {/* 후기 상세 다이얼로그 */}
-      <CustomDialog
+      <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
         maxWidth="md"
-        title={
-          selectedReview && (
-            <CustomLayout>
-              <CustomTypography sx={dialogTitleSx}>
-                {selectedReview.title}
-              </CustomTypography>
-              <CustomLayout.Stack spacing={0.5}>
-                <CustomTypography sx={dateTextSx}>
-                  작성일:{" "}
-                  {new Date(selectedReview.createdAt).toLocaleString("ko-KR")}
-                </CustomTypography>
-                <CustomLayout>
-                  상태: {getStatusChip(selectedReview.confirmed)}
-                </CustomLayout>
-              </CustomLayout.Stack>
-            </CustomLayout>
-          )
-        }
-        showCloseButton={true}
-        actions={
-          <CustomButton
-            text="닫기"
-            onClick={handleCloseDialog}
-            variant="outlined"
-            color="default"
-            size="medium"
-          />
-        }
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 2 },
+        }}
       >
         {selectedReview && (
-          <CustomLayout sx={contentContainerSx}>
-            <CustomTypography sx={contentTextSx}>
-              {selectedReview.content}
-            </CustomTypography>
-          </CustomLayout>
+          <>
+            <DialogTitle>
+              <Typography variant="h6" component="div" fontWeight={600}>
+                {selectedReview.title}
+              </Typography>
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  작성일:{" "}
+                  {new Date(selectedReview.createdAt).toLocaleString("ko-KR")}
+                </Typography>
+                <Box sx={{ mt: 0.5 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    component="span"
+                  >
+                    상태:
+                  </Typography>
+                  <Box component="span" sx={{ ml: 1 }}>
+                    {getStatusChip(selectedReview.confirmed)}
+                  </Box>
+                </Box>
+              </Box>
+            </DialogTitle>
+
+            <DialogContent>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2,
+                  backgroundColor: "grey.50",
+                  minHeight: 200,
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{
+                    whiteSpace: "pre-wrap",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {selectedReview.content}
+                </Typography>
+              </Paper>
+            </DialogContent>
+
+            <DialogActions sx={{ p: 2 }}>
+              <Button onClick={handleCloseDialog} variant="outlined">
+                닫기
+              </Button>
+            </DialogActions>
+          </>
         )}
-      </CustomDialog>
-    </CustomLayout>
+      </Dialog>
+    </Container>
   );
 };
 

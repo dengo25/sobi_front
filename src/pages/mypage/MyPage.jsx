@@ -1,31 +1,155 @@
+"use client";
+
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Card,
-  CircularProgress,
+  Box,
+  Typography,
+  Avatar,
   List,
   ListItem,
   ListItemButton,
-  ListItemText,
   ListItemIcon,
+  ListItemText,
+  Tabs,
+  Tab,
+  Paper,
+  Divider,
+  Badge,
+  Alert,
+  Snackbar,
+  CircularProgress,
+  Button,
+  Container,
+  Card,
+  CardContent,
+  ThemeProvider,
+  createTheme,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import {
+  RateReview as ReviewIcon,
+  Comment as CommentIcon,
+  Stars as PointIcon,
+  EmojiEvents as BadgeIcon,
+  Science as ExperimentIcon,
+  Mail as MailIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Close as CloseIcon,
+} from "@mui/icons-material";
 import {
   getMypage,
   isLoggedIn,
   getReceivedMessages,
 } from "../../service/member/ApiService";
-import { useNavigate } from "react-router-dom";
 import EditProfile from "./EditProfile";
 import DeleteProfile from "./DeleteProfile";
 import SendMessage from "./SendMessage";
 import ReceivedMessages from "./ReceivedMessages";
 import SentMessages from "./SentMessages";
 import MyReviews from "./MyReviews";
-import CustomButton from "../../components/input/CustomButton";
-import CustomAlert from "../../components/input/CustomAlert";
-import CustomTypography from "../../components/input/CustomTypography";
-import CustomLayout from "../../components/input/CustomLayout";
-import CustomTabs from "../../components/input/CustomTabs";
-import CustomAvatar from "../../components/input/CustomAvatar";
+
+// SOBI 정확한 브랜드 색상
+const sobiTheme = createTheme({
+  palette: {
+    primary: {
+      main: "#44C3AA", // SOBI 연한색
+      light: "#6FD4BB", // 더 밝은 버전
+      dark: "#045242", // SOBI 진한색
+      contrastText: "#ffffff",
+    },
+    secondary: {
+      main: "#045242", // SOBI 진한색을 보조색으로
+      light: "#44C3AA",
+      dark: "#033A30", // 더 어두운 버전
+      contrastText: "#ffffff",
+    },
+  },
+});
+
+// 스타일드 컴포넌트
+const MainContainer = styled(Container)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: theme.palette.grey[50],
+  paddingTop: theme.spacing(3),
+  paddingBottom: theme.spacing(3),
+}));
+
+const MainCard = styled(Paper)(({ theme }) => ({
+  borderRadius: theme.spacing(1),
+  overflow: "hidden",
+  minHeight: 700,
+  display: "flex",
+}));
+
+const Sidebar = styled(Box)(({ theme }) => ({
+  width: 280,
+  backgroundColor: theme.palette.background.paper,
+  borderRight: `1px solid ${theme.palette.divider}`,
+  display: "flex",
+  flexDirection: "column",
+}));
+
+const ProfileSection = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(3),
+  textAlign: "center",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  background: `linear-gradient(135deg, ${theme.palette.primary.light}15, ${theme.palette.primary.main}08)`,
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: 80,
+  height: 80,
+  margin: "0 auto 12px",
+  backgroundColor: theme.palette.primary.main,
+  fontSize: 32,
+  fontWeight: "bold",
+}));
+
+const MenuSection = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  flex: 1,
+}));
+
+const MenuLabel = styled(Typography)(({ theme }) => ({
+  fontSize: 12,
+  color: theme.palette.text.secondary,
+  fontWeight: 500,
+  marginBottom: theme.spacing(1.5),
+  paddingLeft: theme.spacing(1),
+}));
+
+const MainContent = styled(Box)({
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+});
+
+const TabsContainer = styled(Box)(({ theme }) => ({
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+}));
+
+const ContentArea = styled(Box)({
+  flex: 1,
+  minHeight: 0,
+});
+
+const MessageTabsContainer = styled(Box)(({ theme }) => ({
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+}));
+
+const DefaultContent = styled(Box)(({ theme }) => ({
+  height: "100%",
+  backgroundColor: theme.palette.grey[50],
+  padding: theme.spacing(4),
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
 
 const Mypage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -39,6 +163,33 @@ const Mypage = () => {
   const [selectedMessageTab, setSelectedMessageTab] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const navigate = useNavigate();
+
+  // 메뉴 아이템 데이터
+  const menuItems = [
+    { text: "내가 쓴 후기", count: "0건", icon: <ReviewIcon /> },
+    { text: "내가 쓴 댓글", count: "0건", icon: <CommentIcon /> },
+    { text: "포인트", count: "0P", icon: <PointIcon /> },
+    { text: "뱃지", count: "0개", icon: <BadgeIcon /> },
+    { text: "체험단", count: "0건?", icon: <ExperimentIcon /> },
+    {
+      text: "쪽지",
+      count:
+        unreadMessageCount > 0
+          ? `미확인 ${unreadMessageCount}건`
+          : "미확인 0건",
+      icon: <MailIcon />,
+    },
+  ];
+
+  const tabLabels = [
+    "내가 쓴 후기",
+    "내가 쓴 댓글",
+    "포인트",
+    "뱃지",
+    "체험단",
+    "쪽지",
+  ];
+  const messageTabLabels = ["받은쪽지", "보낸쪽지", "쪽지보내기"];
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -105,9 +256,16 @@ const Mypage = () => {
   };
 
   const handleSidebarItemClick = (index) => {
-    if (index === 0) {
+    setSelectedTab(index);
+    if (index === 5) {
+      fetchUnreadMessageCount();
+    }
+  };
+
+  const handleSettingClick = (type) => {
+    if (type === "edit") {
       setEditDialogOpen(true);
-    } else if (index === 1) {
+    } else if (type === "delete") {
       setDeleteDialogOpen(true);
     }
   };
@@ -148,456 +306,330 @@ const Mypage = () => {
     fetchUnreadMessageCount();
   };
 
-  // 스타일 정의
-  const pageContainerSx = {
-    minHeight: "100vh",
-    backgroundColor: "#f5f5f5",
-    p: 3,
-  };
-
-  const containerSx = {
-    maxWidth: "1200px",
-    margin: "0 auto",
-  };
-
-  const cardSx = {
-    borderRadius: 2,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-    overflow: "hidden",
-    border: "1px solid #e0e0e0",
-  };
-
-  const splitLayoutSx = {
-    display: "flex",
-    minHeight: "700px",
-  };
-
-  const sidebarSx = {
-    width: "280px",
-    backgroundColor: "white",
-    borderRight: "1px solid #e0e0e0",
-    display: "flex",
-    flexDirection: "column",
-  };
-
-  const profileSectionSx = {
-    p: 3,
-    textAlign: "center",
-    borderBottom: "1px solid #f0f0f0",
-  };
-
-  const avatarSx = {
-    width: 80,
-    height: 80,
-    mx: "auto",
-    mb: 1.5,
-    backgroundColor: "#4ecdc4",
-    fontSize: "32px",
-    color: "white",
-  };
-
-  const userTypeSx = {
-    mb: 0.5,
-    fontSize: "14px",
-    color: "#666",
-  };
-
-  const userNameSx = {
-    fontWeight: 600,
-    color: "#333",
-  };
-
-  const activitySectionSx = {
-    p: 2,
-    flex: 1,
-  };
-
-  const activityTitleSx = {
-    fontSize: "12px",
-    color: "#666",
-    fontWeight: 500,
-    mb: 1.5,
-    px: 1.5,
-  };
-
-  const listSx = {
-    py: 0,
-  };
-
-  const listItemButtonSx = {
-    py: 1.5,
-    px: 1.5,
-    borderRadius: 1,
-    mx: 0.5,
-    "&.Mui-selected": {
-      backgroundColor: "#f0f8ff",
-      color: "#1976d2",
-    },
-    "&:hover": {
-      backgroundColor: "#f8f9fa",
-    },
-  };
-
-  const listItemTextSx = {
-    fontSize: "14px",
-  };
-
-  const countTextSx = {
-    fontSize: "12px",
-    color: "#999",
-    fontWeight: 400,
-  };
-
-  const settingsListItemSx = {
-    py: 1,
-    px: 1.5,
-    borderRadius: 1,
-    mx: 0.5,
-    "&:hover": {
-      backgroundColor: "#f8f9fa",
-    },
-  };
-
-  const iconBoxSx = {
-    width: 20,
-    height: 20,
-    borderRadius: 0.5,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "12px",
-  };
-
-  const editIconBoxSx = {
-    ...iconBoxSx,
-    backgroundColor: "#e3f2fd",
-  };
-
-  const deleteIconBoxSx = {
-    ...iconBoxSx,
-    backgroundColor: "#ffebee",
-  };
-
-  const arrowSx = {
-    color: "#ccc",
-    fontSize: "18px",
-  };
-
-  const mainContentSx = {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
-  };
-
-  const contentAreaSx = {
-    flex: 1,
-    overflow: "hidden",
-  };
-
-  const reviewContentSx = {
-    height: "100%",
-    backgroundColor: "#f8f9fa",
-  };
-
-  const messageTabsContainerSx = {
-    height: "100%",
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-  };
-
-  const sendMessageContainerSx = {
-    p: 2,
-  };
-
-  const placeholderContentSx = {
-    height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    p: 4,
-  };
-
-  const placeholderInnerSx = {
-    maxWidth: 500,
-    textAlign: "center",
-  };
-
-  const placeholderCardSx = {
-    p: 3,
-    backgroundColor: "white",
-    borderRadius: 2,
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-    border: "1px solid #e0e0e0",
-  };
-
-  const placeholderTitleSx = {
-    fontWeight: 500,
-    mb: 2,
-    color: "#555",
-  };
-
-  const placeholderListSx = {
-    textAlign: "left",
-    color: "#666",
-    lineHeight: 1.6,
-  };
-
-  const placeholderItemSx = {
-    mb: 1,
-    fontSize: "14px",
-  };
-
-  const placeholderFooterSx = {
-    mt: 3,
-    fontSize: "14px",
-    color: "#666",
-  };
-
-  const errorContainerSx = {
-    textAlign: "center",
-  };
-
-  const successToastSx = {
-    anchorOrigin: { vertical: "top", horizontal: "center" },
-  };
-
   const renderTabContent = () => {
     // 내가 쓴 후기 탭
     if (selectedTab === 0) {
       return (
-        <CustomLayout sx={reviewContentSx}>
+        <Box sx={{ height: "100%", backgroundColor: "grey.50" }}>
           <MyReviews />
-        </CustomLayout>
+        </Box>
       );
     }
 
     // 쪽지 탭
     if (selectedTab === 5) {
       return (
-        <CustomLayout sx={messageTabsContainerSx}>
-          <CustomTabs.Message
-            selectedTab={selectedMessageTab}
-            onTabChange={handleMessageTabChange}
-            receivedContent={
-              <ReceivedMessages onMessageAction={handleMessageAction} />
-            }
-            sentContent={<SentMessages />}
-            sendContent={
-              <CustomLayout sx={sendMessageContainerSx}>
+        <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          <MessageTabsContainer>
+            <Tabs
+              value={selectedMessageTab}
+              onChange={handleMessageTabChange}
+              variant="fullWidth"
+            >
+              {messageTabLabels.map((label, index) => (
+                <Tab key={index} label={label} />
+              ))}
+            </Tabs>
+          </MessageTabsContainer>
+
+          <Box sx={{ flex: 1, backgroundColor: "grey.50", overflow: "hidden" }}>
+            {selectedMessageTab === 0 && (
+              <Box sx={{ height: "100%" }}>
+                <ReceivedMessages onMessageAction={handleMessageAction} />
+              </Box>
+            )}
+
+            {selectedMessageTab === 1 && (
+              <Box sx={{ height: "100%" }}>
+                <SentMessages />
+              </Box>
+            )}
+
+            {selectedMessageTab === 2 && (
+              <Box sx={{ height: "100%", p: 2 }}>
                 <SendMessage onMessageSent={handleMessageSent} />
-              </CustomLayout>
-            }
-          />
-        </CustomLayout>
+              </Box>
+            )}
+          </Box>
+        </Box>
       );
     }
 
     return (
-      <CustomLayout sx={placeholderContentSx}>
-        <CustomLayout sx={placeholderInnerSx}>
-          <CustomTypography
-            variant="h5"
-            gutterBottom
-            sx={{ fontWeight: 600, mb: 3 }}
-          >
+      <DefaultContent>
+        <Box sx={{ maxWidth: 500, textAlign: "center" }}>
+          <Typography variant="h5" fontWeight={600} gutterBottom>
             콘텐츠 영역
-          </CustomTypography>
-          <Card sx={placeholderCardSx}>
-            <CustomTypography variant="h6" gutterBottom sx={placeholderTitleSx}>
-              선택된 탭별 리스트/테이블 출력
-            </CustomTypography>
-            <CustomLayout sx={placeholderListSx}>
-              <CustomTypography sx={placeholderItemSx}>
-                - 내가 쓴 댓글: 내가 작성한 댓글 목록
-              </CustomTypography>
-              <CustomTypography sx={placeholderItemSx}>
-                - 포인트: 히스토리 테이블
-              </CustomTypography>
-              <CustomTypography sx={placeholderItemSx}>
-                - 뱃지: 획득 조건 안내 카드
-              </CustomTypography>
-              <CustomTypography sx={placeholderItemSx}>
-                - 체험단: ?
-              </CustomTypography>
-            </CustomLayout>
-            <CustomLayout sx={placeholderFooterSx}>
-              <CustomTypography variant="body2">
+          </Typography>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                선택된 탭별 리스트/테이블 출력
+              </Typography>
+              <Box sx={{ textAlign: "left", color: "text.secondary" }}>
+                <Typography variant="body2" gutterBottom>
+                  - 내가 쓴 댓글: 내가 작성한 댓글 목록
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                  - 포인트: 히스토리 테이블
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                  - 뱃지: 획득 조건 안내 카드
+                </Typography>
+                <Typography variant="body2" gutterBottom>
+                  - 체험단: ?
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 3 }}>
                 이 영역에 실제 탭별 콘텐츠가 표시됩니다.
-              </CustomTypography>
-            </CustomLayout>
+              </Typography>
+            </CardContent>
           </Card>
-        </CustomLayout>
-      </CustomLayout>
+        </Box>
+      </DefaultContent>
     );
   };
 
   if (loading) {
     return (
-      <CustomLayout sx={pageContainerSx}>
-        <CustomLayout.Center>
+      <ThemeProvider theme={sobiTheme}>
+        <Box
+          sx={{
+            width: "100%",
+            minHeight: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "grey.50",
+          }}
+        >
           <CircularProgress size={48} />
-        </CustomLayout.Center>
-      </CustomLayout>
+        </Box>
+      </ThemeProvider>
     );
   }
 
   if (error) {
     return (
-      <CustomLayout sx={pageContainerSx}>
-        <CustomLayout.Center>
-          <CustomLayout sx={errorContainerSx}>
-            <CustomAlert.Error message={error} sx={{ mb: 2 }} />
-            <CustomButton
-              text="다시 시도"
-              variant="contained"
-              onClick={fetchUserInfo}
-            />
-          </CustomLayout>
-        </CustomLayout.Center>
-      </CustomLayout>
+      <ThemeProvider theme={sobiTheme}>
+        <Box
+          sx={{
+            width: "100%",
+            minHeight: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "grey.50",
+            p: 2,
+          }}
+        >
+          <Box sx={{ textAlign: "center" }}>
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+            <Button variant="contained" onClick={fetchUserInfo}>
+              다시 시도
+            </Button>
+          </Box>
+        </Box>
+      </ThemeProvider>
     );
   }
 
   return (
-    <CustomLayout sx={pageContainerSx}>
-      <CustomLayout sx={containerSx}>
-        <Card sx={cardSx}>
-          <CustomLayout sx={splitLayoutSx}>
-            {/* 왼쪽 사이드바 */}
-            <CustomLayout sx={sidebarSx}>
-              {/* 프로필 섹션 */}
-              <CustomLayout sx={profileSectionSx}>
-                <CustomAvatar sx={avatarSx}>
-                  {userInfo?.memberName?.charAt(0).toUpperCase() || "H"}
-                </CustomAvatar>
-                <CustomTypography variant="body2" sx={userTypeSx}>
-                  일반 회원
-                </CustomTypography>
-                <CustomTypography variant="h6" sx={userNameSx}>
-                  {userInfo?.memberName || "hh"}#{userInfo?.id || "9"}
-                </CustomTypography>
-              </CustomLayout>
+    <ThemeProvider theme={sobiTheme}>
+      <MainContainer maxWidth="xl">
+        <MainCard elevation={2}>
+          {/* 왼쪽 사이드바 */}
+          <Sidebar>
+            {/* 프로필 섹션 */}
+            <ProfileSection>
+              <StyledAvatar>
+                {userInfo?.memberName?.charAt(0).toUpperCase() || "H"}
+              </StyledAvatar>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                일반 회원
+              </Typography>
+              <Typography variant="h6" fontWeight={600}>
+                {userInfo?.memberName || "hh"}#{userInfo?.id || "9"}
+              </Typography>
+            </ProfileSection>
 
-              {/* 활동 메뉴 섹션 */}
-              <CustomLayout sx={activitySectionSx}>
-                <CustomTypography sx={activityTitleSx}>• 활동</CustomTypography>
+            {/* 활동 메뉴 섹션 */}
+            <MenuSection>
+              <MenuLabel>• 활동</MenuLabel>
 
-                <List sx={listSx}>
-                  {[
-                    { text: "내가 쓴 후기", count: "0건" },
-                    { text: "내가 쓴 댓글", count: "0건" },
-                    { text: "포인트", count: "0P" },
-                    { text: "뱃지", count: "0개" },
-                    { text: "체험단", count: "0건?" },
-                    {
-                      text: "쪽지",
-                      count:
-                        unreadMessageCount > 0
-                          ? `미확인 ${unreadMessageCount}건`
-                          : "미확인 0건",
-                    },
-                  ].map((item, index) => (
-                    <ListItem key={index} disablePadding>
-                      <ListItemButton
-                        onClick={() => handleTabChange(null, index)}
-                        selected={selectedTab === index}
-                        sx={listItemButtonSx}
+              <List disablePadding>
+                {menuItems.map((item, index) => (
+                  <ListItem key={index} disablePadding>
+                    <ListItemButton
+                      selected={selectedTab === index}
+                      onClick={() => handleSidebarItemClick(index)}
+                      sx={{
+                        borderRadius: 1.5,
+                        mb: 0.5,
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": {
+                          transform: "translateX(4px)",
+                          boxShadow: "0 2px 8px rgba(68,195,170,0.2)",
+                        },
+                        "&.Mui-selected": {
+                          backgroundColor: "primary.main",
+                          color: "primary.contrastText",
+                          "&:hover": {
+                            backgroundColor: "primary.dark",
+                          },
+                        },
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 40,
+                          color: selectedTab === index ? "inherit" : "inherit",
+                        }}
                       >
-                        <ListItemText
-                          primary={item.text}
-                          primaryTypographyProps={{
-                            ...listItemTextSx,
-                            color: selectedTab === index ? "#1976d2" : "#666",
-                          }}
-                        />
-                        <CustomTypography sx={countTextSx}>
-                          {item.count}
-                        </CustomTypography>
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-
-                <CustomLayout.Divider sx={{ my: 2 }} />
-
-                <List sx={listSx}>
-                  <ListItem disablePadding>
-                    <ListItemButton
-                      onClick={() => handleSidebarItemClick(0)}
-                      sx={settingsListItemSx}
-                    >
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <CustomLayout sx={editIconBoxSx}>📝</CustomLayout>
+                        {index === 5 && unreadMessageCount > 0 ? (
+                          <Badge
+                            badgeContent={unreadMessageCount}
+                            color="error"
+                          >
+                            {item.icon}
+                          </Badge>
+                        ) : (
+                          item.icon
+                        )}
                       </ListItemIcon>
                       <ListItemText
-                        primary="정보 수정"
-                        primaryTypographyProps={listItemTextSx}
+                        primary={item.text}
+                        secondary={item.count}
+                        primaryTypographyProps={{ variant: "body2" }}
+                        secondaryTypographyProps={{ variant: "caption" }}
                       />
-                      <CustomTypography sx={arrowSx}>›</CustomTypography>
                     </ListItemButton>
                   </ListItem>
+                ))}
+              </List>
 
-                  <ListItem disablePadding>
-                    <ListItemButton
-                      onClick={() => handleSidebarItemClick(1)}
-                      sx={settingsListItemSx}
-                    >
-                      <ListItemIcon sx={{ minWidth: 32 }}>
-                        <CustomLayout sx={deleteIconBoxSx}>🗑️</CustomLayout>
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="회원 탈퇴"
-                        primaryTypographyProps={listItemTextSx}
-                      />
-                      <CustomTypography sx={arrowSx}>›</CustomTypography>
-                    </ListItemButton>
-                  </ListItem>
-                </List>
-              </CustomLayout>
-            </CustomLayout>
+              <Divider sx={{ my: 2 }} />
 
-            {/* 메인 콘텐츠 영역 */}
-            <CustomLayout sx={mainContentSx}>
-              {/* 상단 탭 메뉴 */}
-              <CustomTabs.MyPage
-                selectedTab={selectedTab}
-                onTabChange={handleTabChange}
-                unreadCount={unreadMessageCount}
-                showContent={false}
-              />
+              {/* 설정 메뉴 */}
+              <List disablePadding>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => handleSettingClick("edit")}
+                    sx={{ borderRadius: 1, mb: 0.5 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: 0.5,
+                          backgroundColor: "primary.main",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <EditIcon sx={{ fontSize: 12, color: "white" }} />
+                      </Box>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="정보 수정"
+                      primaryTypographyProps={{ variant: "body2" }}
+                    />
+                  </ListItemButton>
+                </ListItem>
 
-              {/* 콘텐츠 영역 */}
-              <CustomLayout sx={contentAreaSx}>
-                {renderTabContent()}
-              </CustomLayout>
-            </CustomLayout>
-          </CustomLayout>
-        </Card>
-      </CustomLayout>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => handleSettingClick("delete")}
+                    sx={{ borderRadius: 1 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: 0.5,
+                          backgroundColor: "error.light",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <DeleteIcon sx={{ fontSize: 12, color: "white" }} />
+                      </Box>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="회원 탈퇴"
+                      primaryTypographyProps={{ variant: "body2" }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </MenuSection>
+          </Sidebar>
 
-      {/* 다이얼로그들 */}
-      <EditProfile
-        open={editDialogOpen}
-        onClose={handleEditClose}
-        userInfo={userInfo}
-        onUpdate={handleProfileUpdate}
-      />
+          {/* 메인 콘텐츠 영역 */}
+          <MainContent>
+            {/* 상단 탭 메뉴 */}
+            <TabsContainer>
+              <Tabs
+                value={selectedTab}
+                onChange={handleTabChange}
+                variant="fullWidth"
+              >
+                {tabLabels.map((label, index) => (
+                  <Tab key={index} label={label} />
+                ))}
+              </Tabs>
+            </TabsContainer>
 
-      <DeleteProfile
-        open={deleteDialogOpen}
-        onClose={handleDeleteClose}
-        onDelete={handleDeleteSuccess}
-      />
+            {/* 콘텐츠 영역 */}
+            <ContentArea>{renderTabContent()}</ContentArea>
+          </MainContent>
+        </MainCard>
 
-      {/* 성공 메시지 토스트 */}
-      <CustomAlert.SuccessToast
-        open={showSuccessAlert}
-        onClose={handleCloseSuccessAlert}
-        message={successMessage}
-      />
-    </CustomLayout>
+        {/* 다이얼로그들 */}
+        <EditProfile
+          open={editDialogOpen}
+          onClose={handleEditClose}
+          userInfo={userInfo}
+          onUpdate={handleProfileUpdate}
+        />
+
+        <DeleteProfile
+          open={deleteDialogOpen}
+          onClose={handleDeleteClose}
+          onDelete={handleDeleteSuccess}
+        />
+
+        {/* 성공 메시지 스낵바 */}
+        <Snackbar
+          open={showSuccessAlert}
+          autoHideDuration={4000}
+          onClose={handleCloseSuccessAlert}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleCloseSuccessAlert}
+            severity="success"
+            action={
+              <Button
+                color="inherit"
+                size="small"
+                onClick={handleCloseSuccessAlert}
+              >
+                <CloseIcon fontSize="small" />
+              </Button>
+            }
+          >
+            {successMessage}
+          </Alert>
+        </Snackbar>
+      </MainContainer>
+    </ThemeProvider>
   );
 };
 
