@@ -19,7 +19,7 @@ function ListComponent() {
         });
     }, [page, size ]);
 
-    // 글쓰기 버튼 클릭 핸들러
+
     const handleWriteClick = () => {
         navigate("/review/write"); // 라우터에 등록된 경로로 이동
     };
