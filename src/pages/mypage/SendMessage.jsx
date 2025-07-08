@@ -285,7 +285,7 @@ const SendMessage = ({ onMessageSent }) => {
           </CardContent>
         </StyledCard>
 
-        {/* 안내 메시지 */}
+        {/* 안내 메시지
         <InfoCard>
           <CardContent>
             <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -333,7 +333,7 @@ const SendMessage = ({ onMessageSent }) => {
               </ListItem>
             </List>
           </CardContent>
-        </InfoCard>
+        </InfoCard> */}
       </Container>
     </ThemeProvider>
   );

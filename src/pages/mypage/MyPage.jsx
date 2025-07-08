@@ -34,7 +34,6 @@ import {
   EmojiEvents as BadgeIcon,
   Science as ExperimentIcon,
   Mail as MailIcon,
-  Edit as EditIcon,
   Delete as DeleteIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
@@ -43,12 +42,12 @@ import {
   isLoggedIn,
   getReceivedMessages,
 } from "../../service/member/ApiService";
-import EditProfile from "./EditProfile";
 import DeleteProfile from "./DeleteProfile";
 import SendMessage from "./SendMessage";
 import ReceivedMessages from "./ReceivedMessages";
 import SentMessages from "./SentMessages";
 import MyReviews from "./MyReviews";
+import AccountInfo from "./AccountInfo";
 
 // SOBI 정확한 브랜드 색상
 const sobiTheme = createTheme({
@@ -155,7 +154,6 @@ const Mypage = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -166,8 +164,8 @@ const Mypage = () => {
 
   // 메뉴 아이템 데이터
   const menuItems = [
+    { text: "계정 정보", count: "", icon: <CommentIcon /> },
     { text: "내가 쓴 후기", count: "0건", icon: <ReviewIcon /> },
-    { text: "내가 쓴 댓글", count: "0건", icon: <CommentIcon /> },
     { text: "포인트", count: "0P", icon: <PointIcon /> },
     { text: "뱃지", count: "0개", icon: <BadgeIcon /> },
     { text: "체험단", count: "0건?", icon: <ExperimentIcon /> },
@@ -182,8 +180,8 @@ const Mypage = () => {
   ];
 
   const tabLabels = [
+    "계정 정보",
     "내가 쓴 후기",
-    "내가 쓴 댓글",
     "포인트",
     "뱃지",
     "체험단",
@@ -262,16 +260,8 @@ const Mypage = () => {
     }
   };
 
-  const handleSettingClick = (type) => {
-    if (type === "edit") {
-      setEditDialogOpen(true);
-    } else if (type === "delete") {
-      setDeleteDialogOpen(true);
-    }
-  };
-
-  const handleEditClose = () => {
-    setEditDialogOpen(false);
+  const handleDeleteAccount = () => {
+    setDeleteDialogOpen(true);
   };
 
   const handleDeleteClose = () => {
@@ -307,8 +297,21 @@ const Mypage = () => {
   };
 
   const renderTabContent = () => {
-    // 내가 쓴 후기 탭
+    // 계정 정보 탭
     if (selectedTab === 0) {
+      return (
+        <Box sx={{ height: "100%", backgroundColor: "grey.50", p: 3 }}>
+          <AccountInfo
+            userInfo={userInfo}
+            onUpdate={handleProfileUpdate}
+            onDeleteAccount={handleDeleteAccount}
+          />
+        </Box>
+      );
+    }
+
+    // 내가 쓴 후기 탭
+    if (selectedTab === 1) {
       return (
         <Box sx={{ height: "100%", backgroundColor: "grey.50" }}>
           <MyReviews />
@@ -367,9 +370,6 @@ const Mypage = () => {
                 선택된 탭별 리스트/테이블 출력
               </Typography>
               <Box sx={{ textAlign: "left", color: "text.secondary" }}>
-                <Typography variant="body2" gutterBottom>
-                  - 내가 쓴 댓글: 내가 작성한 댓글 목록
-                </Typography>
                 <Typography variant="body2" gutterBottom>
                   - 포인트: 히스토리 테이블
                 </Typography>
@@ -516,34 +516,7 @@ const Mypage = () => {
               <List disablePadding>
                 <ListItem disablePadding>
                   <ListItemButton
-                    onClick={() => handleSettingClick("edit")}
-                    sx={{ borderRadius: 1, mb: 0.5 }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 40 }}>
-                      <Box
-                        sx={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: 0.5,
-                          backgroundColor: "primary.main",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <EditIcon sx={{ fontSize: 12, color: "white" }} />
-                      </Box>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="정보 수정"
-                      primaryTypographyProps={{ variant: "body2" }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-
-                <ListItem disablePadding>
-                  <ListItemButton
-                    onClick={() => handleSettingClick("delete")}
+                    onClick={handleDeleteAccount}
                     sx={{ borderRadius: 1 }}
                   >
                     <ListItemIcon sx={{ minWidth: 40 }}>
@@ -592,13 +565,6 @@ const Mypage = () => {
         </MainCard>
 
         {/* 다이얼로그들 */}
-        <EditProfile
-          open={editDialogOpen}
-          onClose={handleEditClose}
-          userInfo={userInfo}
-          onUpdate={handleProfileUpdate}
-        />
-
         <DeleteProfile
           open={deleteDialogOpen}
           onClose={handleDeleteClose}
