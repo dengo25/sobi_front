@@ -109,7 +109,7 @@ export const getList = async (pageParam) => {
 // 개별 회원 정보 조회
 export const getMember = async (memberId) => {
   const res = await jwtAxios.get(
-    API_BASE_URL + `/api/admin/member/${memberId}`
+    `${API_BASE_URL}/api/admin/member/${memberId}`
   );
   return res.data;
 };

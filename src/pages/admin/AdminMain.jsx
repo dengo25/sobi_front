@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminSidebar from "./AdminSidebar";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getStatus } from "../../service/admin/ApiService";
 
 const AdminMain = () => {
@@ -10,7 +10,7 @@ const AdminMain = () => {
   const [blockedCount, setBlockedCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [unresolvedReports, setUnresolvedReports] = useState(0);
-  const [memberLogList, setMemberLogList] = useState([]);
+  const [blacklist, setBlacklist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -26,7 +26,7 @@ const AdminMain = () => {
         setBlockedCount(res.blockedCount);
         setReviewCount(res.reviewCount);
         setUnresolvedReports(res.unSolvedReportCount);
-        setMemberLogList(res.memberLogs);
+        setBlacklist(res.blacklist);
       } catch (err) {
         console.error("admin main fetch error", err);
         setError("데이터를 불러오는데 실패했습니다.");
@@ -41,9 +41,9 @@ const AdminMain = () => {
   // Handler functions for card clicks
   const handleMemberClick = () => navigate("/admin/member");
   const handleTodayJoinClick = () => navigate("/admin/today-join"); // Add appropriate route
-  const handleBlockedClick = () => navigate("/admin/blocked"); // Add appropriate route
+  const handleBlockedClick = () => navigate("/admin/blocked/memberId"); // Add appropriate route
   const handleReviewClick = () => navigate("/admin/reviews"); // Add appropriate route
-
+  const handleReportClick = () => navigate("/report");
   if (loading) {
     return (
       <main className="admin">
@@ -76,6 +76,7 @@ const AdminMain = () => {
       </div>
 
       {/* 요약 통계 */}
+      <div onClick={handleReportClick}>신고하기</div>
       <div className="stats">
         <div className="card" onClick={handleMemberClick}>
           <h3>회원 관리</h3>
@@ -85,41 +86,33 @@ const AdminMain = () => {
           <h3>신고 관리</h3>
           <p>{unresolvedReports.toLocaleString()}</p>
         </div>
-        <div className="card" onClick={handleBlockedClick}>
-          <h3>블랙리스트</h3>
-          <p>{blockedCount.toLocaleString()}</p>
-        </div>
         <div className="card" onClick={handleReviewClick}>
-          <h3>후기 관리</h3>
+          <h3>리뷰 관리</h3>
           <p>{reviewCount.toLocaleString()}</p>
         </div>
       </div>
 
       {/* 최근 활동 */}
       <div className="section">
-        <h4>🕓 최근 활동 로그</h4>
+        <h4>{blockedCount}명의 사용자가 차단되었습니다.</h4>
         <table className="log-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>메뉴</th>
-              <th>활동</th>
-              <th>접근일자</th>
+              <th>차단일자</th>
             </tr>
           </thead>
           <tbody>
-            {memberLogList && memberLogList.length > 0 ? (
-              memberLogList.map((log, index) => (
-                <tr key={log.id || index}>
-                  <td>{log.memberId}</td>
-                  <td>{log.accessedMenu}</td>
-                  <td>{log.memberActionType}</td>
-                  <td>{new Date(log.memberLogCreated).toLocaleString()}</td>
+            {blacklist && blacklist.length > 0 ? (
+              blacklist.map((log, index) => (
+                <tr key={log.id || index} onClick={handleBlockedClick}>
+                  <td>{blacklist.memberId}</td>
+                  <td>{new Date(blacklist.updateAt).toLocaleString()}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4">최근 활동 내역이 없습니다.</td>
+                <td colSpan="2">차단된 사용자가 없습니다.</td>
               </tr>
             )}
           </tbody>
