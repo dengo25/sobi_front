@@ -63,7 +63,7 @@ function SignUp() {
                 <CustomInput
                     label="아이디"
                     name="memberId"
-                    value={formData.memberId}
+                    value={formData.memberId}//여기서 input 안에 있는 값을 보여주고 아래 메서드로 set을 호출해서 값을 정의
                     onChange={handleChange}
                     placeholder="아이디를 입력하세요"
                     required
