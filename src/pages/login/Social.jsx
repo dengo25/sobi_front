@@ -1,17 +1,35 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
+import {login} from "../../slice/memberSlice.jsx";
+import {useDispatch} from "react-redux";
+
 
 const SocialLogin = () => {
     const location = useLocation();
+    const dispatch = useDispatch();
 
-    // 쿼리 파라미터에서 토큰 가져오기
     const searchParams = new URLSearchParams(location.search);
     const token = searchParams.get("token");
 
-    console.log("토큰 파싱: " + token);
+    useEffect(() => {
+        if (token) {
+            localStorage.setItem("ACCESS_TOKEN", token);
+
+            //토큰 해석해서 Redux에 로그인 상태 저장
+            const decoded = jwtDecode(token);
+
+            dispatch(login({
+                token,
+                memberId: decoded.sub,
+                memberName: decoded.memberName,
+                memberEmail: decoded.memberEmail,
+                role: decoded.role,
+            }));
+        }
+    }, [token, dispatch]);
 
     if (token) {
-        localStorage.setItem("ACCESS_TOKEN", token);
         return <Navigate to="/" state={{ from: location }} />;
     } else {
         return <Navigate to="/login" state={{ from: location }} />;
