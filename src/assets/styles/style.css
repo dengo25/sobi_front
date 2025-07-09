@@ -144,7 +144,7 @@ input[type="url"],
 input[type="week"],
 select,
 textarea,
-.form-control{width:100%;margin:0;/*padding:12px 20px;*/background-color:#fff;border:solid 1px #aaadae;border-radius:22px;box-shadow:none;color:#555;/*font-family:'NotoSansKrBold';*/font-size:14px;line-height:20px;}/* padding:0 10px; */
+.form-control{width:100%;margin:0;/*padding:12px 20px;*/background-color:#fff;/*border:solid 1px #aaadae;border-radius:22px;*/box-shadow:none;color:#555;/*font-family:'NotoSansKrBold';*/font-size:14px;line-height:20px;}/* padding:0 10px; */
 input:hover,input:focus,input:focus-visible,
 .form-control:hover,.form-control:focus,.form-control:focus-visible,
 .form-select:hover,.form-select:focus,.form-select:focus-visible{background-color:#fff;border-color:#4c4c4c;outline:0;box-shadow:none;color:#4c4c4c;}
@@ -214,7 +214,7 @@ textarea:hover,textarea:focus{border-color:#4c4c4c;outline:0;}
 
 
 /* custom : select ---------------------------------------- */
-select.form-select{display:inline-block;position:relative;width:100%;height:44px;margin:0;padding:7px 35px 7px 16px;border:1px solid #aaadae;border-radius:22px;box-sizing:border-box;background:#fff url('../images/ico-arr-select-black.svg') no-repeat top 15px right 20px;color:#4c4c4c;font-size:14px;line-height:17px;}
+select.form-select{display:inline-block;position:relative;width:100%;height:44px;margin:0;padding:7px 35px 7px 16px;border:1px solid #aaadae;border-radius:22px;box-sizing:border-box;background:#fff url('../icons/ico-arr-select-black.svg') no-repeat top 15px right 20px;color:#4c4c4c;font-size:14px;line-height:17px;}
 
 /* custom : checkbox ----------------------------------------*/
 .input-check{display:block;position:relative;padding:0px 0 0px 21px;cursor:pointer;color:#4c4c4c;font-size:14px;word-wrap:break-word;word-break:keep-all;line-height:20px;
@@ -232,8 +232,8 @@ _:-ms-fullscreen, :root .checkMark{border:transparent;}
 
 .input-check input ~ .checkMark{border-color:#aaadae;background-color:#fff;}
 .input-check:hover input ~ .checkMark{border-color:#27AE60;}
-.input-check input:checked ~ .checkMark{border-color:#27AE60;background:#27AE60 url('../images/ico-check.svg') no-repeat center top 55%;background-size:8px auto;}
-.input-check input:disabled ~ .checkMark{border-color:#eaeaea;background:#eaeaea url('../images/ico-check.svg') no-repeat center top 55%;background-size:8px auto;}
+.input-check input:checked ~ .checkMark{border-color:#27AE60;background:#27AE60 url('../icons/ico-check.svg') no-repeat center top 55%;background-size:8px auto;}
+.input-check input:disabled ~ .checkMark{border-color:#eaeaea;background:#eaeaea url('../icons/ico-check.svg') no-repeat center top 55%;background-size:8px auto;}
 .input-check input:disabled ~ em{color:#c1c1c1;}
 [class*="input-group"] .input-check{margin:0 30px 0 0;}/* margin:0 20px 0 0; */
 [class*="input-group"] .input-check:last-child{margin-right:0;}
@@ -244,7 +244,7 @@ _:-ms-fullscreen, :root .checkMark{border:transparent;}
 .input-check.type-img-btn input{top:0;width:100%;height:100%;background-color:transparent;}
 .input-check.type-img-btn input ~ .checkMark{top:0;width:180px;height:180px;border-color:transparent;background-color:transparent;}
 .input-check.type-img-btn input ~ em{display:block;margin-top:24px;color:#4c4c4c;font-size:14px;line-height:20px;}
-.input-check.type-img-btn input:checked ~ .checkMark{border-color:transparent;background:rgba(76,76,76,.6) url('../images/icons/ico-check-80.svg') no-repeat center;}
+.input-check.type-img-btn input:checked ~ .checkMark{border-color:transparent;background:rgba(76,76,76,.6) url('../icons/icons/ico-check-80.svg') no-repeat center;}
 .input-check.type-img-btn:hover input ~ .checkMark{border-color:transparent;}
 
 .input-check.type-only{width:0;margin:0 auto 20px;}

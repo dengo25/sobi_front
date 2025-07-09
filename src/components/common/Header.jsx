@@ -20,6 +20,7 @@ const Header = () => {
           </h1>
 
           <ul className="menu-list">
+            <li><Link to="/common">공통</Link></li>
             <li><Link to="/review">후기</Link></li>
             <li><Link to="/admin">관리자</Link></li>
             <li><Link to="/notice">공지사항</Link></li>

@@ -5,6 +5,7 @@ const beforeReq = (config) => {
     console.log("before request.............");
 
     const accessToken = localStorage.getItem("ACCESS_TOKEN");
+    console.log("token", accessToken); // 여기서 확인!
     if (!accessToken) {
         console.log("Token Not Found");
         return Promise.reject(new Error("REQUIRE_LOGIN"));

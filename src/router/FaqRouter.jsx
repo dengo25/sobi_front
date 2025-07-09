@@ -1,19 +1,19 @@
 import { Suspense } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
-import NoticeList from "../pages/community/Notice.jsx";
-import NoticeDetail from "../pages/community/NoticeDetail.jsx";
-import NoticeForm from "../pages/community/NoticeForm.jsx";
+import FaqList from "../pages/community/Faq.jsx";
+import FaqForm from "../pages/community/FaqForm.jsx";
 
-const NoticeRouter = () => {
+
+const FaqRouter = () => {
     return {
-        path: "notice",
+        path: "faq",
         children: [
             {
                 path: "",
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
-                        <NoticeList />
+                        <FaqList />
                     </Suspense>
                 ),
             },
@@ -21,23 +21,15 @@ const NoticeRouter = () => {
                 path: "insert",
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
-                        <NoticeForm />
+                        <FaqForm />
                     </Suspense>
                 ),
             },
             {
-                path: ":noticeNo",
+                path: "update/:faqNo",
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
-                        <NoticeDetail />
-                    </Suspense>
-                ),
-            },
-            {
-                path: "update/:noticeNo",
-                element: (
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <NoticeForm />
+                        <FaqForm />
                     </Suspense>
                 ),
             },
@@ -62,4 +54,4 @@ const NoticeRouter = () => {
     };
 };
 
-export default NoticeRouter;
+export default FaqRouter;
