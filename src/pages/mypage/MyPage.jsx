@@ -52,7 +52,6 @@ import SentMessages from "./SentMessages";
 import MyReviews from "./MyReviews";
 import AccountInfo from "./AccountInfo";
 
-// SOBI 정확한 브랜드 색상
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -70,7 +69,6 @@ const sobiTheme = createTheme({
   },
 });
 
-// 스타일드 컴포넌트들 (기존과 동일)
 const MainContainer = styled(Container)(({ theme }) => ({
   minHeight: "100vh",
   paddingTop: theme.spacing(3),
@@ -208,7 +206,7 @@ const Mypage = () => {
     // URL 파라미터에서 탭 정보 확인
     const tabParam = searchParams.get("tab");
     if (tabParam !== null) {
-      const tabIndex = parseInt(tabParam, 10);
+      const tabIndex = Number.parseInt(tabParam, 10);
       if (tabIndex >= 0 && tabIndex < tabLabels.length) {
         setSelectedTab(tabIndex);
       }
@@ -235,7 +233,7 @@ const Mypage = () => {
     }
   };
 
-  // 후기 수를 가져오는 함수 추가
+  // 후기 수를 가져오는 함수
   const fetchReviewCount = async () => {
     try {
       const response = await getMyReviews();
@@ -386,7 +384,7 @@ const Mypage = () => {
     fetchUnreadMessageCount();
   };
 
-  // 후기 관련 작업 후 후기 수를 업데이트하는 함수 추가
+  // 후기 관련 작업 후 후기 수를 업데이트하는 함수
   const handleReviewAction = () => {
     fetchReviewCount();
   };
@@ -597,8 +595,17 @@ const Mypage = () => {
                       <ListItemText
                         primary={item.text}
                         secondary={item.count}
-                        primaryTypographyProps={{ variant: "body2" }}
-                        secondaryTypographyProps={{ variant: "caption" }}
+                        primaryTypographyProps={{
+                          variant: "body2",
+                          color: selectedTab === index ? "inherit" : "inherit",
+                        }}
+                        secondaryTypographyProps={{
+                          variant: "caption",
+                          color:
+                            selectedTab === index
+                              ? "inherit"
+                              : "text.secondary",
+                        }}
                       />
                     </ListItemButton>
                   </ListItem>

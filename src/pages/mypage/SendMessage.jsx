@@ -27,25 +27,23 @@ import {
 } from "@mui/icons-material";
 import { sendMessage } from "../../service/member/ApiService";
 
-// SOBI 정확한 브랜드 색상
 const sobiTheme = createTheme({
   palette: {
     primary: {
-      main: "#44C3AA", // SOBI 연한색
-      light: "#6FD4BB", // 더 밝은 버전
-      dark: "#045242", // SOBI 진한색
+      main: "#44C3AA",
+      light: "#6FD4BB",
+      dark: "#045242",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#045242", // SOBI 진한색을 보조색으로
+      main: "#045242",
       light: "#44C3AA",
-      dark: "#033A30", // 더 어두운 버전
+      dark: "#033A30",
       contrastText: "#ffffff",
     },
   },
 });
 
-// 스타일드 컴포넌트
 const StyledCard = styled(Card)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   marginTop: theme.spacing(2),

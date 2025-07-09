@@ -28,7 +28,6 @@ import {
 import { styled } from "@mui/material/styles";
 import { getMyReviews } from "../../service/mypage/ApiService";
 
-// 스타일드 컴포넌트
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(2),
   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",

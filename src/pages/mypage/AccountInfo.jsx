@@ -39,7 +39,6 @@ import {
 } from "@mui/icons-material";
 import { updateMypage } from "../../service/member/ApiService";
 
-// SOBI 브랜드 색상 테마
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -57,7 +56,6 @@ const sobiTheme = createTheme({
   },
 });
 
-// 스타일드 컴포넌트
 const ProfileSection = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(3),
   borderRadius: theme.spacing(2),

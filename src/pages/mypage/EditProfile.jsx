@@ -23,7 +23,6 @@ import { styled } from "@mui/material/styles";
 import { Close as CloseIcon, Save as SaveIcon } from "@mui/icons-material";
 import { updateMypage } from "../../service/member/ApiService";
 
-// 스타일드 컴포넌트
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
     borderRadius: theme.spacing(1),
