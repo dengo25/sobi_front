@@ -2,8 +2,10 @@ import { Suspense } from "react";
 import ReviewList from "../pages/review/ReviewList";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
-import AdminTest from "../pages/admin/AdminTest.jsx";
-
+import AdminMain from "../pages/admin/AdminMain.jsx";
+import UnSolvedReport from "../pages/admin/UnSolvedReport.jsx";
+import AdminMemberRouter from "./AdminMemberRouter.jsx";
+import AdminRoute from "../components/common/AdminRoute.jsx";
 const AdminRouter = () => {
   return {
     path: "admin",
@@ -11,11 +13,24 @@ const AdminRouter = () => {
       {
         path: "",
         element: (
+          <AdminRoute>
             <Suspense fallback={<LoadingSpinner />}>
-              <AdminTest />
+              <AdminMain />
             </Suspense>
+          </AdminRoute>
         ),
       },
+      {
+        path: "report",
+        element: (
+          <AdminRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <UnSolvedReport />
+            </Suspense>
+          </AdminRoute>
+        ),
+      },
+      AdminMemberRouter,
       // {
       //   path: "read/:tno",//아이디를 tno로 사용한다.
       //   element: <Suspense fallback={<LoadingSpinner/>}><ReviewRead/></Suspense>
