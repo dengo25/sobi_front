@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ReportForm from "../pages/admin/ReportForm";
+import ReportList from "../pages/admin/ReportList";
 
 const ReportRouter = () => {
   return {
@@ -11,6 +12,14 @@ const ReportRouter = () => {
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <ReportForm />
+          </Suspense>
+        ),
+      },
+      {
+        path: "list",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ReportList />
           </Suspense>
         ),
       },

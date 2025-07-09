@@ -1,9 +1,10 @@
 import { useState } from "react";
-
+import { report } from "../../service/admin/ApiService";
+import { useNavigate } from "react-router-dom";
 const ReportForm = ({ reporterId, reportedId, targetId, onSubmit }) => {
   const [reportType, setReportType] = useState("");
   const [detail, setDetail] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     const reportDto = {
@@ -24,39 +25,42 @@ const ReportForm = ({ reporterId, reportedId, targetId, onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>신고하기</h3>
-      <div>
-        <label>신고 사유</label>
-        <select
-          value={reportType}
-          onChange={(e) => setReportType(e.target.value)}
-          required
-        >
-          <option value="">선택하세요</option>
-          <option value="가짜/조작된 리뷰">가짜/조작된 리뷰</option>
-          <option value="부적절한 표현 및 혐오 콘텐츠">
-            부적절한 표현 및 혐오 콘텐츠
-          </option>
-          <option value="스팸 및 상업적 광고">스팸 및 상업적 광고</option>
-          <option value="민감한 주제의 표현">민감한 주제의 표현</option>
-          <option value="기타">기타</option>
-        </select>
-      </div>
+    <>
+      <div onClick={() => navigate("/report/list")}>신고목록</div>
+      <form onSubmit={handleSubmit}>
+        <h3>신고하기</h3>
+        <div>
+          <label>신고 사유</label>
+          <select
+            value={reportType}
+            onChange={(e) => setReportType(e.target.value)}
+            required
+          >
+            <option value="">선택하세요</option>
+            <option value="가짜/조작된 리뷰">가짜/조작된 리뷰</option>
+            <option value="부적절한 표현 및 혐오 콘텐츠">
+              부적절한 표현 및 혐오 콘텐츠
+            </option>
+            <option value="스팸 및 상업적 광고">스팸 및 상업적 광고</option>
+            <option value="민감한 주제의 표현">민감한 주제의 표현</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
 
-      <div>
-        <label>상세 내용</label>
-        <textarea
-          value={detail}
-          onChange={(e) => setDetail(e.target.value)}
-          placeholder="신고 내용을 자세히 입력해주세요"
-          rows={5}
-          required
-        />
-      </div>
+        <div>
+          <label>상세 내용</label>
+          <textarea
+            value={detail}
+            onChange={(e) => setDetail(e.target.value)}
+            placeholder="신고 내용을 자세히 입력해주세요"
+            rows={5}
+            required
+          />
+        </div>
 
-      <button type="submit">신고 제출</button>
-    </form>
+        <button type="submit">신고 제출</button>
+      </form>
+    </>
   );
 };
 

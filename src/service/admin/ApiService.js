@@ -120,5 +120,42 @@ const handleReportSubmit = async (reportDto) => {
     alert("다시 시도해주세요.");
   }
 };
+// 신고 목록 조회 (페이징 + 필터링)
+export const getReportList = async (searchParams) => {
+  const {
+    page = 0,
+    size = 10,
+    sortBy = "createdAt",
+    sortDir = "desc",
+    status = null,
+    reportType = null,
+  } = searchParams || {};
+
+  console.log("신고 목록 API 요청 파라미터:", searchParams);
+
+  try {
+    const params = {};
+
+    // 기본 페이징 파라미터
+    params.page = page;
+    params.size = size;
+    params.sortBy = sortBy;
+    params.sortDir = sortDir;
+
+    // 필터 파라미터 (값이 있을 때만 추가)
+    if (status) params.status = status;
+    if (reportType) params.reportType = reportType;
+
+    const res = await jwtAxios.get(`${API_BASE_URL}/api/report`, {
+      params: params,
+    });
+
+    console.log("신고 목록 API 응답:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("신고 목록 조회 API 오류:", error);
+    throw error;
+  }
+};
 
 export default jwtAxios;
