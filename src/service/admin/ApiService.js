@@ -73,28 +73,21 @@ export const getStatus = async () => {
 }; // 회원 목록 조회 (페이징 + 검색 통합)
 export const getList = async (pageParam) => {
   const {
-    page = 1,
+    page = 0,
     size = 10,
     sortBy = "memberReg",
     sortDir = "desc",
-    keyword = "", // 검색어 추가
   } = pageParam || {};
 
-  console.log("API 요청 파라미터:", { page, size, sortBy, sortDir, keyword });
+  console.log("API 요청 파라미터:", { page, size, sortBy, sortDir });
 
   try {
     const params = {
-      page: page,
+      page: page + 1,
       size: size,
       sortBy: sortBy,
       sortDir: sortDir,
     };
-
-    // 검색어가 있을 때만 keyword 파라미터 추가
-    if (keyword && keyword.trim()) {
-      params.keyword = keyword.trim();
-    }
-
     const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/member`, {
       params: params,
     });
@@ -112,6 +105,20 @@ export const getMember = async (memberId) => {
     `${API_BASE_URL}/api/admin/member/${memberId}`
   );
   return res.data;
+};
+
+//신고
+export const report = async (reportParam) => {
+  const res = await jwtAxios.put(`${API_BASE_URL}/api/report`, reportParam);
+  return res.data;
+};
+const handleReportSubmit = async (reportDto) => {
+  try {
+    await report(reportDto);
+    alert("신고가 접수되었습니다.");
+  } catch (error) {
+    alert("다시 시도해주세요.");
+  }
 };
 
 export default jwtAxios;

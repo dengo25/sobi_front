@@ -9,29 +9,43 @@ const MemberList = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  const [sortBy, setSortBy] = useState("memberReg");
+  const [sortDir, setSortDir] = useState("desc");
+
   const navigate = useNavigate();
   const { page, size, moveToList } = useCustomMove();
+
+  // 정렬 옵션 설정
+  const sortOptions = [
+    { value: "memberReg", label: "가입일" },
+    { value: "memberName", label: "이름" },
+    { value: "memberId", label: "아이디" },
+    { value: "memberReviewCount", label: "게시글수" },
+    { value: "memberReportCount", label: "신고이력" },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        console.log("🔍 요청 파라미터:", { page: page || 1, size: size || 10 });
-
-        const data = await getList({
-          page: page || 1, // 현재 페이지가 1이면 그대로 1로 요청
-          size: size || 10,
+        console.log("🔍 요청 파라미터:", {
+          page: page ?? 0,
+          size: size ?? 10,
+          sortBy,
+          sortDir,
         });
 
-        console.log("🔍 API 응답:", data);
+        const data = await getList({
+          page: page ?? 0, // 현재 페이지가 1이면 그대로 1로 요청
+          size: size ?? 10,
+          sortBy,
+          sortDir,
+        });
 
         // API 응답에서 필요한 데이터 추출
         setMemberList(data.content || []);
         setTotalPages(data.totalPages || 0);
         setTotalElements(data.totalElements || 0);
-
-        console.log("🔍 설정된 memberList:", data.content);
-        console.log("🔍 memberList 길이:", data.content?.length);
       } catch (error) {
         console.error("❌ 데이터 로딩 실패:", error);
         setMemberList([]);
@@ -43,8 +57,27 @@ const MemberList = () => {
     };
 
     fetchData();
-  }, [page, size]);
+  }, [page, size, sortBy, sortDir]);
 
+  const handleHeaderClick = (field) => {
+    if (sortBy === field) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortDir("desc");
+    }
+    moveToList({ page: 0, size });
+  };
+
+  const handleSoryByChange = (newSortBy) => {
+    setSortBy(newSortBy);
+    moveToList({ page: 0, size });
+  };
+
+  const handleSoryDirChange = (newSortDir) => {
+    setSortDir(newSortDir);
+    moveToList({ page: 0, size }); //정렬 후 첫 페이지로 이동
+  };
   return (
     <>
       {/* 로딩 표시 */}
@@ -56,11 +89,15 @@ const MemberList = () => {
       <table>
         <thead>
           <tr>
-            <th>이름</th>
-            <th>아이디</th>
-            <th>가입일</th>
-            <th>게시글수</th>
-            <th>신고이력</th>
+            <th onClick={() => handleHeaderClick("memberName")}>이름</th>
+            <th onClick={() => handleHeaderClick("memberId")}>아이디</th>
+            <th onClick={() => handleHeaderClick("memberReg")}>가입일</th>
+            <th onClick={() => handleHeaderClick("memberReviewCount")}>
+              게시글수
+            </th>
+            <th onClick={() => handleHeaderClick("memberReportCount")}>
+              신고이력
+            </th>
           </tr>
         </thead>
         <tbody>

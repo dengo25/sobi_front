@@ -14,7 +14,7 @@ function useCustomMove() {
   const pageStr = queryParams.get("page");
   const sizeStr = queryParams.get("size");
 
-  const page = pageStr ? Number(pageStr) : 1;
+  const page = pageStr ? Number(pageStr) : 0;
   const size = sizeStr ? Number(sizeStr) : 10;
 
   const queryDefault = createSearchParams({
