@@ -1,5 +1,7 @@
 import { API_BASE_URL } from "../util/api-config.js";
 import jwtAxios from "../util/JwtUtil.jsx";
+import store from "../../store.jsx";
+import {logout} from "../../slice/memberSlice.jsx";
 
 //API 호출을 위한 공통 함수 정의
 export function call(api, method, request) {
@@ -78,7 +80,14 @@ export async function signin(memberDTO) {
 
 //로그아웃 함수: 토큰 제거 후 로그인 페이지로 이동
 export function signout() {
-  localStorage.setItem("ACCESS_TOKEN", null);
+  // localStorage.setItem("ACCESS_TOKEN", null);
+  localStorage.removeItem("ACCESS_TOKEN");
+  localStorage.removeItem("LOGIN_USER");
+  localStorage.removeItem("persist:root");
+
+
+  // Redux 상태 초기화
+  store.dispatch(logout());
   window.location.href = "/login";
 }
 

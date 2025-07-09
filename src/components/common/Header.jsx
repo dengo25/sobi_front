@@ -1,6 +1,13 @@
-import { Link } from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
+import {signout} from "../../service/member/ApiService.js";
 
 const Header = () => {
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    signout();
+  };
 
   return (
     <header>
@@ -21,9 +28,12 @@ const Header = () => {
           </ul>
 
           <ul className="util-box">
-            <li><Link to="/login">로그인</Link></li> 
-            <li><Link to="/">로그아웃</Link></li> 
-            <li><Link to="/join">회원가입</Link></li>
+            <li><Link to="/login">로그인</Link></li>
+            <li>
+              <button onClick={handleLogout} className="logout-button">
+                로그아웃
+              </button>
+            </li>            <li><Link to="/join">회원가입</Link></li>
             <li><Link to="/mypage">마이페이지</Link></li> 
           </ul>
         </nav>
