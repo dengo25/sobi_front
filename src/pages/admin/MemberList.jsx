@@ -1,7 +1,89 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  CircularProgress,
+  Alert,
+  Container,
+  Card,
+  Pagination,
+  Stack,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel,
+  Chip,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import {
+  People as PeopleIcon,
+  Sort as SortIcon,
+  ArrowUpward as ArrowUpwardIcon,
+  ArrowDownward as ArrowDownwardIcon,
+} from "@mui/icons-material";
 import { getList } from "../../service/admin/ApiService";
 import useCustomMove from "../../hooks/admin/UseCustomMove";
+
+const sobiTheme = createTheme({
+  palette: {
+    primary: {
+      main: "#44C3AA",
+      light: "#6FD4BB",
+      dark: "#045242",
+      contrastText: "#ffffff",
+    },
+    secondary: {
+      main: "#045242",
+      light: "#44C3AA",
+      dark: "#033A30",
+      contrastText: "#ffffff",
+    },
+  },
+});
+
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: "pointer",
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const HeaderBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: theme.spacing(2),
+}));
+
+const SortControls = styled(Box)(({ theme }) => ({
+  display: "flex",
+  gap: theme.spacing(2),
+  alignItems: "center",
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  color: theme.palette.secondary.main,
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+}));
 
 const MemberList = () => {
   const [memberList, setMemberList] = useState([]);
@@ -15,7 +97,6 @@ const MemberList = () => {
   const navigate = useNavigate();
   const { page, size, moveToList } = useCustomMove();
 
-  // 정렬 옵션 설정
   const sortOptions = [
     { value: "memberReg", label: "가입일" },
     { value: "memberName", label: "이름" },
@@ -36,13 +117,12 @@ const MemberList = () => {
         });
 
         const data = await getList({
-          page: page ?? 0, // 현재 페이지가 1이면 그대로 1로 요청
+          page: page ?? 0,
           size: size ?? 10,
           sortBy,
           sortDir,
         });
 
-        // API 응답에서 필요한 데이터 추출
         setMemberList(data.content || []);
         setTotalPages(data.totalPages || 0);
         setTotalElements(data.totalElements || 0);
@@ -66,117 +146,261 @@ const MemberList = () => {
       setSortBy(field);
       setSortDir("desc");
     }
-    moveToList({ page: 0, size });
+    // moveToList 호출 제거 - URL 변경하지 않음
   };
 
-  const handleSoryByChange = (newSortBy) => {
-    setSortBy(newSortBy);
-    moveToList({ page: 0, size });
+  const handleSortByChange = (event) => {
+    setSortBy(event.target.value);
+    // moveToList 호출 제거 - URL 변경하지 않음
   };
 
-  const handleSoryDirChange = (newSortDir) => {
-    setSortDir(newSortDir);
-    moveToList({ page: 0, size }); //정렬 후 첫 페이지로 이동
+  const handleSortDirChange = (event) => {
+    setSortDir(event.target.value);
+    // moveToList 호출 제거 - URL 변경하지 않음
   };
+
+  const getSortIcon = (field) => {
+    if (sortBy !== field) return <SortIcon fontSize="small" />;
+    return sortDir === "asc" ? (
+      <ArrowUpwardIcon fontSize="small" />
+    ) : (
+      <ArrowDownwardIcon fontSize="small" />
+    );
+  };
+
+  if (loading) {
+    return (
+      <ThemeProvider theme={sobiTheme}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: 400,
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </ThemeProvider>
+    );
+  }
+
   return (
-    <>
-      {/* 로딩 표시 */}
-      {loading && <div>로딩 중...</div>}
+    <ThemeProvider theme={sobiTheme}>
+      <Container maxWidth="lg" sx={{ p: 2 }}>
+        {/* 헤더 영역 */}
+        <HeaderBox>
+          <Box>
+            <SectionTitle variant="h6">
+              <PeopleIcon />
+              회원 관리 ({totalElements.toLocaleString()}명)
+            </SectionTitle>
+            <Typography variant="body2" color="text.secondary">
+              페이지 {(page || 0) + 1} / {totalPages}
+            </Typography>
+          </Box>
 
-      {/* 총 회원 수 표시 */}
-      <div style={{ marginBottom: "10px" }}>총 {totalElements}명의 회원</div>
-
-      <table>
-        <thead>
-          <tr>
-            <th onClick={() => handleHeaderClick("memberName")}>이름</th>
-            <th onClick={() => handleHeaderClick("memberId")}>아이디</th>
-            <th onClick={() => handleHeaderClick("memberReg")}>가입일</th>
-            <th onClick={() => handleHeaderClick("memberReviewCount")}>
-              게시글수
-            </th>
-            <th onClick={() => handleHeaderClick("memberReportCount")}>
-              신고이력
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {(() => {
-            console.log("🔍 렌더링 시점 memberList:", memberList);
-
-            if (loading) {
-              return (
-                <tr>
-                  <td colSpan="5">로딩 중...</td>
-                </tr>
-              );
-            }
-
-            if (!Array.isArray(memberList)) {
-              return (
-                <tr>
-                  <td colSpan="5">❌ 데이터 형식 오류 (배열이 아님)</td>
-                </tr>
-              );
-            }
-
-            if (memberList.length === 0) {
-              return (
-                <tr>
-                  <td colSpan="5">📄 회원 정보가 없습니다.</td>
-                </tr>
-              );
-            }
-
-            return memberList.map((member) => (
-              <tr
-                key={member.memberId}
-                onClick={() => navigate(`/admin/member/${member.memberId}`)}
-                style={{ cursor: "pointer" }}
+          {/* 정렬 컨트롤 */}
+          <SortControls>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>정렬 기준</InputLabel>
+              <Select
+                value={sortBy}
+                onChange={handleSortByChange}
+                label="정렬 기준"
               >
-                <td>{member.memberName}</td>
-                <td>{member.memberId}</td>
-                <td>
-                  {new Date(member.memberReg).toLocaleDateString("ko-KR")}
-                </td>
-                <td>{member.memberReviewCount}</td>
-                <td>{member.memberReportCount}</td>
-              </tr>
-            ));
-          })()}
-        </tbody>
-      </table>
+                {sortOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-      {/* 페이징 */}
-      <div style={{ marginTop: "20px", textAlign: "center" }}>
-        {totalPages > 0 &&
-          [...Array(totalPages)].map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => moveToList({ page: idx, size })}
-              style={{
-                fontWeight: idx === (page || 0) ? "bold" : "normal",
-                margin: "0 5px",
-                padding: "5px 10px",
-              }}
-            >
-              {idx + 1}
-            </button>
-          ))}
-      </div>
+            <FormControl size="small" sx={{ minWidth: 100 }}>
+              <InputLabel>순서</InputLabel>
+              <Select
+                value={sortDir}
+                onChange={handleSortDirChange}
+                label="순서"
+              >
+                <MenuItem value="desc">내림차순</MenuItem>
+                <MenuItem value="asc">오름차순</MenuItem>
+              </Select>
+            </FormControl>
+          </SortControls>
+        </HeaderBox>
 
-      {/* 페이지 정보 */}
-      <div
-        style={{
-          textAlign: "center",
-          marginTop: "10px",
-          fontSize: "14px",
-          color: "#666",
-        }}
-      >
-        페이지 {(page || 0) + 1} / {totalPages} (총 {totalElements}개 항목)
-      </div>
-    </>
+        {/* 회원 목록 테이블 */}
+        <Card>
+          <StyledTableContainer>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "grey.50" }}>
+                  <TableCell
+                    onClick={() => handleHeaderClick("memberName")}
+                    sx={{ cursor: "pointer", fontWeight: 600 }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      이름 {getSortIcon("memberName")}
+                    </Box>
+                  </TableCell>
+                  <TableCell
+                    onClick={() => handleHeaderClick("memberId")}
+                    sx={{ cursor: "pointer", fontWeight: 600 }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      아이디 {getSortIcon("memberId")}
+                    </Box>
+                  </TableCell>
+                  <TableCell
+                    onClick={() => handleHeaderClick("memberReg")}
+                    sx={{ cursor: "pointer", fontWeight: 600 }}
+                    align="center"
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        justifyContent: "center",
+                      }}
+                    >
+                      가입일 {getSortIcon("memberReg")}
+                    </Box>
+                  </TableCell>
+                  <TableCell
+                    onClick={() => handleHeaderClick("memberReviewCount")}
+                    sx={{ cursor: "pointer", fontWeight: 600 }}
+                    align="center"
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        justifyContent: "center",
+                      }}
+                    >
+                      게시글수 {getSortIcon("memberReviewCount")}
+                    </Box>
+                  </TableCell>
+                  <TableCell
+                    onClick={() => handleHeaderClick("memberReportCount")}
+                    sx={{ cursor: "pointer", fontWeight: 600 }}
+                    align="center"
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        justifyContent: "center",
+                      }}
+                    >
+                      신고이력 {getSortIcon("memberReportCount")}
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {(() => {
+                  if (!Array.isArray(memberList)) {
+                    return (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center">
+                          <Alert severity="error">데이터 형식 오류</Alert>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+
+                  if (memberList.length === 0) {
+                    return (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center">
+                          <Box sx={{ py: 4 }}>
+                            <PeopleIcon
+                              sx={{ fontSize: 48, color: "grey.400", mb: 1 }}
+                            />
+                            <Typography variant="body2" color="text.secondary">
+                              회원 정보가 없습니다.
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+
+                  return memberList.map((member) => (
+                    <StyledTableRow
+                      key={member.memberId}
+                      onClick={() =>
+                        navigate(`/admin/member/${member.memberId}`)
+                      }
+                    >
+                      <TableCell sx={{ fontWeight: 500 }}>
+                        {member.memberName}
+                      </TableCell>
+                      <TableCell>{member.memberId}</TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          {new Date(member.memberReg).toLocaleDateString(
+                            "ko-KR"
+                          )}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={member.memberReviewCount}
+                          color="primary"
+                          size="small"
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={member.memberReportCount}
+                          color={
+                            member.memberReportCount > 0 ? "error" : "default"
+                          }
+                          size="small"
+                          variant={
+                            member.memberReportCount > 0 ? "filled" : "outlined"
+                          }
+                        />
+                      </TableCell>
+                    </StyledTableRow>
+                  ));
+                })()}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+
+          {/* 페이지네이션 */}
+          {totalPages > 0 && (
+            <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
+              <Stack spacing={2} alignItems="center">
+                <Pagination
+                  count={totalPages}
+                  page={(page || 0) + 1}
+                  onChange={(event, value) =>
+                    moveToList({ page: value - 1, size })
+                  }
+                  color="primary"
+                  size="medium"
+                  showFirstButton
+                  showLastButton
+                />
+                <Typography variant="caption" color="text.secondary">
+                  총 {totalElements}개 항목
+                </Typography>
+              </Stack>
+            </Box>
+          )}
+        </Card>
+      </Container>
+    </ThemeProvider>
   );
 };
 
