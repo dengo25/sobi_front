@@ -280,7 +280,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
               />
             ) : (
               <Typography variant="h5" fontWeight={700} gutterBottom>
-                {userInfo?.memberName || "사용자"}
+                {userInfo?.memberName || "사용자"}#{userInfo?.id || "0"}
               </Typography>
             )}
 

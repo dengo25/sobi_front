@@ -55,15 +55,15 @@ import AccountInfo from "./AccountInfo";
 const sobiTheme = createTheme({
   palette: {
     primary: {
-      main: "#44C3AA", // SOBI 연한색
-      light: "#6FD4BB", // 더 밝은 버전
-      dark: "#045242", // SOBI 진한색
+      main: "#44C3AA",
+      light: "#6FD4BB",
+      dark: "#045242",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#045242", // SOBI 진한색을 보조색으로
+      main: "#045242",
       light: "#44C3AA",
-      dark: "#033A30", // 더 어두운 버전
+      dark: "#033A30",
       contrastText: "#ffffff",
     },
   },
@@ -72,7 +72,6 @@ const sobiTheme = createTheme({
 // 스타일드 컴포넌트
 const MainContainer = styled(Container)(({ theme }) => ({
   minHeight: "100vh",
-  backgroundColor: theme.palette.grey[50],
   paddingTop: theme.spacing(3),
   paddingBottom: theme.spacing(3),
 }));
@@ -248,11 +247,20 @@ const Mypage = () => {
         // API에서 가져온 정보를 상태에 저장
         setUserInfo(response);
 
-        // Redux 상태도 API 응답으로 업데이트 (최신 정보로 동기화)
+        // *** 수정된 부분: 기존 Redux 상태를 안전하게 유지하면서 업데이트 ***
         dispatch(
           login({
-            ...reduxUserInfo, // 기존 토큰 등은 유지
-            ...response, // API에서 가져온 최신 정보로 덮어쓰기
+            // 기존 토큰과 중요 정보는 반드시 유지
+            token: reduxUserInfo.token,
+            memberId: reduxUserInfo.memberId,
+            role: reduxUserInfo.role,
+            // API에서 가져온 최신 정보로 업데이트 (token 제외)
+            memberName: response.memberName,
+            memberEmail: response.memberEmail,
+            memberGender: response.memberGender,
+            memberBirth: response.memberBirth,
+            memberAddr: response.memberAddr,
+            memberZip: response.memberZip,
           })
         );
 
@@ -313,11 +321,21 @@ const Mypage = () => {
     // 로컬 상태 업데이트
     setUserInfo(updatedUserInfo);
 
-    // Redux 상태도 업데이트
+    // *** 수정된 부분: 아이디도 함께 업데이트 ***
     dispatch(
       login({
-        ...reduxUserInfo,
-        ...updatedUserInfo,
+        // 기존 토큰과 역할은 반드시 유지
+        token: reduxUserInfo.token,
+        role: reduxUserInfo.role,
+        // 업데이트된 정보 반영 (아이디 포함)
+        id: updatedUserInfo.id,
+        memberId: updatedUserInfo.memberId, // ← 아이디도 업데이트
+        memberName: updatedUserInfo.memberName,
+        memberEmail: updatedUserInfo.memberEmail,
+        memberGender: updatedUserInfo.memberGender,
+        memberBirth: updatedUserInfo.memberBirth,
+        memberAddr: updatedUserInfo.memberAddr,
+        memberZip: updatedUserInfo.memberZip,
       })
     );
 
@@ -499,7 +517,7 @@ const Mypage = () => {
               <Typography variant="h6" fontWeight={600}>
                 {userInfo?.memberName || "사용자"}#{userInfo?.id || "0"}
               </Typography>
-              {/* 디버깅용 임시 정보 표시 */}
+              {/* 디버깅용 임시 정보 표시
               {process.env.NODE_ENV === "development" && (
                 <Typography
                   variant="caption"
@@ -508,7 +526,7 @@ const Mypage = () => {
                 >
                   ID: {userInfo?.memberId}
                 </Typography>
-              )}
+              )} */}
             </ProfileSection>
 
             {/* 활동 메뉴 섹션 */}
