@@ -14,7 +14,6 @@ import {
   CircularProgress,
   Alert,
   Container,
-  Card,
   Pagination,
   Stack,
   FormControl,
@@ -24,6 +23,7 @@ import {
   Chip,
   ThemeProvider,
   createTheme,
+  Paper,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -83,6 +83,19 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing(1),
+}));
+
+const PaginationContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: theme.spacing(2),
+  borderTop: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  position: "sticky",
+  bottom: 0,
+  zIndex: 1,
+  boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
 }));
 
 const MemberList = () => {
@@ -187,7 +200,16 @@ const MemberList = () => {
 
   return (
     <ThemeProvider theme={sobiTheme}>
-      <Container maxWidth="lg" sx={{ p: 2 }}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          p: 2,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "calc(100vh - 200px)",
+        }}
+      >
         {/* 헤더 영역 */}
         <HeaderBox>
           <Box>
@@ -232,8 +254,8 @@ const MemberList = () => {
         </HeaderBox>
 
         {/* 회원 목록 테이블 */}
-        <Card>
-          <StyledTableContainer>
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <StyledTableContainer component={Paper} sx={{ flex: 1 }}>
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "grey.50" }}>
@@ -377,9 +399,9 @@ const MemberList = () => {
             </Table>
           </StyledTableContainer>
 
-          {/* 페이지네이션 */}
-          {totalPages > 0 && (
-            <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
+          {/* 페이지네이션을 하단 고정 */}
+          <PaginationContainer>
+            {totalPages > 0 ? (
               <Stack spacing={2} alignItems="center">
                 <Pagination
                   count={totalPages}
@@ -391,14 +413,24 @@ const MemberList = () => {
                   size="medium"
                   showFirstButton
                   showLastButton
+                  siblingCount={1}
+                  boundaryCount={1}
                 />
                 <Typography variant="caption" color="text.secondary">
-                  총 {totalElements}개 항목
+                  {(page || 0) * size + 1}-
+                  {Math.min(((page || 0) + 1) * size, totalElements)} /{" "}
+                  {totalElements}개 표시
                 </Typography>
               </Stack>
-            </Box>
-          )}
-        </Card>
+            ) : (
+              totalElements > 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  총 {totalElements}개
+                </Typography>
+              )
+            )}
+          </PaginationContainer>
+        </Box>
       </Container>
     </ThemeProvider>
   );
