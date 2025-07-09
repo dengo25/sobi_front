@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux"; // Redux 훅 추가
+import { login } from "../../slice/memberSlice"; // login 액션 추가
 import {
   Box,
   Typography,
@@ -161,6 +163,13 @@ const Mypage = () => {
   const [selectedMessageTab, setSelectedMessageTab] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // Redux에서 사용자 정보 가져오기
+  const reduxUserInfo = useSelector((state) => state.member);
+
+  // URL 파라미터에서 탭 정보 가져오기
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // 메뉴 아이템 데이터
   const menuItems = [
@@ -194,8 +203,20 @@ const Mypage = () => {
       navigate("/login");
       return;
     }
+
+    // URL 파라미터에서 탭 정보 확인
+    const tabParam = searchParams.get("tab");
+    if (tabParam !== null) {
+      const tabIndex = parseInt(tabParam, 10);
+      if (tabIndex >= 0 && tabIndex < tabLabels.length) {
+        setSelectedTab(tabIndex);
+      }
+      // URL 파라미터 제거 (깔끔한 URL 유지)
+      setSearchParams({});
+    }
+
     fetchUserInfo();
-  }, [navigate]);
+  }, [navigate, searchParams, setSearchParams]);
 
   // 읽지 않은 쪽지 수를 가져오는 함수
   const fetchUnreadMessageCount = async () => {
@@ -217,9 +238,24 @@ const Mypage = () => {
     try {
       setLoading(true);
       setError(null);
+
+      console.log("Redux 사용자 정보:", reduxUserInfo);
+
       const response = await getMypage();
+      console.log("API 응답 사용자 정보:", response);
+
       if (response) {
+        // API에서 가져온 정보를 상태에 저장
         setUserInfo(response);
+
+        // Redux 상태도 API 응답으로 업데이트 (최신 정보로 동기화)
+        dispatch(
+          login({
+            ...reduxUserInfo, // 기존 토큰 등은 유지
+            ...response, // API에서 가져온 최신 정보로 덮어쓰기
+          })
+        );
+
         await fetchUnreadMessageCount();
       } else {
         setError("사용자 정보를 불러올 수 없습니다.");
@@ -274,7 +310,17 @@ const Mypage = () => {
   };
 
   const handleProfileUpdate = (updatedUserInfo, message) => {
+    // 로컬 상태 업데이트
     setUserInfo(updatedUserInfo);
+
+    // Redux 상태도 업데이트
+    dispatch(
+      login({
+        ...reduxUserInfo,
+        ...updatedUserInfo,
+      })
+    );
+
     if (message) {
       setSuccessMessage(message);
       setShowSuccessAlert(true);
@@ -445,14 +491,24 @@ const Mypage = () => {
             {/* 프로필 섹션 */}
             <ProfileSection>
               <StyledAvatar>
-                {userInfo?.memberName?.charAt(0).toUpperCase() || "H"}
+                {userInfo?.memberName?.charAt(0).toUpperCase() || "U"}
               </StyledAvatar>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                일반 회원
+                {userInfo?.role === "ROLE_USER" ? "일반 회원" : "관리자"}
               </Typography>
               <Typography variant="h6" fontWeight={600}>
-                {userInfo?.memberName || "hh"}#{userInfo?.id || "9"}
+                {userInfo?.memberName || "사용자"}#{userInfo?.id || "0"}
               </Typography>
+              {/* 디버깅용 임시 정보 표시 */}
+              {process.env.NODE_ENV === "development" && (
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mt: 1, display: "block" }}
+                >
+                  ID: {userInfo?.memberId}
+                </Typography>
+              )}
             </ProfileSection>
 
             {/* 활동 메뉴 섹션 */}
