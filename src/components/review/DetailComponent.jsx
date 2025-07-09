@@ -2,6 +2,8 @@ import {useEffect, useState} from "react";
 import useCustomMove from "../../hooks/review/UseCustomMove.jsx";
 import {getReview} from "../../service/review/ReviewService.js";
 import BasicEditor from "../editor/BasicEditor.jsx";
+import CustomButton from "../input/CustomButton.jsx";
+import Stack from "@mui/material/Stack";
 
 
 function DetailComponent({tno}) {
@@ -18,21 +20,18 @@ function DetailComponent({tno}) {
 
     return (
         <div>
-            <h1>DetailComponent</h1>
+            <h2>리뷰 상세 보기</h2>
+
             {review && (
-                <div>
-                    <h2>{review.title}</h2>
+                <div className="content-area">
+                    <h3>{review.title}</h3>
 
+                    <div className="content" dangerouslySetInnerHTML={{ __html: review.content }} />
 
-                    <BasicEditor
-                        value={review.content}
-                        onChange={() => {}} // 빈 함수 전달
-                        readOnly={true}
-                        theme={null} // readOnly면 테마 없어도 됨
-                    />
-
-                    <button onClick={() => moveToList()}>목록</button>
-                    <button onClick={() => moveToModify(tno)}>수정</button>
+                    <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end", mt: 2 }}>
+                        <CustomButton type="button" color="primary" text="목록" onClick={moveToList} />
+                        <CustomButton type="button" color="default" text="수정" onClick={() => moveToModify(tno)} />
+                    </Stack>
                 </div>
             )}
         </div>
