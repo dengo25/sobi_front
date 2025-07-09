@@ -507,7 +507,8 @@ const Common = () => {
           count={10}
           page={page}
           onChange={pageHandleChange}
-          color="primary"
+          useCustomStyle={true}
+          customColor="primary"
         />
         <br />
         <h4># 고급 옵션 페이지네이션</h4>
@@ -518,7 +519,8 @@ const Common = () => {
           count={20}
           page={page2}
           onChange={pageHandleChange2}
-          color="secondary"
+          useCustomStyle={true}
+          customColor="default"
           showFirstButton
           showLastButton
           siblingCount={2}
@@ -544,7 +546,8 @@ const Common = () => {
           count={totalPages}
           page={currentPage}
           onChange={handlePageChange}
-          color="primary"
+          useCustomStyle={true}
+          customColor="primary"
           showFirstButton
           showLastButton
         />
