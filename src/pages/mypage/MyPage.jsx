@@ -114,7 +114,7 @@ const MenuSection = styled(Box)(({ theme }) => ({
 }));
 
 const MenuLabel = styled(Typography)(({ theme }) => ({
-  fontSize: 12,
+  fontSize: 14,
   color: theme.palette.text.secondary,
   fontWeight: 500,
   marginBottom: theme.spacing(1.5),
