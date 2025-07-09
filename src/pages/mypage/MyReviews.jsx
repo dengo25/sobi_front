@@ -22,6 +22,8 @@ import {
   Container,
   Card,
   CardContent,
+  Pagination,
+  Stack,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { getMyReviews } from "../../service/mypage/ApiService";
@@ -30,6 +32,9 @@ import { getMyReviews } from "../../service/mypage/ApiService";
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(2),
   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  "& .MuiTable-root": {
+    tableLayout: "fixed",
+  },
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -52,12 +57,27 @@ const LoadingBox = styled(Box)(({ theme }) => ({
   height: 200,
 }));
 
-const MyReviews = () => {
+const PaginationContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: theme.spacing(2),
+  borderTop: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  position: "sticky",
+  bottom: 0,
+  zIndex: 1,
+  boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
+}));
+
+const MyReviews = ({ onReviewAction }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedReview, setSelectedReview] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 14;
 
   useEffect(() => {
     fetchMyReviews();
@@ -72,6 +92,8 @@ const MyReviews = () => {
 
       if (response && response.rnoList) {
         setReviews(response.rnoList);
+        // 데이터가 새로 로드되면 첫 페이지로 이동
+        setCurrentPage(1);
       } else {
         setReviews([]);
       }
@@ -91,6 +113,10 @@ const MyReviews = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setSelectedReview(null);
+  };
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
   };
 
   const formatDate = (dateString) => {
@@ -128,6 +154,12 @@ const MyReviews = () => {
     }
   };
 
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(reviews.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentReviews = reviews.slice(startIndex, endIndex);
+
   if (loading) {
     return (
       <LoadingBox>
@@ -154,12 +186,26 @@ const MyReviews = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ p: 2 }}>
+    <Container
+      maxWidth="lg"
+      sx={{
+        p: 2,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "calc(100vh - 200px)",
+      }}
+    >
       {/* 헤더 */}
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6" component="h3" fontWeight={600}>
           내가 쓴 후기 ({reviews.length})
         </Typography>
+        {reviews.length > 0 && (
+          <Typography variant="body2" color="text.secondary">
+            페이지 {currentPage} / {totalPages} (총 {reviews.length}개)
+          </Typography>
+        )}
       </Box>
 
       {reviews.length === 0 ? (
@@ -176,47 +222,88 @@ const MyReviews = () => {
           </CardContent>
         </Card>
       ) : (
-        <StyledTableContainer component={Paper}>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "grey.50" }}>
-                <TableCell>번호</TableCell>
-                <TableCell>제목</TableCell>
-                <TableCell align="center">상태</TableCell>
-                <TableCell align="center">작성일</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {reviews.map((review, index) => (
-                <StyledTableRow
-                  key={review.tno}
-                  onClick={() => handleReviewClick(review)}
-                >
-                  <TableCell>{reviews.length - index}</TableCell>
-                  <TableCell
-                    sx={{
-                      maxWidth: 300,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {review.title}
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <StyledTableContainer component={Paper} sx={{ flex: 1 }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "grey.50" }}>
+                  <TableCell sx={{ width: "80px" }}>번호</TableCell>
+                  <TableCell sx={{ width: "auto" }}>제목</TableCell>
+                  <TableCell align="center" sx={{ width: "100px" }}>
+                    상태
                   </TableCell>
-                  <TableCell align="center">
-                    {getStatusChip(review.confirmed)}
+                  <TableCell align="center" sx={{ width: "120px" }}>
+                    작성일
                   </TableCell>
-                  <TableCell align="center">
-                    <Typography variant="body2" color="text.secondary">
-                      {formatDate(review.createdAt)}
-                    </Typography>
-                  </TableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </StyledTableContainer>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {currentReviews.map((review, index) => {
+                  // 전체 목록에서의 실제 번호 계산 (최신순)
+                  const actualIndex = startIndex + index;
+                  const displayNumber = reviews.length - actualIndex;
+
+                  return (
+                    <StyledTableRow
+                      key={review.tno}
+                      onClick={() => handleReviewClick(review)}
+                    >
+                      <TableCell>{displayNumber}</TableCell>
+                      <TableCell
+                        sx={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          fontWeight: 500,
+                          paddingRight: 1, // 우측 여백 추가
+                        }}
+                      >
+                        {review.title}
+                      </TableCell>
+                      <TableCell align="center">
+                        {getStatusChip(review.confirmed)}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDate(review.createdAt)}
+                        </Typography>
+                      </TableCell>
+                    </StyledTableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+
+          {/* 페이지네이션 */}
+          <PaginationContainer>
+            {totalPages > 1 ? (
+              <Stack spacing={2} alignItems="center">
+                <Pagination
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="medium"
+                  showFirstButton
+                  showLastButton
+                  siblingCount={1}
+                  boundaryCount={1}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {startIndex + 1}-{Math.min(endIndex, reviews.length)} /{" "}
+                  {reviews.length}개 표시
+                </Typography>
+              </Stack>
+            ) : (
+              reviews.length > 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  총 {reviews.length}개
+                </Typography>
+              )
+            )}
+          </PaginationContainer>
+        </Box>
       )}
 
       {/* 후기 상세 다이얼로그 */}

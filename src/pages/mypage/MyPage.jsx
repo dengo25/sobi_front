@@ -44,6 +44,7 @@ import {
   isLoggedIn,
   getReceivedMessages,
 } from "../../service/member/ApiService";
+import { getMyReviews } from "../../service/mypage/ApiService"; // 후기 API 추가
 import DeleteProfile from "./DeleteProfile";
 import SendMessage from "./SendMessage";
 import ReceivedMessages from "./ReceivedMessages";
@@ -69,7 +70,7 @@ const sobiTheme = createTheme({
   },
 });
 
-// 스타일드 컴포넌트
+// 스타일드 컴포넌트들 (기존과 동일)
 const MainContainer = styled(Container)(({ theme }) => ({
   minHeight: "100vh",
   paddingTop: theme.spacing(3),
@@ -161,6 +162,7 @@ const Mypage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedMessageTab, setSelectedMessageTab] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0); // 후기 수 상태 추가
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -170,10 +172,10 @@ const Mypage = () => {
   // URL 파라미터에서 탭 정보 가져오기
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // 메뉴 아이템 데이터
+  // 메뉴 아이템 데이터 - 동적으로 후기 수 반영
   const menuItems = [
     { text: "계정 정보", count: "", icon: <CommentIcon /> },
-    { text: "내가 쓴 후기", count: "0건", icon: <ReviewIcon /> },
+    { text: "내가 쓴 후기", count: `${reviewCount}건`, icon: <ReviewIcon /> },
     { text: "포인트", count: "0P", icon: <PointIcon /> },
     { text: "뱃지", count: "0개", icon: <BadgeIcon /> },
     { text: "체험단", count: "0건?", icon: <ExperimentIcon /> },
@@ -233,6 +235,23 @@ const Mypage = () => {
     }
   };
 
+  // 후기 수를 가져오는 함수 추가
+  const fetchReviewCount = async () => {
+    try {
+      const response = await getMyReviews();
+      console.log("후기 수 조회 응답:", response);
+
+      if (response && response.rnoList && Array.isArray(response.rnoList)) {
+        setReviewCount(response.rnoList.length);
+      } else {
+        setReviewCount(0);
+      }
+    } catch (err) {
+      console.error("후기 수 조회 오류:", err);
+      setReviewCount(0);
+    }
+  };
+
   const fetchUserInfo = async () => {
     try {
       setLoading(true);
@@ -247,7 +266,6 @@ const Mypage = () => {
         // API에서 가져온 정보를 상태에 저장
         setUserInfo(response);
 
-        // *** 수정된 부분: 기존 Redux 상태를 안전하게 유지하면서 업데이트 ***
         dispatch(
           login({
             // 기존 토큰과 중요 정보는 반드시 유지
@@ -264,7 +282,8 @@ const Mypage = () => {
           })
         );
 
-        await fetchUnreadMessageCount();
+        // 쪽지 수와 후기 수를 병렬로 가져오기
+        await Promise.all([fetchUnreadMessageCount(), fetchReviewCount()]);
       } else {
         setError("사용자 정보를 불러올 수 없습니다.");
       }
@@ -286,6 +305,11 @@ const Mypage = () => {
     if (newValue === 5) {
       fetchUnreadMessageCount();
     }
+
+    // 내가 쓴 후기 탭을 선택했을 때 후기 수를 다시 가져옴
+    if (newValue === 1) {
+      fetchReviewCount();
+    }
   };
 
   const handleMessageTabChange = (event, newValue) => {
@@ -301,6 +325,9 @@ const Mypage = () => {
     setSelectedTab(index);
     if (index === 5) {
       fetchUnreadMessageCount();
+    }
+    if (index === 1) {
+      fetchReviewCount();
     }
   };
 
@@ -321,7 +348,6 @@ const Mypage = () => {
     // 로컬 상태 업데이트
     setUserInfo(updatedUserInfo);
 
-    // *** 수정된 부분: 아이디도 함께 업데이트 ***
     dispatch(
       login({
         // 기존 토큰과 역할은 반드시 유지
@@ -329,7 +355,7 @@ const Mypage = () => {
         role: reduxUserInfo.role,
         // 업데이트된 정보 반영 (아이디 포함)
         id: updatedUserInfo.id,
-        memberId: updatedUserInfo.memberId, // ← 아이디도 업데이트
+        // memberId: updatedUserInfo.memberId, // ← 아이디도 업데이트
         memberName: updatedUserInfo.memberName,
         memberEmail: updatedUserInfo.memberEmail,
         memberGender: updatedUserInfo.memberGender,
@@ -360,6 +386,11 @@ const Mypage = () => {
     fetchUnreadMessageCount();
   };
 
+  // 후기 관련 작업 후 후기 수를 업데이트하는 함수 추가
+  const handleReviewAction = () => {
+    fetchReviewCount();
+  };
+
   const renderTabContent = () => {
     // 계정 정보 탭
     if (selectedTab === 0) {
@@ -378,7 +409,7 @@ const Mypage = () => {
     if (selectedTab === 1) {
       return (
         <Box sx={{ height: "100%", backgroundColor: "grey.50" }}>
-          <MyReviews />
+          <MyReviews onReviewAction={handleReviewAction} />
         </Box>
       );
     }
@@ -517,16 +548,6 @@ const Mypage = () => {
               <Typography variant="h6" fontWeight={600}>
                 {userInfo?.memberName || "사용자"}#{userInfo?.id || "0"}
               </Typography>
-              {/* 디버깅용 임시 정보 표시
-              {process.env.NODE_ENV === "development" && (
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: 1, display: "block" }}
-                >
-                  ID: {userInfo?.memberId}
-                </Typography>
-              )} */}
             </ProfileSection>
 
             {/* 활동 메뉴 섹션 */}

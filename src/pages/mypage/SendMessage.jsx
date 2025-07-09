@@ -195,12 +195,12 @@ const SendMessage = ({ onMessageSent }) => {
                 </Alert>
               )}
 
-              {/* 성공 알림 */}
+              {/* 성공 알림
               {success && (
                 <Alert severity="success" sx={{ mb: 2 }}>
                   {success}
                 </Alert>
-              )}
+              )} */}
 
               {/* 받는 사람과 제목 */}
               <Grid container spacing={2} sx={{ mb: 2 }}>

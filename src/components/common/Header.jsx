@@ -25,7 +25,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { signout } from "../../service/member/ApiService.js";
 import { useSelector } from "react-redux";
 
-// SOBI 브랜드 색상 테마
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -43,7 +42,6 @@ const sobiTheme = createTheme({
   },
 });
 
-// 스타일드 컴포넌트
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: "white",
   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
@@ -69,7 +67,7 @@ const LogoContainer = styled(Box)(({ theme }) => ({
 }));
 
 const LogoImage = styled("img")(({ theme }) => ({
-  height: "70px", // 50px에서 70px로 변경
+  height: "70px",
   width: "auto",
   transition: "all 0.3s ease",
   "&:hover": {
@@ -175,8 +173,6 @@ const Header = () => {
   const [mobileMenuAnchor, setMobileMenuAnchor] = useState(null);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
   const isMobile = useMediaQuery(sobiTheme.breakpoints.down("md"));
-
-  // Redux에서 사용자 정보 가져오기
   const userInfo = useSelector((state) => state.member);
   const isLoggedIn = userInfo && userInfo.token;
 
