@@ -1,6 +1,7 @@
 import jwtAxios from "../util/JwtUtil.jsx";
 import {API_BASE_URL} from "../util/api-config.js";
 import {call} from "../member/ApiService.js";
+import axios from "axios";
 
 export const insertReview = async (dto) => {
     try {
@@ -12,6 +13,11 @@ export const insertReview = async (dto) => {
         throw error;
     }
 };
+
+export async function getReview(tno) {
+    const response = await axios.get(`${API_BASE_URL}/api/review/${tno}`);
+    return response.data;
+}
 
 export function getCategoryList() {
     return call("/api/category", "GET", null);
