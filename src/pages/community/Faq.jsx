@@ -1,24 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Stack } from '@mui/material';
 
 import CNTAccordion from '../../components/list/ControlledAccordions';
 import CustomButton from '../../components/input/CustomButton';
 import { getFaqList, deleteFaq } from '../../service/community/FaqApiService';
-import { useSelector } from 'react-redux';
-// import { getUserRoleFromToken } from "../../service/util/auth";
 
 const Faq = () =>{
     const [selectedFaqs, setSelectedFaqs] = useState([]);
     const [list, setList] = useState([]);
     const [expanded, setExpanded] = useState(false);
     const navigate = useNavigate();
-    // const user = JSON.parse(localStorage.getItem("loginUser"));
-    // const userRole = user?.role;  // ex: "ROLE_ADMIN"
-    // const userRole = getUserRoleFromToken();
-    // console.log("현재 유저 권한:", userRole);
     const member = useSelector((state) => state.memberSlice);
-    console.log("현재 유저 정보:", member);
+    console.log("[slice] 현재 유저 정보 :", member);
 
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : false);
@@ -95,7 +90,7 @@ const Faq = () =>{
                 faqNo={faq.faqNo}
                 isChecked={selectedFaqs.includes(faq.faqNo)}
                 onCheckToggle={toggleSelect}
-                // isAdmin={userRole === "ROLE_ADMIN"}
+                isAdmin={member.role === "ROLE_ADMIN"}
                 ></CNTAccordion>
         )
     });
@@ -104,7 +99,7 @@ const Faq = () =>{
         <>
             <h2>FAQ</h2>
             {dataList}
-            {member?.role === "" && (
+            {member?.role === "ROLE_ADMIN" && (
             <Stack direction="row" spacing={1} sx={{justifyContent:"right"}}>
                 <CustomButton
                     type="button"

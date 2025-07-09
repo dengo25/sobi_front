@@ -88,7 +88,7 @@ const FaqForm = () => {
                         size='medium'
                         variant="contained"
                         color="success"
-                        text='새글 등록'
+                        text='등록'
                     />
                     <CustomButton
                         type="button"
