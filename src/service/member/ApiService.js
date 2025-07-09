@@ -83,8 +83,8 @@ export function signout() {
 }
 
 //회원가입 함수: userDTO를 post로 전달
-export function signup(userDTO) {
-  return call("/auth/signup", "POST", userDTO);
+export function signup(memberDTO) {
+  return call("/auth/signup", "POST", memberDTO);
 }
 
 // 소셜 로그인 함수: provider에 따라 OAuth2 인증시작

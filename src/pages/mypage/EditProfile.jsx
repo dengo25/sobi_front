@@ -1,5 +1,70 @@
-import React, { useState, useEffect } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Box,
+  Avatar,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { Close as CloseIcon, Save as SaveIcon } from "@mui/icons-material";
 import { updateMypage } from "../../service/member/ApiService";
+
+// 스타일드 컴포넌트
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialog-paper": {
+    borderRadius: theme.spacing(1),
+    maxWidth: 600,
+    width: "100%",
+  },
+}));
+
+const HeaderBox = styled(Box)(({ theme }) => ({
+  position: "relative",
+  padding: theme.spacing(3, 3, 2, 3),
+  textAlign: "center",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  background: `linear-gradient(135deg, ${theme.palette.primary.light}20, ${theme.palette.primary.main}10)`,
+}));
+
+const CloseButton = styled(IconButton)(({ theme }) => ({
+  position: "absolute",
+  right: theme.spacing(2),
+  top: theme.spacing(2),
+  color: theme.palette.grey[500],
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: 64,
+  height: 64,
+  margin: "0 auto 16px",
+  backgroundColor: theme.palette.primary.main,
+  fontSize: 24,
+  fontWeight: "bold",
+}));
+
+const ContentBox = styled(DialogContent)(({ theme }) => ({
+  padding: theme.spacing(4),
+}));
+
+const ActionsBox = styled(DialogActions)(({ theme }) => ({
+  padding: theme.spacing(2, 4),
+  borderTop: `1px solid ${theme.palette.divider}`,
+  gap: theme.spacing(1.5),
+}));
 
 const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -150,653 +215,228 @@ const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
     }
   };
 
-  if (!open) return null;
-
-  const styles = {
-    // 오버레이
-    overlay: {
-      position: "fixed",
-      inset: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 50,
-      padding: "16px",
-    },
-
-    // 다이얼로그 컨테이너
-    dialog: {
-      backgroundColor: "white",
-      borderRadius: "8px",
-      boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
-      maxWidth: "600px",
-      width: "100%",
-      maxHeight: "90vh",
-      overflow: "hidden",
-      display: "flex",
-      flexDirection: "column",
-      position: "relative",
-    },
-
-    // 헤더
-    header: {
-      padding: "32px 32px 16px 32px",
-      textAlign: "center",
-      borderBottom: "1px solid #f0f0f0",
-      position: "relative",
-    },
-
-    closeButton: {
-      position: "absolute",
-      right: "16px",
-      top: "16px",
-      backgroundColor: "transparent",
-      border: "none",
-      color: "#666",
-      cursor: "pointer",
-      padding: "8px",
-      borderRadius: "4px",
-      fontSize: "18px",
-      fontWeight: "bold",
-      width: "32px",
-      height: "32px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      transition: "background-color 0.2s",
-    },
-
-    closeButtonHover: {
-      backgroundColor: "#f0f0f0",
-    },
-
-    // 프로필 아바타
-    avatar: {
-      width: "64px",
-      height: "64px",
-      margin: "0 auto 16px",
-      backgroundColor: "#4ecdc4",
-      borderRadius: "50%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "white",
-      fontSize: "24px",
-      fontWeight: "bold",
-    },
-
-    // 타이틀
-    title: {
-      fontSize: "18px",
-      fontWeight: "600",
-      color: "#111827",
-      margin: "0 0 4px 0",
-    },
-
-    subtitle: {
-      fontSize: "14px",
-      color: "#6b7280",
-      margin: 0,
-    },
-
-    // 컨텐츠
-    content: {
-      padding: "32px",
-      flex: 1,
-      overflowY: "auto",
-    },
-
-    // 폼 컨테이너
-    form: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "24px",
-    },
-
-    // 알림
-    alert: {
-      padding: "12px 16px",
-      borderRadius: "8px",
-      fontSize: "14px",
-      backgroundColor: "#ffebee",
-      border: "1px solid #ffcdd2",
-      color: "#d32f2f",
-    },
-
-    // 입력 그룹
-    inputGroup: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "6px",
-    },
-
-    label: {
-      fontSize: "14px",
-      fontWeight: "500",
-      color: "#374151",
-    },
-
-    required: {
-      color: "#dc2626",
-    },
-
-    // 입력 필드들
-    input: {
-      width: "100%",
-      padding: "12px 16px",
-      border: "1px solid #d1d5db",
-      borderRadius: "8px",
-      fontSize: "14px",
-      color: "#111827",
-      backgroundColor: "white",
-      transition: "all 0.2s ease",
-      outline: "none",
-      boxSizing: "border-box",
-    },
-
-    inputFocus: {
-      borderColor: "#4ecdc4",
-      boxShadow: "0 0 0 3px rgba(78, 205, 196, 0.1)",
-    },
-
-    inputDisabled: {
-      backgroundColor: "#f9fafb",
-      color: "#6b7280",
-      cursor: "not-allowed",
-    },
-
-    inputError: {
-      borderColor: "#dc2626",
-    },
-
-    // Select
-    select: {
-      width: "100%",
-      padding: "12px 16px",
-      border: "1px solid #d1d5db",
-      borderRadius: "8px",
-      fontSize: "14px",
-      color: "#111827",
-      backgroundColor: "white",
-      transition: "all 0.2s ease",
-      outline: "none",
-      boxSizing: "border-box",
-      cursor: "pointer",
-    },
-
-    selectFocus: {
-      borderColor: "#4ecdc4",
-      boxShadow: "0 0 0 3px rgba(78, 205, 196, 0.1)",
-    },
-
-    // 헬퍼 텍스트
-    helperText: {
-      fontSize: "12px",
-      color: "#6b7280",
-      marginTop: "4px",
-    },
-
-    helperTextError: {
-      color: "#dc2626",
-    },
-
-    // 구분선
-    divider: {
-      height: "1px",
-      backgroundColor: "#e5e7eb",
-      margin: "8px 0",
-    },
-
-    // 액션 버튼들
-    actions: {
-      display: "flex",
-      justifyContent: "flex-end",
-      gap: "12px",
-      marginTop: "32px",
-      paddingTop: "24px",
-      borderTop: "1px solid #f0f0f0",
-    },
-
-    button: {
-      padding: "10px 24px",
-      fontSize: "14px",
-      fontWeight: "500",
-      borderRadius: "8px",
-      border: "none",
-      cursor: "pointer",
-      transition: "all 0.2s ease",
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      minWidth: "80px",
-      justifyContent: "center",
-    },
-
-    cancelButton: {
-      backgroundColor: "transparent",
-      color: "#6b7280",
-      border: "1px solid #d1d5db",
-    },
-
-    cancelButtonHover: {
-      backgroundColor: "#f8f9fa",
-    },
-
-    submitButton: {
-      backgroundColor: "#4ecdc4",
-      color: "white",
-    },
-
-    submitButtonHover: {
-      backgroundColor: "#26b5a8",
-    },
-
-    submitButtonDisabled: {
-      backgroundColor: "#d1d5db",
-      color: "#9ca3af",
-      cursor: "not-allowed",
-    },
-
-    // 스피너
-    spinner: {
-      width: "16px",
-      height: "16px",
-      border: "2px solid transparent",
-      borderTop: "2px solid currentColor",
-      borderRadius: "50%",
-      animation: "spin 1s linear infinite",
-    },
-
-    // 2열 레이아웃
-    twoColumnRow: {
-      display: "flex",
-      gap: "16px",
-    },
-
-    halfWidth: {
-      flex: 1,
-    },
-  };
+  const isPasswordMismatch =
+    formData.password !== formData.confirmPassword &&
+    formData.confirmPassword !== "";
 
   return (
-    <>
-      <div style={styles.overlay} onClick={onClose}>
-        <div style={styles.dialog} onClick={(e) => e.stopPropagation()}>
-          {/* 헤더 */}
-          <div style={styles.header}>
-            <button
-              onClick={onClose}
-              style={styles.closeButton}
-              onMouseEnter={(e) => {
-                Object.assign(e.target.style, styles.closeButtonHover);
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "transparent";
-              }}
-            >
-              ✕
-            </button>
+    <StyledDialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      {/* 헤더 */}
+      <HeaderBox>
+        <CloseButton onClick={onClose} disabled={loading}>
+          <CloseIcon />
+        </CloseButton>
 
-            <div style={styles.avatar}>
-              {userInfo?.memberName?.charAt(0).toUpperCase() || "U"}
-            </div>
+        <StyledAvatar>
+          {userInfo?.memberName?.charAt(0).toUpperCase() || "U"}
+        </StyledAvatar>
 
-            <h2 style={styles.title}>회원정보 수정</h2>
-            <p style={styles.subtitle}>
-              {userInfo?.memberName || "사용자"}#{userInfo?.id || "N/A"}
-            </p>
-          </div>
+        <Typography variant="h6" component="h2" fontWeight={600} gutterBottom>
+          회원정보 수정
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {userInfo?.memberName || "사용자"}#{userInfo?.id || "N/A"}
+        </Typography>
+      </HeaderBox>
 
-          {/* 컨텐츠 */}
-          <div style={styles.content}>
-            <form onSubmit={handleSubmit} style={styles.form}>
-              {/* 에러 알림 */}
-              {error && <div style={styles.alert}>{error}</div>}
+      {/* 컨텐츠 */}
+      <ContentBox>
+        <Box component="form" onSubmit={handleSubmit}>
+          {/* 에러 알림 */}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
 
-              {/* 사용자 ID (읽기 전용) */}
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>사용자 ID</label>
-                <input
-                  type="text"
-                  value={userInfo?.memberId || ""}
-                  disabled
-                  style={{
-                    ...styles.input,
-                    ...styles.inputDisabled,
-                  }}
-                />
-                <div style={styles.helperText}>
-                  사용자 ID는 변경할 수 없습니다.
-                </div>
-              </div>
+          <Grid container spacing={2.5}>
+            {/* 사용자 ID (읽기 전용) */}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="사용자 ID"
+                value={userInfo?.memberId || ""}
+                disabled
+                helperText="사용자 ID는 변경할 수 없습니다."
+                size="small"
+              />
+            </Grid>
 
-              {/* 이름과 이메일 */}
-              <div style={styles.twoColumnRow}>
-                <div style={{ ...styles.inputGroup, ...styles.halfWidth }}>
-                  <label style={styles.label}>
-                    이름 <span style={styles.required}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="memberName"
-                    value={formData.memberName}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                    style={{
-                      ...styles.input,
-                      ...(loading ? styles.inputDisabled : {}),
-                    }}
-                    onFocus={(e) => {
-                      if (!loading) {
-                        Object.assign(e.target.style, styles.inputFocus);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      Object.assign(e.target.style, {
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                      });
-                    }}
-                  />
-                </div>
+            {/* 이름과 이메일 */}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="이름"
+                name="memberName"
+                value={formData.memberName}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                size="small"
+              />
+            </Grid>
 
-                <div style={{ ...styles.inputGroup, ...styles.halfWidth }}>
-                  <label style={styles.label}>
-                    이메일 <span style={styles.required}>*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="memberEmail"
-                    value={formData.memberEmail}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                    style={{
-                      ...styles.input,
-                      ...(loading ? styles.inputDisabled : {}),
-                    }}
-                    onFocus={(e) => {
-                      if (!loading) {
-                        Object.assign(e.target.style, styles.inputFocus);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      Object.assign(e.target.style, {
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                      });
-                    }}
-                  />
-                </div>
-              </div>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                type="email"
+                label="이메일"
+                name="memberEmail"
+                value={formData.memberEmail}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                size="small"
+              />
+            </Grid>
 
-              {/* 성별과 생년월일 */}
-              <div style={styles.twoColumnRow}>
-                <div style={{ ...styles.inputGroup, ...styles.halfWidth }}>
-                  <label style={styles.label}>성별</label>
-                  <select
-                    name="memberGender"
-                    value={formData.memberGender}
-                    onChange={handleChange}
-                    disabled={loading}
-                    style={{
-                      ...styles.select,
-                      ...(loading ? styles.inputDisabled : {}),
-                    }}
-                    onFocus={(e) => {
-                      if (!loading) {
-                        Object.assign(e.target.style, styles.selectFocus);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      Object.assign(e.target.style, {
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                      });
-                    }}
-                  >
-                    <option value="">선택</option>
-                    <option value="M">남성</option>
-                    <option value="F">여성</option>
-                  </select>
-                </div>
+            {/* 성별과 생년월일 */}
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth size="small" disabled={loading}>
+                <InputLabel>성별</InputLabel>
+                <Select
+                  name="memberGender"
+                  value={formData.memberGender}
+                  onChange={handleChange}
+                  label="성별"
+                >
+                  <MenuItem value="">선택</MenuItem>
+                  <MenuItem value="M">남성</MenuItem>
+                  <MenuItem value="F">여성</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
 
-                <div style={{ ...styles.inputGroup, ...styles.halfWidth }}>
-                  <label style={styles.label}>생년월일</label>
-                  <input
-                    type="text"
-                    name="memberBirth"
-                    value={formData.memberBirth}
-                    onChange={handleChange}
-                    disabled={loading}
-                    placeholder="YYMMDD (예: 901225)"
-                    style={{
-                      ...styles.input,
-                      ...(loading ? styles.inputDisabled : {}),
-                    }}
-                    onFocus={(e) => {
-                      if (!loading) {
-                        Object.assign(e.target.style, styles.inputFocus);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      Object.assign(e.target.style, {
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                      });
-                    }}
-                  />
-                  <div style={styles.helperText}>
-                    6자리 숫자로 입력해주세요 (예: 901225)
-                  </div>
-                </div>
-              </div>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="생년월일"
+                name="memberBirth"
+                value={formData.memberBirth}
+                onChange={handleChange}
+                disabled={loading}
+                placeholder="YYMMDD (예: 901225)"
+                helperText="6자리 숫자로 입력해주세요 (예: 901225)"
+                size="small"
+              />
+            </Grid>
 
-              {/* 우편번호와 주소 */}
-              <div style={styles.twoColumnRow}>
-                <div style={{ ...styles.inputGroup, ...styles.halfWidth }}>
-                  <label style={styles.label}>우편번호</label>
-                  <input
-                    type="text"
-                    name="memberZip"
-                    value={formData.memberZip}
-                    onChange={handleChange}
-                    disabled={loading}
-                    placeholder="12345"
-                    style={{
-                      ...styles.input,
-                      ...(loading ? styles.inputDisabled : {}),
-                    }}
-                    onFocus={(e) => {
-                      if (!loading) {
-                        Object.assign(e.target.style, styles.inputFocus);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      Object.assign(e.target.style, {
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                      });
-                    }}
-                  />
-                  <div style={styles.helperText}>5자리 숫자로 입력해주세요</div>
-                </div>
+            {/* 우편번호와 주소 */}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="우편번호"
+                name="memberZip"
+                value={formData.memberZip}
+                onChange={handleChange}
+                disabled={loading}
+                placeholder="12345"
+                helperText="5자리 숫자로 입력해주세요"
+                size="small"
+              />
+            </Grid>
 
-                <div style={{ ...styles.inputGroup, ...styles.halfWidth }}>
-                  <label style={styles.label}>주소</label>
-                  <input
-                    type="text"
-                    name="memberAddr"
-                    value={formData.memberAddr}
-                    onChange={handleChange}
-                    disabled={loading}
-                    style={{
-                      ...styles.input,
-                      ...(loading ? styles.inputDisabled : {}),
-                    }}
-                    onFocus={(e) => {
-                      if (!loading) {
-                        Object.assign(e.target.style, styles.inputFocus);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      Object.assign(e.target.style, {
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                      });
-                    }}
-                  />
-                </div>
-              </div>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="주소"
+                name="memberAddr"
+                value={formData.memberAddr}
+                onChange={handleChange}
+                disabled={loading}
+                size="small"
+              />
+            </Grid>
 
-              {/* 구분선 */}
-              <div style={styles.divider}></div>
+            {/* 구분선 */}
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  my: 2,
+                  "&::before, &::after": {
+                    content: '""',
+                    flex: 1,
+                    height: "1px",
+                    backgroundColor: "divider",
+                  },
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ px: 2, fontWeight: 500 }}
+                >
+                  비밀번호 변경 (선택사항)
+                </Typography>
+              </Box>
+            </Grid>
 
-              {/* 새 비밀번호 */}
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>새 비밀번호 (선택사항)</label>
-                <input
+            {/* 새 비밀번호 */}
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="password"
+                label="새 비밀번호 (선택사항)"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                disabled={loading}
+                helperText="비밀번호를 변경하지 않으려면 비워두세요."
+                size="small"
+              />
+            </Grid>
+
+            {/* 비밀번호 확인 */}
+            {formData.password && (
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
                   type="password"
-                  name="password"
-                  value={formData.password}
+                  label="비밀번호 확인"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
                   onChange={handleChange}
                   disabled={loading}
-                  style={{
-                    ...styles.input,
-                    ...(loading ? styles.inputDisabled : {}),
-                  }}
-                  onFocus={(e) => {
-                    if (!loading) {
-                      Object.assign(e.target.style, styles.inputFocus);
-                    }
-                  }}
-                  onBlur={(e) => {
-                    Object.assign(e.target.style, {
-                      borderColor: "#d1d5db",
-                      boxShadow: "none",
-                    });
-                  }}
+                  error={isPasswordMismatch}
+                  helperText={
+                    isPasswordMismatch ? "비밀번호가 일치하지 않습니다." : ""
+                  }
+                  size="small"
                 />
-                <div style={styles.helperText}>
-                  비밀번호를 변경하지 않으려면 비워두세요.
-                </div>
-              </div>
+              </Grid>
+            )}
+          </Grid>
+        </Box>
+      </ContentBox>
 
-              {/* 비밀번호 확인 */}
-              {formData.password && (
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>비밀번호 확인</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    disabled={loading}
-                    style={{
-                      ...styles.input,
-                      ...(loading ? styles.inputDisabled : {}),
-                      ...(formData.password !== formData.confirmPassword &&
-                      formData.confirmPassword !== ""
-                        ? styles.inputError
-                        : {}),
-                    }}
-                    onFocus={(e) => {
-                      if (!loading) {
-                        Object.assign(e.target.style, styles.inputFocus);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      Object.assign(e.target.style, {
-                        borderColor:
-                          formData.password !== formData.confirmPassword &&
-                          formData.confirmPassword !== ""
-                            ? "#dc2626"
-                            : "#d1d5db",
-                        boxShadow: "none",
-                      });
-                    }}
-                  />
-                  {formData.password !== formData.confirmPassword &&
-                    formData.confirmPassword !== "" && (
-                      <div
-                        style={{
-                          ...styles.helperText,
-                          ...styles.helperTextError,
-                        }}
-                      >
-                        비밀번호가 일치하지 않습니다.
-                      </div>
-                    )}
-                </div>
-              )}
-
-              {/* 액션 버튼들 */}
-              <div style={styles.actions}>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  disabled={loading}
-                  style={{
-                    ...styles.button,
-                    ...styles.cancelButton,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading) {
-                      Object.assign(e.target.style, styles.cancelButtonHover);
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loading) {
-                      Object.assign(e.target.style, {
-                        backgroundColor: "transparent",
-                      });
-                    }
-                  }}
-                >
-                  취소
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    ...styles.button,
-                    ...styles.submitButton,
-                    ...(loading ? styles.submitButtonDisabled : {}),
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading) {
-                      Object.assign(e.target.style, styles.submitButtonHover);
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loading) {
-                      Object.assign(e.target.style, {
-                        backgroundColor: "#4ecdc4",
-                      });
-                    }
-                  }}
-                >
-                  {loading && <div style={styles.spinner}></div>}
-                  {loading ? "수정 중..." : "수정"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      {/* 스피너 애니메이션 */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+      {/* 액션 버튼들 */}
+      <ActionsBox>
+        <Button
+          onClick={onClose}
+          disabled={loading}
+          variant="outlined"
+          color="inherit"
+        >
+          취소
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={loading}
+          variant="contained"
+          startIcon={
+            loading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <SaveIcon />
+            )
           }
-        `}
-      </style>
-    </>
+        >
+          {loading ? "수정 중..." : "수정"}
+        </Button>
+      </ActionsBox>
+    </StyledDialog>
   );
 };
 
