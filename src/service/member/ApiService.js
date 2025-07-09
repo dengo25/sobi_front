@@ -2,6 +2,7 @@ import { API_BASE_URL } from "../util/api-config.js";
 import jwtAxios from "../util/JwtUtil.jsx";
 import store from "../../store.jsx";
 import {logout} from "../../slice/memberSlice.jsx";
+import axios from "axios";
 
 //API 호출을 위한 공통 함수 정의
 export function call(api, method, request) {
@@ -177,6 +178,13 @@ export const getList = async (pageParam) => {
   return res.data;
 };
 
-export function getCategoryList() {
-  return call("/api/category", "GET", null);
-}
+// 토큰 없이 리스트 조회
+export const getListWithoutToken = async (pageParam) => {
+  const res = await axios.get(`${API_BASE_URL}/api/review/list`, {
+    params: pageParam,
+  });
+  return res.data;
+};
+
+
+

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getList } from "../../service/member/ApiService.js";
+import {getList, getListWithoutToken} from "../../service/member/ApiService.js";
 import useCustomMove from "../../hooks/review/UseCustomMove.jsx";
 import { useNavigate } from "react-router-dom";
 
@@ -11,21 +11,24 @@ import {
     Typography,
     Divider,
 } from "@mui/material";
+import PageComponent from "./PageComponent.jsx";
 
 function ListComponent() {
-    const { page, size } = useCustomMove();
+    const { page, size,moveToList } = useCustomMove();
     const [serverData, setServerData] = useState();
     const navigate = useNavigate();
 
+
+
     useEffect(() => {
-        getList({ page, size }).then((data) => {
+        getListWithoutToken({ page, size }).then((data) => {
             console.log(data);
             setServerData(data);
         });
     }, [page, size]);
 
     const handleWriteClick = () => {
-        navigate("/review/write");
+        navigate("/review/insert");
     };
 
     const handleItemClick = (tno) => {
@@ -33,6 +36,7 @@ function ListComponent() {
     };
 
     return (
+        <>
         <Container sx={{ mt: 4 }}>
             {/* 상단 글쓰기 버튼 */}
             <Box display="flex" justifyContent="flex-end" mb={3}>
@@ -65,7 +69,11 @@ function ListComponent() {
                 </Paper>
             ))}
         </Container>
-    );
+            {serverData && (
+                <PageComponent serverData={serverData} movePage={moveToList} />
+            )}
+        </>
+);
 }
 
 export default ListComponent;

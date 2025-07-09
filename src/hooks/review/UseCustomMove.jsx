@@ -32,26 +32,22 @@ function useCustomMove() {
     };
 
     const moveToList = (pageParam) => {
-        if (pageParam) {
-            const queryStr = createSearchParams({
-                page: String(pageParam.page),
-                size: String(pageParam.size),
-            }).toString();
+        const nextPage = pageParam?.page ?? page;
+        const nextSize = pageParam?.size ?? size;
 
-            if (queryStr === queryDefault) {
-                setRefresh(!refresh); // 강제 리렌더링
-            }
+        const queryStr = createSearchParams({
+            page: String(nextPage),
+            size: String(nextSize),
+        }).toString();
 
-            navigate({
-                pathname: "../list",
-                search: queryStr,
-            });
-        } else {
-            navigate({
-                pathname: "../list",
-                search: queryDefault,
-            });
+        if (queryStr === queryDefault) {
+            setRefresh(!refresh); // 강제 리렌더링
         }
+
+        navigate({
+            pathname: "../list",
+            search: queryStr,
+        });
     };
 
     return { page, size, refresh, moveToRead, moveToModify, moveToList };

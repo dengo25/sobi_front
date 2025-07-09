@@ -3,6 +3,7 @@ import ReviewList from "../pages/review/ReviewList";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
 import ReviewWrite from "../pages/review/ReviewWrite.jsx";
+import ReviewInsert from "../pages/review/ReviewWrite.jsx";
 
 const reviewRouter = () => {
   return {
@@ -13,8 +14,8 @@ const reviewRouter = () => {
         element: (<Suspense fallback={<LoadingSpinner />}><ReviewList /></Suspense>),
       },
       {
-        path: "write",
-        element: (<Suspense fallback={<LoadingSpinner />}><ReviewWrite/></Suspense>),
+        path: "insert",
+        element: (<Suspense fallback={<LoadingSpinner />}><ReviewInsert/></Suspense>),
       },
 
       {

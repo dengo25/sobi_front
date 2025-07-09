@@ -13,6 +13,7 @@ const BasicEditor = ({
   customModules = {},
   customFormats = [],
   s3Folder = "notice", // S3 폴더명을 props
+  onImageUpload // review에서 추가
 }) => {
   const quillRef = useRef();
 
@@ -40,6 +41,7 @@ const BasicEditor = ({
   }, [s3Folder]);
 
   const imageHandler = useCallback(async () => {
+    console.log("imageHandler 실행됨") //review 추가
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
@@ -48,6 +50,7 @@ const BasicEditor = ({
     input.onchange = async () => {
       const file = input.files[0];
       if (!file) return;
+      console.log("파일 선택됨:", file); //review에서 추가
 
       try {
         const { data } = await jwtAxios.post(
@@ -55,6 +58,7 @@ const BasicEditor = ({
           {
             folder: s3Folder,
             filenames: [file.name], // 문자열 배열로 감싸야 함
+
           }
         );
         console.log("S3 응답:", data);
@@ -85,6 +89,20 @@ const BasicEditor = ({
         await axios.put(presignedUrl, file, {
           headers: { "Content-Type": file.type },
         });
+
+        // review에서 추가
+        const imageInfo = {
+          fileUrl,
+          originalFileName: file.name,
+          fileType: file.type,
+          isThumbnail: "N",
+        };
+
+        if (onImageUpload) {
+          onImageUpload(imageInfo);
+        }
+        //-----------------------
+
 
         // 에디터 참조 방식 수정
         const quill = quillRef.current?.getEditor?.();
@@ -190,6 +208,9 @@ const BasicEditor = ({
     },
     [onChange, value]
   );
+
+
+
 
   return (
     <div className="editor-area">
