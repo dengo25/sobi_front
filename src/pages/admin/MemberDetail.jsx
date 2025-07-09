@@ -177,11 +177,11 @@ const MemberDetail = () => {
               @{member?.memberId || "unknown"}
             </Typography>
 
-            <Chip
+            {/* <Chip
               label={`게시글 ${member?.memberReviewCount || 0}개`}
               color="primary"
               sx={{ mt: 1 }}
-            />
+            /> */}
           </CardContent>
         </ProfileSection>
 
