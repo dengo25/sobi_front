@@ -14,7 +14,7 @@ import {
 import PageComponent from "./PageComponent.jsx";
 
 function ListComponent() {
-    const { page, size,moveToList } = useCustomMove();
+    const { page, size,moveToList,moveToDetail } = useCustomMove();
     const [serverData, setServerData] = useState();
     const navigate = useNavigate();
 
@@ -32,7 +32,7 @@ function ListComponent() {
     };
 
     const handleItemClick = (tno) => {
-        navigate(`/review/detail/${tno}`);
+        moveToDetail(tno, { page, size });
     };
 
     return (
