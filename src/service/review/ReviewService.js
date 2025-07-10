@@ -24,10 +24,9 @@ export function getCategoryList() {
 }
 
 
-export const updateReviewList = async (reviewData) => {
-    const { tno, ...updateData } = reviewData;
-    const res  = await jwtAxios.put(`${API_BASE_URL}/api/review/${tno}` , updateData);
-    // console.log("수정 응답 데이터 : ",res.data);
+//프론트에서 const { tno, ...updateData } = reviewData 코드를 사용하면 tno가 body에서 빠지므로, 백엔드 DTO에 tno가 null로 들어가게 된다.
+//그래서 reviewData.tno 이렇게 보내줘야 tno가 넣어짐
+export const updateReview = async (reviewData) => {
+    const res  = await jwtAxios.put(`${API_BASE_URL}/api/review/${reviewData.tno}`, reviewData);
     return res.data;
-}
-
+};

@@ -21,7 +21,7 @@ const SocialLogin = () => {
 
             dispatch(login({
                 token,
-                memberId: decoded.sub,
+                memberId: decoded.memberId,
                 memberName: decoded.memberName,
                 memberEmail: decoded.memberEmail,
                 role: decoded.role,

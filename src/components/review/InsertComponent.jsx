@@ -4,7 +4,7 @@ import {MenuItem, Stack} from '@mui/material';
 
 import CustomButton from '../../components/input/CustomButton';
 import BasicEditor from '../../components/editor/BasicEditor';
-import {getCategoryList, insertReview} from "../../service/review/ReviewService.js";
+import {getCategoryList, insertReview, updateReview} from "../../service/review/ReviewService.js";
 import TextField from "@mui/material/TextField";
 import {useSelector} from "react-redux";
 
@@ -73,18 +73,18 @@ const InsertComponent = () => {
         const dto = {
             ...formData,
             images: images,
-            memberId: member.memberId
+            memberId: member.memberId,
         };
 
         console.log("전송 DTO:", dto);
 
         try {
-            await insertReview(dto);
-            // if (isEdit) {
-            //     await updateReview(dto);
-            // } else {
-            //     await insertReview(dto);
-            // }
+            if (isEdit) {
+                await updateReview(dto); // 수정
+            } else {
+                await insertReview(dto); // 등록
+            }
+
             navigate("/review/list");
         } catch (err) {
             console.error("리뷰 등록/수정 실패", err);

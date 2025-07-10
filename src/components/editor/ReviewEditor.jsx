@@ -6,14 +6,16 @@ import axios from "axios";
 import jwtAxios from "../../service/util/JwtUtil";
 import { API_BASE_URL } from "../../service/util/api-config";
 
-const BasicEditor = ({
-                       value = "",
-                       onChange,
-                       theme = "snow",
-                       customModules = {},
-                       customFormats = [],
-                       s3Folder = "notice", // S3 폴더명을 props
-                     }) => {
+const ReviewEditor = ({
+  value = "",
+  onChange,
+  theme = "snow",
+  customModules = {},
+  customFormats = [],
+  s3Folder = "notice", // S3 폴더명을 props
+  onImageUpload, // review에서 추가
+  onImageDelete  // review에서 추가
+}) => {
   const quillRef = useRef();
 
   // 이미지 삭제 기능
@@ -25,7 +27,7 @@ const BasicEditor = ({
           folder: s3Folder
         }
       });
-
+      
       if (response.data.success) {
         console.log("S3 이미지 삭제 성공:", response.data.deletedFile);
         return true;
@@ -40,6 +42,7 @@ const BasicEditor = ({
   }, [s3Folder]);
 
   const imageHandler = useCallback(async () => {
+    console.log("imageHandler 실행됨") //review 추가
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
@@ -48,14 +51,16 @@ const BasicEditor = ({
     input.onchange = async () => {
       const file = input.files[0];
       if (!file) return;
+      console.log("파일 선택됨:", file); //review에서 추가
 
       try {
         const { data } = await jwtAxios.post(
-            `${API_BASE_URL}/api/s3/presigned`,
-            {
-              folder: s3Folder,
-              filenames: [file.name], // 문자열 배열로 감싸야 함
-            }
+          `${API_BASE_URL}/api/s3/presigned`,
+          {
+            folder: s3Folder,
+            filenames: [file.name], // 문자열 배열로 감싸야 함
+
+          }
         );
         console.log("S3 응답:", data);
 
@@ -85,6 +90,20 @@ const BasicEditor = ({
         await axios.put(presignedUrl, file, {
           headers: { "Content-Type": file.type },
         });
+
+        // review에서 추가
+        const imageInfo = {
+          fileUrl,
+          originalFileName: file.name,
+          fileType: file.type,
+          isThumbnail: "N",
+        };
+
+        if (onImageUpload) {
+          onImageUpload(imageInfo);
+        }
+        //-----------------------
+
 
         // 에디터 참조 방식 수정
         const quill = quillRef.current?.getEditor?.();
@@ -139,73 +158,97 @@ const BasicEditor = ({
   }, [onChange, s3Folder]);
 
   const modules = useMemo(
-      () => ({
-        toolbar: {
-          container: [
-            [{ header: [1, 2, false] }],
-            ["bold", "italic", "underline", "strike", "blockquote"],
-            [
-              { list: "ordered" },
-              { list: "bullet" },
-              { indent: "-1" },
-              { indent: "+1" },
-            ],
-            ["link", "image"],
-            ["clean"],
+    () => ({
+      toolbar: {
+        container: [
+          [{ header: [1, 2, false] }],
+          ["bold", "italic", "underline", "strike", "blockquote"],
+          [
+            { list: "ordered" },
+            { list: "bullet" },
+            { indent: "-1" },
+            { indent: "+1" },
           ],
-          handlers: {
-            image: imageHandler,
-          },
+          ["link", "image"],
+          ["clean"],
+        ],
+        handlers: {
+          image: imageHandler,
         },
-        ...customModules,
-      }),
-      [imageHandler, customModules]
+      },
+      ...customModules,
+    }),
+    [imageHandler, customModules]
   );
 
   const formats = useMemo(
-      () => [
-        "header",
-        "bold",
-        "italic",
-        "underline",
-        "strike",
-        "blockquote",
-        "list",
-        "bullet",
-        "indent",
-        "link",
-        "image",
-        ...customFormats,
-      ],
-      [customFormats]
+    () => [
+      "header",
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "blockquote",
+      "list",
+      "bullet",
+      "indent",
+      "link",
+      "image",
+      ...customFormats,
+    ],
+    [customFormats]
   );
 
   // onChange 핸들러 최적화 - 이미지 삽입 시 방해하지 않도록
   const handleChange = useCallback(
       (content, delta, source, editor) => {
-        // 모든 변경사항을 처리하되, 무한 루프 방지
         if (onChange && content !== value) {
           onChange(content);
+
+          // 이미지 삭제 감지
+          if (onImageDelete) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, "text/html");
+
+            const currentImageUrls = Array.from(doc.querySelectorAll("img")).map(
+                (img) => img.getAttribute("src")
+            );
+
+            const previousDoc = parser.parseFromString(value, "text/html");
+            const previousImageUrls = Array.from(previousDoc.querySelectorAll("img")).map(
+                (img) => img.getAttribute("src")
+            );
+
+            const deletedUrls = previousImageUrls.filter(
+                (url) => !currentImageUrls.includes(url)
+            );
+
+            deletedUrls.forEach((url) => {
+              onImageDelete(url); // 부모에게 알림
+            });
+          }
         }
       },
-      [onChange, value]
+      [onChange, value, onImageDelete]
   );
 
+
+
   return (
-      <div className="editor-area">
-        <ReactQuill
-            ref={quillRef}
-            value={value}
-            onChange={handleChange}
-            theme={theme}
-            modules={modules}
-            formats={formats}
-            style={{ minHeight: "300px", backgroundColor: "white" }}
-            placeholder="내용을 입력해주세요..."
-            preserveWhitespace={false}
-        />
-      </div>
+    <div className="editor-area">
+      <ReactQuill
+        ref={quillRef}
+        value={value}
+        onChange={handleChange}
+        theme={theme}
+        modules={modules}
+        formats={formats}
+        style={{ minHeight: "300px", backgroundColor: "white" }}
+        placeholder="내용을 입력해주세요..."
+        preserveWhitespace={false}
+      />
+    </div>
   );
 };
 
-export default BasicEditor;
+export default ReviewEditor;
