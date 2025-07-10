@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 import ReviewWrite from "../pages/review/ReviewWrite.jsx";
 import ReviewInsert from "../pages/review/ReviewWrite.jsx";
 import ReviewDetail from "../pages/review/ReviewDetail.jsx";
+import ReviewModify from "../pages/review/ReviewModify.jsx";
 
 const reviewRouter = () => {
   return {
@@ -21,6 +22,10 @@ const reviewRouter = () => {
       {
         path: "detail/:tno",
         element: (<Suspense fallback={<LoadingSpinner />}><ReviewDetail/></Suspense>),
+      },
+      {
+        path: "modify/:tno",
+        element: (<Suspense fallback={<LoadingSpinner />}><ReviewModify/></Suspense>),
       },
       // {
       //   path: "modify/:tno",//아이디를 tno로 사용한다.

@@ -24,8 +24,8 @@ export function getCategoryList() {
 }
 
 
-export const updateReviewList = async (noticeData) => {
-    const { tno, ...updateData } = noticeData;
+export const updateReviewList = async (reviewData) => {
+    const { tno, ...updateData } = reviewData;
     const res  = await jwtAxios.put(`${API_BASE_URL}/api/review/${tno}` , updateData);
     // console.log("수정 응답 데이터 : ",res.data);
     return res.data;
