@@ -21,8 +21,8 @@ export const getNoticeList = async (token) => {
   }
 };
 
-// Notice 페이징 목록 (새로 추가)
-export const getNoticeListWithPaging = async (params = {}) => {
+// Notice 페이징 목록
+export const getNoticeListWithPaging = async (params = {},token) => {
   try {
     const {
       page = 0,
@@ -45,12 +45,22 @@ export const getNoticeListWithPaging = async (params = {}) => {
         queryParams.append("searchType", searchType);
       }
     }
-    const res = await jwtAxios.get(
-      `${API_BASE_URL}/api/notice/page?${queryParams.toString()}`
-    );
+
+    const instance = getInstance(token);
+    const res = await instance.get(`${API_BASE_URL}/api/notice/page?${queryParams.toString()}`);
+    // const res = await jwtAxios.get(
+    //   `${API_BASE_URL}/api/notice/page?${queryParams.toString()}`
+    // );
+    console.log("페이징 목록 조회:", res.data);
+    if (!res.data) {
+      throw new Error("응답 데이터가 없습니다.");
+    }
     return res.data;
   } catch (error) {
-    console.error("페이징 목록 조회 실패:", error);
+    if (error.res) {
+      console.error("에러 상세:", error.res.data);
+      console.error("상태 코드:", error.res.status);
+    }
     throw error;
   }
 };

@@ -39,7 +39,13 @@ const Notice = () => {
     searchType: "all",
   });
 
-  // **추가: 전체/검색 카운트 상태**
+  // 정렬 상태
+  const [currentSort, setCurrentSort] = useState({
+    sortBy: "noticeCreateDate",
+    sortDirection: "desc",
+  });
+
+  // 전체/검색 카운트 상태
   const [totalCount, setTotalCount] = useState(0);
   const [searchCount, setSearchCount] = useState(null);
 
@@ -47,23 +53,63 @@ const Notice = () => {
   const member = useSelector((state) => state.member);
   console.log("[slice] 현재 유저 정보 :", member);
 
+  // 공지사항 목록 조회
+  const fetchNotices = async (params = {}) => {
+    const requestParams = {
+      page: params.page !== undefined ? params.page : pageInfo.currentPage,
+      size: params.size !== undefined ? params.size : pageInfo.pageSize || 10,
+      sortBy: params.sortBy || currentSort.sortBy,
+      sortDirection: params.sortDirection || currentSort.sortDirection,
+      // size: pageInfo.pageSize,
+      // sortBy: "noticeCreateDate",
+      // sortDirection: "desc",
+      ...searchParams,
+      ...params,
+    };
+
+    console.log("Request params:", requestParams); // 디버깅용
+    const res = await getNoticeListWithPaging(requestParams);
+
+    setList(res.content || []);
+    setPageInfo({
+      currentPage: res.currentPage || 0,
+      totalPages: res.totalPages || 0,
+      totalElements: res.totalElements || 0,
+      pageSize: res.pageSize || 10,
+      first: res.first || false,
+      last: res.last || false,
+      hasNext: res.hasNext || false,
+      hasPrevious: res.hasPrevious || false,
+    });
+
+    // 현재 정렬 상태 업데이트
+    setCurrentSort({
+      sortBy: requestParams.sortBy,
+      sortDirection: requestParams.sortDirection,
+    });
+
+    setTotalCount(res.totalElements); // 토탈 카운트 셋팅
+  };
 
   // 마운트 시: 목록만 가져와서 totalCount 세팅
   useEffect(() => {
-    (async () => {
-      const resp = await getNoticeListWithPaging({
-        page: 0,
-        size: pageInfo.pageSize,
-      });
-      setList(resp.content);
-      setPageInfo({
-        ...pageInfo,
-        currentPage: resp.currentPage,
-        totalPages: resp.totalPages,
-        totalElements: resp.totalElements,
-      });
-      setTotalCount(resp.totalElements); // 토탈 카운트 셋팅
-    })();
+    // (async () => {
+    //   const resp = await getNoticeListWithPaging({
+    //     page: 0,
+    //     size: pageInfo.pageSize,
+    //   });
+    //   setList(resp.content);
+    //   setPageInfo({
+    //     ...pageInfo,
+    //     currentPage: resp.currentPage,
+    //     totalPages: resp.totalPages,
+    //     totalElements: resp.totalElements,
+    //   });
+    //   setTotalCount(resp.totalElements); // 토탈 카운트 셋팅
+    // })();
+
+    // 첫 로드시 페이지 0번 데이터 조회
+    fetchNotices({ page: 0, size: 10 });
   }, []);
 
   // 검색
@@ -98,33 +144,6 @@ const Notice = () => {
     });
     setTotalCount(resp.totalElements); // 초기화 후 다시 전체 카운트
     setSearchCount(null);
-  };
-
-  // 공지사항 목록 조회
-  const fetchNotices = async (params = {}) => {
-    const requestParams = {
-      page: params.page !== undefined ? params.page : pageInfo.currentPage,
-      size: pageInfo.pageSize,
-      sortBy: "noticeCreateDate",
-      sortDirection: "desc",
-      ...searchParams,
-      ...params,
-    };
-
-    console.log("Request params:", requestParams); // 디버깅용
-    const response = await getNoticeListWithPaging(requestParams);
-
-    setList(response.content);
-    setPageInfo({
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      totalElements: response.totalElements,
-      pageSize: response.pageSize,
-      first: response.first,
-      last: response.last,
-      hasNext: response.hasNext,
-      hasPrevious: response.hasPrevious,
-    });
   };
 
   // 페이지 변경
