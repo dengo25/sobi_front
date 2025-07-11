@@ -10,7 +10,7 @@ const NoticeDetail = () => {
     const { noticeNo } = useParams();
     const navigate = useNavigate();
     const [detail, setDetail] = useState(null);
-    const member = useSelector((state) => state.memberSlice);
+    const member = useSelector((state) => state.member);
     console.log("[slice] 현재 유저 정보 :", member);
     
     useEffect(()=>{
