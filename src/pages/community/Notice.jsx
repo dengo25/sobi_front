@@ -44,10 +44,11 @@ const Notice = () => {
   const [searchCount, setSearchCount] = useState(null);
 
   const navigate = useNavigate();
-  const member = useSelector((state) => state.memberSlice);
+  const member = useSelector((state) => state.member);
   console.log("[slice] 현재 유저 정보 :", member);
 
-  // **1) 마운트 시: 목록만 가져와서 totalCount 세팅
+
+  // 마운트 시: 목록만 가져와서 totalCount 세팅
   useEffect(() => {
     (async () => {
       const resp = await getNoticeListWithPaging({
@@ -147,7 +148,7 @@ const Notice = () => {
   };
 
   let dataList = list.map((notice, index) => {
-    console.log(`Notice ${index}:`, notice);
+    // console.log(`Notice ${index}:`, notice);
     return (
       <tr key={notice.noticeNo}>
         <td>{notice.noticeNo}</td>
