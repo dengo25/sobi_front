@@ -15,7 +15,6 @@ import {
   Alert,
   Container,
   Pagination,
-  Stack,
   FormControl,
   Select,
   MenuItem,
@@ -24,13 +23,16 @@ import {
   ThemeProvider,
   createTheme,
   Paper,
+  TextField,
+  Button,
+  Grid,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
   People as PeopleIcon,
-  Sort as SortIcon,
-  ArrowUpward as ArrowUpwardIcon,
-  ArrowDownward as ArrowDownwardIcon,
+  Warning as WarningIcon,
+  Refresh as RefreshIcon,
+  FilterList as FilterIcon,
 } from "@mui/icons-material";
 import { getList } from "../../service/admin/ApiService";
 import useCustomMove from "../../hooks/admin/UseCustomMove";
@@ -52,8 +54,22 @@ const sobiTheme = createTheme({
   },
 });
 
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  color: theme.palette.secondary.main,
+  marginBottom: theme.spacing(2),
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+}));
+
+const FilterSection = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  backgroundColor: theme.palette.grey[50],
+}));
+
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  marginTop: theme.spacing(2),
   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
 }));
 
@@ -64,121 +80,145 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const HeaderBox = styled(Box)(({ theme }) => ({
+const PaginationContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: theme.spacing(2),
+  marginTop: theme.spacing(2),
+  padding: theme.spacing(1),
 }));
 
-const SortControls = styled(Box)(({ theme }) => ({
-  display: "flex",
-  gap: theme.spacing(2),
-  alignItems: "center",
-}));
-
-const SectionTitle = styled(Typography)(({ theme }) => ({
-  fontWeight: 700,
-  color: theme.palette.secondary.main,
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing(1),
-}));
-
-const PaginationContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  padding: theme.spacing(2),
-  borderTop: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.background.paper,
-  position: "sticky",
-  bottom: 0,
-  zIndex: 1,
-  boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
-}));
-
-const MemberList = () => {
+const RealisticMemberList = () => {
+  // 회원 목록과 페이징 상태
   const [memberList, setMemberList] = useState([]);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentDisplayPage, setCurrentDisplayPage] = useState(1); // MUI 표시용 (1부터 시작)
+  const [pageInfo, setPageInfo] = useState({
+    totalElements: 0,
+    totalPages: 0,
+    currentPage: 0,
+    pageSize: 10,
+  });
 
-  const [sortBy, setSortBy] = useState("memberReg");
-  const [sortDir, setSortDir] = useState("desc");
+  // 필터링 상태 (검색 제외, 정렬만)
+  const [filters, setFilters] = useState({
+    sortBy: "memberReg",
+    sortDir: "desc",
+  });
+
+  // 임시 필터 상태 (적용 전)
+  const [tempFilters, setTempFilters] = useState({ ...filters });
 
   const navigate = useNavigate();
-  const { page, size, moveToList } = useCustomMove();
+  const { moveToList } = useCustomMove();
 
+  // 정렬 옵션 (계산된 필드 제외)
   const sortOptions = [
     { value: "memberReg", label: "가입일" },
     { value: "memberName", label: "이름" },
     { value: "memberId", label: "아이디" },
-    { value: "memberReviewCount", label: "게시글수" },
-    { value: "memberReportCount", label: "신고이력" },
+    // memberReviewCount, memberReportCount 제거 (계산된 필드라 정렬 불가)
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
+  // 페이지 크기 옵션
+  const pageSizeOptions = [5, 10, 20, 50];
+
+  // 회원 목록 조회
+  const fetchMembers = async (currentPage = pageInfo.currentPage) => {
+    try {
       setLoading(true);
-      try {
-        console.log("🔍 요청 파라미터:", {
-          page: page ?? 0,
-          size: size ?? 10,
-          sortBy,
-          sortDir,
-        });
 
-        const data = await getList({
-          page: page ?? 0,
-          size: size ?? 10,
-          sortBy,
-          sortDir,
-        });
+      // 백엔드 API에 맞는 파라미터 구조
+      const searchParams = {
+        page: currentPage, // MUI에서 온 페이지 번호를 그대로 전달 (1부터 시작)
+        size: pageInfo.pageSize,
+        sortBy: filters.sortBy,
+        sortDir: filters.sortDir,
+      };
 
-        setMemberList(data.content || []);
-        setTotalPages(data.totalPages || 0);
-        setTotalElements(data.totalElements || 0);
-      } catch (error) {
-        console.error("❌ 데이터 로딩 실패:", error);
+      console.log("🔍 회원 목록 API 호출 파라미터:", searchParams);
+      const response = await getList(searchParams);
+      console.log("📥 회원 목록 API 응답:", response);
+
+      if (response) {
+        setMemberList(response.content || []);
+        setPageInfo({
+          totalElements: response.totalElements || 0,
+          totalPages: response.totalPages || 0,
+          currentPage: response.number || 0, // 백엔드는 0부터 시작
+          pageSize: response.size || 10,
+        });
+        console.log(
+          "✅ 회원 목록 설정 완료:",
+          (response.content || []).length,
+          "명"
+        );
+      } else {
+        console.log("❌ 예상하지 못한 응답 구조:", response);
         setMemberList([]);
-        setTotalPages(0);
-        setTotalElements(0);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchData();
-  }, [page, size, sortBy, sortDir]);
-
-  const handleHeaderClick = (field) => {
-    if (sortBy === field) {
-      setSortDir(sortDir === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(field);
-      setSortDir("desc");
+    } catch (err) {
+      console.error("❌ 회원 목록 조회 오류:", err);
+      setError("회원 목록을 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
     }
-    // moveToList 호출 제거 - URL 변경하지 않음
   };
 
-  const handleSortByChange = (event) => {
-    setSortBy(event.target.value);
-    // moveToList 호출 제거 - URL 변경하지 않음
+  // 초기 로드
+  useEffect(() => {
+    setCurrentDisplayPage(1); // 초기 표시 페이지 설정
+    fetchMembers(1); // 첫 페이지부터 시작
+  }, [filters, pageInfo.pageSize]);
+
+  // 정렬 적용
+  const handleApplySort = () => {
+    setFilters({ ...tempFilters });
+    setCurrentDisplayPage(1); // 첫 페이지로 표시 변경
+    setTimeout(() => fetchMembers(1), 0); // 첫 페이지 명시적 호출
   };
 
-  const handleSortDirChange = (event) => {
-    setSortDir(event.target.value);
-    // moveToList 호출 제거 - URL 변경하지 않음
+  // 필터 초기화
+  const handleResetFilters = () => {
+    const resetFilters = {
+      sortBy: "memberReg",
+      sortDir: "desc",
+    };
+    setTempFilters(resetFilters);
+    setFilters(resetFilters);
+    setCurrentDisplayPage(1); // 첫 페이지로 표시 변경
   };
 
-  const getSortIcon = (field) => {
-    if (sortBy !== field) return <SortIcon fontSize="small" />;
-    return sortDir === "asc" ? (
-      <ArrowUpwardIcon fontSize="small" />
-    ) : (
-      <ArrowDownwardIcon fontSize="small" />
-    );
+  // 페이지 변경
+  const handlePageChange = (event, newPage) => {
+    console.log("🔥 페이지 클릭:", newPage);
+    setCurrentDisplayPage(newPage); // 표시 페이지 즉시 업데이트
+    fetchMembers(newPage);
+  };
+
+  // 페이지 크기 변경
+  const handlePageSizeChange = (event) => {
+    setPageInfo((prev) => ({
+      ...prev,
+      pageSize: event.target.value,
+      currentPage: 0,
+    }));
+    setCurrentDisplayPage(1); // 첫 페이지로 표시 변경
+  };
+
+  // 정렬 방향 토글
+  const handleSortToggle = () => {
+    const newSortDir = filters.sortDir === "desc" ? "asc" : "desc";
+    setFilters((prev) => ({ ...prev, sortDir: newSortDir }));
+    setTempFilters((prev) => ({ ...prev, sortDir: newSortDir }));
+  };
+
+  // 신고 이력에 따른 칩 색상
+  const getReportChipColor = (count) => {
+    if (count === 0) return "default";
+    if (count <= 2) return "warning";
+    return "error";
   };
 
   if (loading) {
@@ -198,163 +238,117 @@ const MemberList = () => {
     );
   }
 
+  if (error) {
+    return (
+      <ThemeProvider theme={sobiTheme}>
+        <Container maxWidth="xl" sx={{ p: 2 }}>
+          <Alert severity="error">{error}</Alert>
+        </Container>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={sobiTheme}>
-      <Container
-        maxWidth="lg"
-        sx={{
-          p: 2,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "calc(100vh - 200px)",
-        }}
-      >
-        {/* 헤더 영역 */}
-        <HeaderBox>
-          <Box>
-            <SectionTitle variant="h6">
-              <PeopleIcon />
-              회원 관리 ({totalElements.toLocaleString()}명)
-            </SectionTitle>
-            <Typography variant="body2" color="text.secondary">
-              페이지 {(page || 0) + 1} / {totalPages}
-            </Typography>
-          </Box>
+      <Container maxWidth="xl" sx={{ p: 2 }}>
+        {/* 헤더 */}
+        <SectionTitle variant="h6">
+          <PeopleIcon />
+          회원 관리 ({pageInfo.totalElements.toLocaleString()}명)
+        </SectionTitle>
 
-          {/* 정렬 컨트롤 */}
-          <SortControls>
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel>정렬 기준</InputLabel>
-              <Select
-                value={sortBy}
-                onChange={handleSortByChange}
-                label="정렬 기준"
-              >
-                {sortOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+        {/* 정렬 섹션 */}
+        <FilterSection>
+          <Typography
+            variant="subtitle1"
+            gutterBottom
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <FilterIcon />
+            정렬 설정
+          </Typography>
 
-            <FormControl size="small" sx={{ minWidth: 100 }}>
-              <InputLabel>순서</InputLabel>
-              <Select
-                value={sortDir}
-                onChange={handleSortDirChange}
-                label="순서"
+          <Grid container spacing={2} alignItems="center">
+            {/* 정렬 기준 */}
+            <Grid item xs={12} sm={6} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>정렬 기준</InputLabel>
+                <Select
+                  value={tempFilters.sortBy}
+                  label="정렬 기준"
+                  onChange={(e) =>
+                    setTempFilters((prev) => ({
+                      ...prev,
+                      sortBy: e.target.value,
+                    }))
+                  }
+                >
+                  {sortOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* 정렬 방향 */}
+            <Grid item xs={12} sm={6} md={3}>
+              <Button
+                variant="outlined"
+                onClick={handleSortToggle}
+                size="small"
+                fullWidth
               >
-                <MenuItem value="desc">내림차순</MenuItem>
-                <MenuItem value="asc">오름차순</MenuItem>
-              </Select>
-            </FormControl>
-          </SortControls>
-        </HeaderBox>
+                {filters.sortDir === "desc" ? "내림차순" : "오름차순"}
+              </Button>
+            </Grid>
+
+            {/* 버튼들 */}
+            <Grid item xs={12} sm={6} md={5}>
+              <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                <Button
+                  variant="contained"
+                  onClick={handleApplySort}
+                  size="small"
+                >
+                  적용
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<RefreshIcon />}
+                  onClick={handleResetFilters}
+                  size="small"
+                >
+                  초기화
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </FilterSection>
 
         {/* 회원 목록 테이블 */}
-        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <StyledTableContainer component={Paper} sx={{ flex: 1 }}>
+        <Paper>
+          <StyledTableContainer>
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "grey.50" }}>
-                  <TableCell
-                    onClick={() => handleHeaderClick("memberName")}
-                    sx={{ cursor: "pointer", fontWeight: 600 }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      이름 {getSortIcon("memberName")}
-                    </Box>
+                  <TableCell sx={{ fontWeight: 600 }}>이름</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>아이디</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 600 }}>
+                    가입일
                   </TableCell>
-                  <TableCell
-                    onClick={() => handleHeaderClick("memberId")}
-                    sx={{ cursor: "pointer", fontWeight: 600 }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      아이디 {getSortIcon("memberId")}
-                    </Box>
+                  <TableCell align="center" sx={{ fontWeight: 600 }}>
+                    게시글수
                   </TableCell>
-                  <TableCell
-                    onClick={() => handleHeaderClick("memberReg")}
-                    sx={{ cursor: "pointer", fontWeight: 600 }}
-                    align="center"
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        justifyContent: "center",
-                      }}
-                    >
-                      가입일 {getSortIcon("memberReg")}
-                    </Box>
-                  </TableCell>
-                  <TableCell
-                    onClick={() => handleHeaderClick("memberReviewCount")}
-                    sx={{ cursor: "pointer", fontWeight: 600 }}
-                    align="center"
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        justifyContent: "center",
-                      }}
-                    >
-                      게시글수 {getSortIcon("memberReviewCount")}
-                    </Box>
-                  </TableCell>
-                  <TableCell
-                    onClick={() => handleHeaderClick("memberReportCount")}
-                    sx={{ cursor: "pointer", fontWeight: 600 }}
-                    align="center"
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        justifyContent: "center",
-                      }}
-                    >
-                      신고이력 {getSortIcon("memberReportCount")}
-                    </Box>
+                  <TableCell align="center" sx={{ fontWeight: 600 }}>
+                    신고이력
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {(() => {
-                  if (!Array.isArray(memberList)) {
-                    return (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center">
-                          <Alert severity="error">데이터 형식 오류</Alert>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  }
-
-                  if (memberList.length === 0) {
-                    return (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center">
-                          <Box sx={{ py: 4 }}>
-                            <PeopleIcon
-                              sx={{ fontSize: 48, color: "grey.400", mb: 1 }}
-                            />
-                            <Typography variant="body2" color="text.secondary">
-                              회원 정보가 없습니다.
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  }
-
-                  return memberList.map((member) => (
+                {memberList.length > 0 ? (
+                  memberList.map((member) => (
                     <StyledTableRow
                       key={member.memberId}
                       onClick={() =>
@@ -362,19 +356,21 @@ const MemberList = () => {
                       }
                     >
                       <TableCell sx={{ fontWeight: 500 }}>
-                        {member.memberName}
+                        {member.memberName || "N/A"}
                       </TableCell>
-                      <TableCell>{member.memberId}</TableCell>
+                      <TableCell>{member.memberId || "N/A"}</TableCell>
                       <TableCell align="center">
                         <Typography variant="body2" color="text.secondary">
-                          {new Date(member.memberReg).toLocaleDateString(
-                            "ko-KR"
-                          )}
+                          {member.memberReg
+                            ? new Date(member.memberReg).toLocaleDateString(
+                                "ko-KR"
+                              )
+                            : "N/A"}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
                         <Chip
-                          label={member.memberReviewCount}
+                          label={member.memberReviewCount || 0}
                           color="primary"
                           size="small"
                           variant="outlined"
@@ -382,10 +378,10 @@ const MemberList = () => {
                       </TableCell>
                       <TableCell align="center">
                         <Chip
-                          label={member.memberReportCount}
-                          color={
-                            member.memberReportCount > 0 ? "error" : "default"
-                          }
+                          label={member.memberReportCount || 0}
+                          color={getReportChipColor(
+                            member.memberReportCount || 0
+                          )}
                           size="small"
                           variant={
                             member.memberReportCount > 0 ? "filled" : "outlined"
@@ -393,47 +389,68 @@ const MemberList = () => {
                         />
                       </TableCell>
                     </StyledTableRow>
-                  ));
-                })()}
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      <Box sx={{ py: 4 }}>
+                        <WarningIcon
+                          sx={{ fontSize: 48, color: "grey.400", mb: 1 }}
+                        />
+                        <Typography variant="body2" color="text.secondary">
+                          회원이 없습니다.
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </StyledTableContainer>
 
-          {/* 페이지네이션을 하단 고정 */}
+          {/* 페이징 컨트롤 */}
           <PaginationContainer>
-            {totalPages > 0 ? (
-              <Stack spacing={2} alignItems="center">
-                <Pagination
-                  count={totalPages}
-                  page={(page || 0) + 1}
-                  onChange={(event, value) =>
-                    moveToList({ page: value - 1, size })
-                  }
-                  color="primary"
-                  size="medium"
-                  showFirstButton
-                  showLastButton
-                  siblingCount={1}
-                  boundaryCount={1}
-                />
-                <Typography variant="caption" color="text.secondary">
-                  {(page || 0) * size + 1}-
-                  {Math.min(((page || 0) + 1) * size, totalElements)} /{" "}
-                  {totalElements}개 표시
-                </Typography>
-              </Stack>
-            ) : (
-              totalElements > 0 && (
-                <Typography variant="caption" color="text.secondary">
-                  총 {totalElements}개
-                </Typography>
-              )
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                총 {pageInfo.totalElements.toLocaleString()}명 | 페이지{" "}
+                {currentDisplayPage} / {pageInfo.totalPages}
+              </Typography>
+
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>페이지 크기</InputLabel>
+                <Select
+                  value={pageInfo.pageSize}
+                  label="페이지 크기"
+                  onChange={handlePageSizeChange}
+                >
+                  {pageSizeOptions.map((size) => (
+                    <MenuItem key={size} value={size}>
+                      {size}명씩
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            {pageInfo.totalPages > 1 && (
+              <Pagination
+                count={pageInfo.totalPages}
+                page={currentDisplayPage}
+                onChange={handlePageChange}
+                color="primary"
+                variant="outlined"
+                shape="rounded"
+                showFirstButton
+                showLastButton
+                siblingCount={1}
+                boundaryCount={1}
+              />
             )}
           </PaginationContainer>
-        </Box>
+        </Paper>
       </Container>
     </ThemeProvider>
   );
 };
 
-export default MemberList;
+export default RealisticMemberList;

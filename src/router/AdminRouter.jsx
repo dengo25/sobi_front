@@ -1,11 +1,12 @@
 import { Suspense } from "react";
-import ReviewList from "../pages/review/ReviewList";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
-import { Navigate } from "react-router-dom";
 import AdminMain from "../pages/admin/AdminMain.jsx";
-import UnSolvedReport from "../pages/admin/UnSolvedReport.jsx";
+import ReportList from "../pages/admin/ReportList.jsx";
 import AdminMemberRouter from "./AdminMemberRouter.jsx";
 import AdminRoute from "../components/common/AdminRoute.jsx";
+import ReportDetail from "../pages/admin/ReportDetail.jsx";
+import ReportedReview from "../pages/admin/ReportedReview.jsx";
+import AdminReviewList from "../pages/admin/AdminReviewList.jsx";
 const AdminRouter = () => {
   return {
     path: "admin",
@@ -25,7 +26,37 @@ const AdminRouter = () => {
         element: (
           <AdminRoute>
             <Suspense fallback={<LoadingSpinner />}>
-              <UnSolvedReport />
+              <ReportList />
+            </Suspense>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "report/:reportId",
+        element: (
+          <AdminRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReportDetail />
+            </Suspense>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "report/review/:targetId",
+        element: (
+          <AdminRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReportedReview />
+            </Suspense>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "review/list",
+        element: (
+          <AdminRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AdminReviewList />
             </Suspense>
           </AdminRoute>
         ),

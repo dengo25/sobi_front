@@ -17,9 +17,6 @@ const AdminSidebar = () => {
         <li>
           <Link to="/admin/reports">🚨 신고 관리</Link>
         </li>
-        <li>
-          <Link to="/admin/blacklist">⛔ 블랙리스트</Link>
-        </li>
       </ul>
     </aside>
   );

@@ -1,10 +1,16 @@
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { signout } from "../../service/member/ApiService.js";
 
 const Header = () => {
   const member = useSelector((state) => state.member);
   const role = member?.role;
   console.log("role", role);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    signout();
+  };
   return (
     <header>
       <div className="wrap">
@@ -16,6 +22,9 @@ const Header = () => {
           </h1>
 
           <ul className="menu-list">
+            <li>
+              <Link to="/common">공통</Link>
+            </li>
             <li>
               <Link to="/review">후기</Link>
             </li>
@@ -37,8 +46,10 @@ const Header = () => {
               <Link to="/login">로그인</Link>
             </li>
             <li>
-              <Link to="/">로그아웃</Link>
-            </li>
+              <button onClick={handleLogout} className="logout-button">
+                로그아웃
+              </button>
+            </li>{" "}
             <li>
               <Link to="/join">회원가입</Link>
             </li>

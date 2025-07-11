@@ -2,7 +2,9 @@ import { Suspense } from "react";
 import ReviewList from "../pages/review/ReviewList";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
-//import ReviewWrite from "../pages/review/ReviewWrite.jsx";
+import ReviewWrite from "../pages/review/ReviewWrite.jsx";
+import ReviewInsert from "../pages/review/ReviewWrite.jsx";
+import ReviewDetail from "../pages/review/ReviewDetail.jsx";
 
 const reviewRouter = () => {
   return {
@@ -17,14 +19,21 @@ const reviewRouter = () => {
         ),
       },
       {
-        // path: "write",
-        // element: (
-        //   <Suspense fallback={<LoadingSpinner />}>
-        //     <ReviewWrite />
-        //   </Suspense>
-        // ),
+        path: "insert",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ReviewInsert />
+          </Suspense>
+        ),
       },
-
+      {
+        path: "detail/:tno",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ReviewDetail />
+          </Suspense>
+        ),
+      },
       {
         //아무것도 없는 경로로 들어오면 review의 list로 이동시켜
         path: "",

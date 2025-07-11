@@ -1,9 +1,5 @@
 import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 
-// import Accordion from '@mui/material/Accordion';
-// import AccordionDetails from '@mui/material/AccordionDetails';
-// import AccordionSummary from '@mui/material/AccordionSummary';
-
 import CustomCheckbox from "../input/CustomCheckbox"
 
 import faqIconQ from "../../assets/icons/ico-faq-q.svg";

@@ -24,7 +24,7 @@ import {
 } from "@mui/icons-material";
 import { useState } from "react";
 import { report } from "../../service/admin/ApiService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const sobiTheme = createTheme({
   palette: {
@@ -66,7 +66,18 @@ const ActionButtons = styled(Box)(({ theme }) => ({
   borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
-const ReportForm = ({ reporterId, reportedId, targetId, onSubmit }) => {
+const ReportForm = () => {
+  // props 제거
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // 전달받은 데이터 추출
+  const { reviewId, writerId, reporterId } = location.state || {};
+
+  console.log("reviewId:", reviewId);
+  console.log("writerId:", writerId);
+  console.log("reporterId:", reporterId);
+
   const [reportType, setReportType] = useState("");
   const [detail, setDetail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -90,9 +101,9 @@ const ReportForm = ({ reporterId, reportedId, targetId, onSubmit }) => {
     }
 
     const reportDto = {
-      reporterId,
-      reportedId,
-      targetId,
+      reporterId, // location.state에서 받은 값
+      reportedId: writerId, // location.state에서 받은 값
+      targetId: reviewId, // location.state에서 받은 값
       reportType,
       detail: detail.trim(),
     };
@@ -102,11 +113,15 @@ const ReportForm = ({ reporterId, reportedId, targetId, onSubmit }) => {
       setError("");
       setSuccess("");
 
-      await onSubmit(reportDto);
+      // 직접 API 호출
+      await report(reportDto);
 
-      setReportType("");
-      setDetail("");
       setSuccess("신고가 성공적으로 제출되었습니다.");
+
+      // 2초 후 이전 페이지로 이동
+      setTimeout(() => {
+        navigate(-1);
+      }, 2000);
     } catch (error) {
       console.error("신고 제출 실패: ", error);
       setError("신고 제출 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -196,9 +211,9 @@ const ReportForm = ({ reporterId, reportedId, targetId, onSubmit }) => {
                   • 신고자 ID: {reporterId}
                 </Typography>
                 <Typography variant="body2">
-                  • 신고 대상 ID: {reportedId}
+                  • 신고 대상 ID: {writerId}
                 </Typography>
-                <Typography variant="body2">• 대상 번호: {targetId}</Typography>
+                <Typography variant="body2">• 대상 번호: {reviewId}</Typography>
               </Box>
 
               {/* 액션 버튼들 */}

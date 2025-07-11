@@ -33,9 +33,8 @@ import {
 import { getStatus } from "../../service/admin/ApiService";
 import AdminDashboard from "./AdminDashBoard";
 import MemberList from "./MemberList";
-import ReviewManagement from "./ReviewManagement";
-import UnSolvedReport from "./UnSolvedReport";
-import BlacklistManagement from "./BlackListManagement";
+import AdminReviewList from "./AdminReviewList";
+import ReportList from "./ReportList";
 
 const sobiTheme = createTheme({
   palette: {
@@ -138,13 +137,7 @@ const AdminMain = () => {
   const [blacklist, setBlacklist] = useState([]);
 
   // 탭 라벨
-  const tabLabels = [
-    "대시보드",
-    "회원 관리",
-    "리뷰 관리",
-    "신고 관리",
-    "블랙리스트",
-  ];
+  const tabLabels = ["대시보드", "회원 관리", "리뷰 관리", "신고 관리"];
 
   // 메뉴 아이템 데이터 - 동적으로 수치 반영
   const menuItems = [
@@ -168,11 +161,6 @@ const AdminMain = () => {
       count:
         unresolvedReports > 0 ? `미해결 ${unresolvedReports}건` : "미해결 0건",
       icon: <ReportIcon />,
-    },
-    {
-      text: "블랙리스트",
-      count: `${blockedCount}명`,
-      icon: <BlockIcon />,
     },
   ];
 
@@ -202,7 +190,7 @@ const AdminMain = () => {
       setBlockedCount(res.blockedCount || 0);
       setReviewCount(res.reviewCount || 0);
       setUnresolvedReports(res.unSolvedReportCount || 0);
-      setBlacklist(res.blacklist || []);
+      setBlacklist(res.blacklistDto || []);
     } catch (err) {
       console.error("admin main fetch error", err);
       setError("데이터를 불러오는데 실패했습니다.");
@@ -235,11 +223,9 @@ const AdminMain = () => {
       case 1: // 회원 관리
         return <MemberList />;
       case 2: // 리뷰 관리
-        return <ReviewManagement />;
+        return <AdminReviewList />;
       case 3: // 신고 관리
-        return <UnSolvedReport />;
-      case 4: // 블랙리스트
-        return <BlacklistManagement />;
+        return <ReportList />;
       default:
         return <AdminDashboard />;
     }

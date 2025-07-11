@@ -1,57 +1,79 @@
-import {useEffect, useState} from "react";
-import {getList} from "../../service/member/ApiService.js";
+import { useEffect, useState } from "react";
+import {getList, getListWithoutToken} from "../../service/member/ApiService.js";
 import useCustomMove from "../../hooks/review/UseCustomMove.jsx";
-import CustomButton from "../input/CustomButton.jsx";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
+import {
+    Box,
+    Button,
+    Container,
+    Paper,
+    Typography,
+    Divider,
+} from "@mui/material";
+import PageComponent from "./PageComponent.jsx";
 
 function ListComponent() {
-    const { page, size,   } = useCustomMove();
-
+    const { page, size,moveToList } = useCustomMove();
     const [serverData, setServerData] = useState();
-
     const navigate = useNavigate();
 
+
+
     useEffect(() => {
-        getList({ page, size }).then((data) => {
+        getListWithoutToken({ page, size }).then((data) => {
             console.log(data);
             setServerData(data);
         });
-    }, [page, size ]);
-
+    }, [page, size]);
 
     const handleWriteClick = () => {
-        navigate("/review/write"); // 라우터에 등록된 경로로 이동
+        navigate("/review/insert");
+    };
+
+    const handleItemClick = (tno) => {
+        navigate(`/review/detail/${tno}`);
     };
 
     return (
-        <div>
+        <>
+        <Container sx={{ mt: 4 }}>
+            {/* 상단 글쓰기 버튼 */}
+            <Box display="flex" justifyContent="flex-end" mb={3}>
+                <Button variant="contained" color="success" onClick={handleWriteClick}>
+                    글쓰기
+                </Button>
+            </Box>
+
+            {/* 게시판 리스트 */}
+            {serverData?.rnoList.map((review) => (
+                <Paper
+                    key={review.tno}
+                    elevation={1}
+                    sx={{
+                        mb: 2,
+                        p: 2,
+                        cursor: "pointer",
+                        "&:hover": { backgroundColor: "#f5f5f5" },
+                    }}
+                    onClick={() => handleItemClick(review.tno)}
+                >
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6">{review.title}</Typography>
+                        <Typography variant="caption">글 번호: {review.tno}</Typography>
+                    </Box>
+                    <Divider sx={{ my: 1 }} />
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                        {review.content}
+                    </Typography>
+                </Paper>
+            ))}
+        </Container>
             {serverData && (
-                <>
-                    <div className="text-right mb-4">
-                        <CustomButton
-                            text="글쓰기"
-                            onClick={handleWriteClick}
-                            variant="contained"
-                            customColor="success"
-                            size="medium"
-                        />
-                    </div>
-                    <div>
-                        {serverData.rnoList.map((review) => (
-                            <div key={review.tno}>
-                                <div>
-                                    <div>{review.rno}</div>
-                                    <div>{review.title}</div>
-                                    <div>{review.content}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </>
+                <PageComponent serverData={serverData} movePage={moveToList} />
             )}
-        </div>
-    );
+        </>
+);
 }
 
 export default ListComponent;

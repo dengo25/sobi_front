@@ -70,7 +70,8 @@ export function call(api, method, request) {
 export const getStatus = async () => {
   const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/main`);
   return res.data;
-}; // 회원 목록 조회 (페이징 + 검색 통합)
+};
+
 export const getList = async (pageParam) => {
   const {
     page = 0,
@@ -83,11 +84,12 @@ export const getList = async (pageParam) => {
 
   try {
     const params = {
-      page: page + 1,
+      page: page, // ✅ +1 제거!
       size: size,
       sortBy: sortBy,
       sortDir: sortDir,
     };
+
     const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/member`, {
       params: params,
     });
@@ -99,6 +101,7 @@ export const getList = async (pageParam) => {
     throw error;
   }
 };
+
 // 개별 회원 정보 조회
 export const getMember = async (memberId) => {
   const res = await jwtAxios.get(
@@ -109,9 +112,13 @@ export const getMember = async (memberId) => {
 
 //신고
 export const report = async (reportParam) => {
-  const res = await jwtAxios.put(`${API_BASE_URL}/api/report`, reportParam);
+  const res = await jwtAxios.put(
+    `${API_BASE_URL}/api/admin/report`,
+    reportParam
+  );
   return res.data;
 };
+
 const handleReportSubmit = async (reportDto) => {
   try {
     await report(reportDto);
@@ -146,7 +153,7 @@ export const getReportList = async (searchParams) => {
     if (status) params.status = status;
     if (reportType) params.reportType = reportType;
 
-    const res = await jwtAxios.get(`${API_BASE_URL}/api/report`, {
+    const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/report`, {
       params: params,
     });
 
@@ -156,6 +163,45 @@ export const getReportList = async (searchParams) => {
     console.error("신고 목록 조회 API 오류:", error);
     throw error;
   }
+};
+// 신고 상세 조회
+export const getReportDetail = async (reportId) => {
+  const res = await jwtAxios.get(
+    `${API_BASE_URL}/api/admin/report/${reportId}`
+  );
+  return res.data;
+};
+
+// 신고 처리 (승인/반려)
+export const processReport = async (reportId, processData) => {
+  const res = await jwtAxios.put(
+    `${API_BASE_URL}/api/admin/report/${reportId}/process`,
+    processData
+  );
+  return res.data;
+};
+
+// 블랙리스트 추가
+export const addToBlacklist = async (blacklistData) => {
+  const res = await jwtAxios.post(
+    `${API_BASE_URL}/api/admin/blacklist`,
+    blacklistData
+  );
+  return res.data;
+};
+//관리자 review 조회
+export async function getReview(targetId) {
+  const response = await axios.get(
+    `${API_BASE_URL}/api/admin/review/${targetId}`
+  );
+  return response.data;
+}
+//관리자 Review List
+export const getReviewList = async (pageParam) => {
+  const res = await jwtAxios.get(`${API_BASE_URL}/api/review/list`, {
+    params: pageParam,
+  });
+  return res.data;
 };
 
 export default jwtAxios;
