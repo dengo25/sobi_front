@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import ReviewList from "../pages/review/ReviewList";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
+import ReviewDetail from "../pages/review/ReviewDetail";
+import ReviewModify from "../pages/review/ReviewModify";
 //import ReviewWrite from "../pages/review/ReviewWrite.jsx";
 
 const reviewRouter = () => {
