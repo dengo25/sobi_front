@@ -10,7 +10,8 @@ import MypageRouter from "./MypageRouter.jsx";
 import LoginRouter from "./LoginRouter.jsx";
 import JoinRouter from "./JoinRouter.jsx";
 import ReportRouter from "./ReportRouter.jsx";
-import SocialRouter from "./SocialRouter.jsx";
+import CommonRouter from "./CommonRouter.jsx";
+import SocialRouter from "./SocialRouter.jsx"; // 소셜 라우터 추가
 
 const Loading = () => LoadingSpinner();
 
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
       LoginRouter(),
       JoinRouter(),
       ReportRouter(),
+      CommonRouter(),
       SocialRouter(),
     ],
   },

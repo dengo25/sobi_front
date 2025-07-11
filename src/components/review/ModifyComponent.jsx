@@ -3,10 +3,11 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import {MenuItem, Stack} from '@mui/material';
 
 import CustomButton from '../../components/input/CustomButton';
-import BasicEditor from '../../components/editor/BasicEditor';
-import {getCategoryList, insertReview, updateReview} from "../../service/review/ReviewService.js";
+
+import {getCategoryList, getReview, insertReview, updateReview} from "../../service/review/ReviewService.js";
 import TextField from "@mui/material/TextField";
 import {useSelector} from "react-redux";
+import ReviewEditor from "../editor/ReviewEditor.jsx";
 
 
 const InsertComponent = () => {
@@ -19,6 +20,25 @@ const InsertComponent = () => {
 
 
     const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        // 수정 모드일 때 기존 글 데이터 불러오기
+        if (tno) {
+            getReview(tno).then((data) => {
+                setFormData({
+                    tno: Number(tno),
+                    title: data.title,
+                    content: data.content,
+                    categoryId: data.categoryId,
+                    imageUrls: [], // 필요하면 여기서 image preview도 할 수 있음
+                });
+                setImages(data.images || []); // 이미지도 미리 설정
+            }).catch((err) => {
+                console.error("리뷰 불러오기 실패", err);
+            });
+        }
+    }, [tno]);
+
 
     useEffect(() => {
         getCategoryList()
@@ -52,6 +72,18 @@ const InsertComponent = () => {
         }));
     }, []);
 
+    useEffect(() => {
+        console.log("실시간 content 확인:", formData.content);
+    }, [formData.content]);
+
+    const extractImageUrlsFromHTML = (html) => {
+        const div = document.createElement("div");
+        div.innerHTML = html;
+        const imgTags = div.getElementsByTagName("img");
+        return Array.from(imgTags).map(img => img.getAttribute("src"));
+    };
+
+
     const submitEditor = async (e) => {
         e.preventDefault();
 
@@ -65,17 +97,15 @@ const InsertComponent = () => {
             return;
         }
 
-        // const imageUrls = extractImageUrls(formData.content);
-        // const dto = {
-        //     ...formData,
-        //     images: imageUrls
-        // };
+        const validImageUrls = extractImageUrlsFromHTML(formData.content);
+        const filteredImages = images.filter(img => validImageUrls.includes(img.fileUrl));
+
         const dto = {
             ...formData,
-            images: images,
+            images: filteredImages, // ❗️삭제된 이미지 제외된 리스트
             memberId: member.memberId,
+            tno: Number(tno)
         };
-
         console.log("전송 DTO:", dto);
 
         try {
@@ -91,7 +121,6 @@ const InsertComponent = () => {
             alert("작업 중 오류가 발생했습니다.");
         }
     };
-
     return (
         <>
             <h2>{isEdit ? '리뷰 수정' : '리뷰 작성'}</h2>
@@ -128,25 +157,37 @@ const InsertComponent = () => {
                         </MenuItem>
                     ))}
                 </TextField>
-                <BasicEditor
+                <ReviewEditor
                     value={formData.content}
                     onChange={handleEditorChange}
                     s3Folder="review"
                     onImageUpload={(imageInfo) => {
                         setImages((prev) => {
-                            const newImage = {...imageInfo};
-                            // 만약 첫 번째 이미지라면 썸네일로 지정
+                            const newImage = { ...imageInfo };
                             if (prev.length === 0) {
                                 newImage.isThumbnail = "Y";
                             }
                             return [...prev, newImage];
                         });
                     }}
+                    onImageDelete={(fileUrl) => {
+                        setImages((prev) => prev.filter((img) => img.fileUrl !== fileUrl));
+
+                        // content에서 <img src="fileUrl"> 태그 제거
+                        setFormData(prev => ({
+                            ...prev,
+                            content: prev.content.replace(
+                                new RegExp(`<img[^>]*src=["']${fileUrl}["'][^>]*>`, 'g'),
+                                ''
+                            )
+                        }));
+                    }}
                 />
 
                 <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end", mt: 2 }}>
                     <CustomButton type="submit" color="primary" text={isEdit ? '수정' : '등록'} />
-                    <CustomButton type="button" color="default" text="취소" onClick={() => navigate("/review/list")} />
+                    <CustomButton type="button" color="default" text="취소"
+                                  onClick={() => navigate(`/review/detail/${tno}`)} />
                 </Stack>
             </form>
         </>

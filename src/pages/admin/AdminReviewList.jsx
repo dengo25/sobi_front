@@ -12,11 +12,14 @@ import {
   Divider,
 } from "@mui/material";
 import PageComponent from "../../components/review/PageComponent.jsx";
+import { useSelector } from "react-redux";
 
 const AdminReviewList = () => {
-  const { page, size, moveToList } = useCustomMove();
+  const { page, size, moveToList, moveToDetail } = useCustomMove();
   const [serverData, setServerData] = useState();
   const navigate = useNavigate();
+
+  const memberId = useSelector((state) => state.member.memberId);
 
   useEffect(() => {
     getReviewList({ page, size }).then((data) => {
@@ -30,7 +33,7 @@ const AdminReviewList = () => {
   };
 
   const handleItemClick = (tno) => {
-    navigate(`admin/review/detail/${tno}`);
+    moveToDetail(tno, { page, size });
   };
 
   return (
@@ -42,6 +45,7 @@ const AdminReviewList = () => {
             variant="contained"
             color="success"
             onClick={handleWriteClick}
+            disabled={!memberId}
           >
             글쓰기
           </Button>
@@ -70,7 +74,8 @@ const AdminReviewList = () => {
             </Box>
             <Divider sx={{ my: 1 }} />
             <Typography variant="body2" color="text.secondary" noWrap>
-              {review.content}
+              {/*정규식으로 태그 제거*/}
+              {review.content.replace(/<[^>]+>/g, "")}
             </Typography>
           </Paper>
         ))}

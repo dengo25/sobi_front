@@ -21,10 +21,14 @@ function useCustomMove() {
     size: String(size),
   }).toString();
 
-  const moveToRead = (rno) => {
+  const moveToDetail = (rno, pageParam) => {
+    const queryStr = createSearchParams({
+      page: String(pageParam?.page ?? page),
+      size: String(pageParam?.size ?? size),
+    }).toString();
     navigate({
-      pathname: `../read/${rno}`,
-      search: queryDefault,
+      pathname: `../detail/${rno}`,
+      search: queryStr,
     });
   };
 
@@ -54,7 +58,7 @@ function useCustomMove() {
     });
   };
 
-  return { page, size, refresh, moveToRead, moveToModify, moveToList };
+  return { page, size, refresh, moveToDetail, moveToModify, moveToList };
 }
 
 export default useCustomMove;
