@@ -176,6 +176,9 @@ const Header = () => {
   const userInfo = useSelector((state) => state.member);
   const isLoggedIn = userInfo && userInfo.token;
 
+  const member = useSelector((state) => state.member);
+  const role = member?.role;
+
   const handleLogout = () => {
     signout();
     setUserMenuAnchor(null);
@@ -201,7 +204,7 @@ const Header = () => {
   const menuItems = [
     { label: "공통", path: "/common" },
     { label: "후기", path: "/review" },
-    { label: "관리자", path: "/admin" },
+    ...(role === "ROLE_ADMIN" ? [{ label: "관리자", path: "/admin" }] : []),
     { label: "공지사항", path: "/notice" },
     { label: "FAQ", path: "/faq" },
   ];
