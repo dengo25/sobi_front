@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getList } from "../../service/member/ApiService.js";
+import {getList, getListWithoutToken} from "../../service/member/ApiService.js";
 import useCustomMove from "../../hooks/review/UseCustomMove.jsx";
 import { useNavigate } from "react-router-dom";
 
@@ -11,32 +11,44 @@ import {
     Typography,
     Divider,
 } from "@mui/material";
+import PageComponent from "./PageComponent.jsx";
+import {useSelector} from "react-redux";
 
 function ListComponent() {
-    const { page, size } = useCustomMove();
+    const { page, size,moveToList,moveToDetail } = useCustomMove();
     const [serverData, setServerData] = useState();
     const navigate = useNavigate();
 
+    const memberId = useSelector(state => state.member.memberId);
+
+
     useEffect(() => {
-        getList({ page, size }).then((data) => {
+        getListWithoutToken({ page, size }).then((data) => {
             console.log(data);
             setServerData(data);
         });
     }, [page, size]);
 
     const handleWriteClick = () => {
-        navigate("/review/write");
+        navigate("/review/insert");
     };
 
     const handleItemClick = (tno) => {
-        navigate(`/review/detail/${tno}`);
+        moveToDetail(tno, { page, size });
     };
 
     return (
+        <>
         <Container sx={{ mt: 4 }}>
+
             {/* 상단 글쓰기 버튼 */}
             <Box display="flex" justifyContent="flex-end" mb={3}>
-                <Button variant="contained" color="success" onClick={handleWriteClick}>
+                <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleWriteClick}
+                    disabled={!memberId}
+                >
                     글쓰기
                 </Button>
             </Box>
@@ -60,12 +72,17 @@ function ListComponent() {
                     </Box>
                     <Divider sx={{ my: 1 }} />
                     <Typography variant="body2" color="text.secondary" noWrap>
-                        {review.content}
+                        {/*정규식으로 태그 제거*/}
+                        {review.content.replace(/<[^>]+>/g, '')}
                     </Typography>
                 </Paper>
             ))}
         </Container>
-    );
+            {serverData && (
+                <PageComponent serverData={serverData} movePage={moveToList} />
+            )}
+        </>
+);
 }
 
 export default ListComponent;

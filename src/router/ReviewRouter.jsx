@@ -24,7 +24,26 @@ const reviewRouter = () => {
         //   </Suspense>
         // ),
       },
-
+      {
+        path: "detail/:tno",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ReviewDetail />
+          </Suspense>
+        ),
+      },
+      {
+        path: "modify/:tno",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ReviewModify />
+          </Suspense>
+        ),
+      },
+      // {
+      //   path: "modify/:tno",//아이디를 tno로 사용한다.
+      //   element: <Suspense fallback={<LoadingSpinner />}><ReviewModify/></Suspense>),
+      // },
       {
         //아무것도 없는 경로로 들어오면 review의 list로 이동시켜
         path: "",
