@@ -186,6 +186,9 @@ export const getListWithoutToken = async (pageParam) => {
   return res.data;
 };
 
-
+export const deleteReview = async (tno) => {
+  const res = await jwtAxios.delete(`${API_BASE_URL}/api/review/${tno}`);
+  return res.data;
+};
 
 
