@@ -183,7 +183,7 @@ const AdminDashboard = ({
         <CardContent>
           <SectionTitle variant="h6">
             <WarningIcon />
-            최근 차단된 사용자 ({blockedCount}명)
+            차단된 사용자 ({blockedCount}명)
           </SectionTitle>
 
           <TableContainer>

@@ -103,7 +103,6 @@ const InfoValue = styled(Box)({
 
 const MemberDetail = () => {
   const [member, setMember] = useState({});
-  const [recentReviews, setRecentReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { memberId } = useParams();
@@ -114,7 +113,6 @@ const MemberDetail = () => {
         setLoading(true);
         const data = await getMember(memberId);
         setMember(data);
-        setRecentReviews(data.recentReviews || []);
       } catch (err) {
         console.error("회원 정보 조회 오류:", err);
         setError("회원 정보를 불러오는 중 오류가 발생했습니다.");
@@ -342,7 +340,7 @@ const MemberDetail = () => {
         </BasicInfoSection>
 
         {/* 최근 게시물 섹션 */}
-        {recentReviews.length > 0 && (
+        {/* {recentReviews.length > 0 && (
           <Card>
             <CardContent sx={{ p: 4 }}>
               <SectionTitle variant="h6">
@@ -380,7 +378,7 @@ const MemberDetail = () => {
               </TableContainer>
             </CardContent>
           </Card>
-        )}
+        )} */}
       </Container>
     </ThemeProvider>
   );
