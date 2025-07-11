@@ -4,7 +4,8 @@ import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { Navigate } from "react-router-dom";
 import ReviewDetail from "../pages/review/ReviewDetail";
 import ReviewModify from "../pages/review/ReviewModify";
-//import ReviewWrite from "../pages/review/ReviewWrite.jsx";
+import ReviewInsert from "../pages/review/ReviewInsert.jsx";
+//import ReviewWrite from "../pages/review/ReviewInsert.jsx";
 
 const reviewRouter = () => {
   return {
@@ -19,12 +20,12 @@ const reviewRouter = () => {
         ),
       },
       {
-        // path: "write",
-        // element: (
-        //   <Suspense fallback={<LoadingSpinner />}>
-        //     <ReviewWrite />
-        //   </Suspense>
-        // ),
+        path: "insert",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ReviewInsert />
+          </Suspense>
+        ),
       },
       {
         path: "detail/:tno",
