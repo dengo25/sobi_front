@@ -190,18 +190,43 @@ export const addToBlacklist = async (blacklistData) => {
   return res.data;
 };
 //관리자 review 조회
-export async function getReview(targetId) {
-  const response = await axios.get(
-    `${API_BASE_URL}/api/admin/review/${targetId}`
+export async function getReview(tno) {
+  const response = await jwtAxios.get(
+    `${API_BASE_URL}/api/admin/review/${tno}`
   );
   return response.data;
 }
 //관리자 Review List
 export const getReviewList = async (pageParam) => {
-  const res = await jwtAxios.get(`${API_BASE_URL}/api/review/list`, {
+  const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/review/list`, {
     params: pageParam,
   });
   return res.data;
+};
+
+// 리뷰 승인 (confirm = 'Y')
+export const confirmedReview = async (tno) => {
+  const response = await jwtAxios.patch(
+    `${API_BASE_URL}/api/admin/review/${tno}/approve`
+  );
+  return response.data;
+};
+// 리뷰 반려 (confirm = 'R')
+export const rejectedReview = async (tno) => {
+  const response = await jwtAxios.patch(
+    `${API_BASE_URL}/api/admin/review/${tno}/reject`
+  );
+  return response.data;
+};
+// 리뷰 차단 (is_deleted = 'Y' + 블랙리스트 등록)
+export const blockedReview = async (tno, reason) => {
+  const params = new URLSearchParams();
+  if (reason) params.append("reason", reason);
+
+  const response = await jwtAxios.patch(
+    `${API_BASE_URL}/api/admin/review/${tno}/block?${params}`
+  );
+  return response.data;
 };
 
 export default jwtAxios;

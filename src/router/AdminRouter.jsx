@@ -5,7 +5,7 @@ import ReportList from "../pages/admin/ReportList.jsx";
 import AdminMemberRouter from "./AdminMemberRouter.jsx";
 import AdminRoute from "../components/common/AdminRoute.jsx";
 import ReportDetail from "../pages/admin/ReportDetail.jsx";
-import ReportedReview from "../pages/admin/ReportedReview.jsx";
+import AdminReviewDetail from "../pages/admin/AdminReviewDetail.jsx";
 import AdminReviewList from "../pages/admin/AdminReviewList.jsx";
 const AdminRouter = () => {
   return {
@@ -42,11 +42,11 @@ const AdminRouter = () => {
         ),
       },
       {
-        path: "report/review/:targetId",
+        path: "review/:tno",
         element: (
           <AdminRoute>
             <Suspense fallback={<LoadingSpinner />}>
-              <ReportedReview />
+              <AdminReviewDetail />
             </Suspense>
           </AdminRoute>
         ),

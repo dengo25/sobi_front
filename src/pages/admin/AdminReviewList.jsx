@@ -15,7 +15,7 @@ import PageComponent from "../../components/review/PageComponent.jsx";
 import { useSelector } from "react-redux";
 
 const AdminReviewList = () => {
-  const { page, size, moveToList, moveToDetail } = useCustomMove();
+  const { page, size, moveToList, adminMoveToDetail } = useCustomMove();
   const [serverData, setServerData] = useState();
   const navigate = useNavigate();
 
@@ -28,29 +28,9 @@ const AdminReviewList = () => {
     });
   }, [page, size]);
 
-  const handleWriteClick = () => {
-    navigate("/review/insert");
-  };
-
-  const handleItemClick = (tno) => {
-    moveToDetail(tno, { page, size });
-  };
-
   return (
     <>
       <Container sx={{ mt: 4 }}>
-        {/* 상단 글쓰기 버튼 */}
-        <Box display="flex" justifyContent="flex-end" mb={3}>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleWriteClick}
-            disabled={!memberId}
-          >
-            글쓰기
-          </Button>
-        </Box>
-
         {/* 게시판 리스트 */}
         {serverData?.rnoList.map((review) => (
           <Paper
@@ -62,14 +42,28 @@ const AdminReviewList = () => {
               cursor: "pointer",
               "&:hover": { backgroundColor: "#f5f5f5" },
             }}
-            onClick={() => handleItemClick(review.tno)}
+            onClick={() => navigate(`/admin/review/${review.tno}`)}
           >
             <Box
               display="flex"
               justifyContent="space-between"
               alignItems="center"
             >
-              <Typography variant="h6">{review.title}</Typography>
+              <Typography variant="h6">
+                {" "}
+                {review.confirmed === "Y" && (
+                  <span
+                    style={{
+                      marginLeft: "10px",
+                      color: "green",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    ✅
+                  </span>
+                )}
+                {review.title}
+              </Typography>
               <Typography variant="caption">글 번호: {review.tno}</Typography>
             </Box>
             <Divider sx={{ my: 1 }} />
