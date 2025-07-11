@@ -3,11 +3,16 @@ import useCustomMove from "../../hooks/review/UseCustomMove.jsx";
 import {getReview} from "../../service/review/ReviewService.js";
 import CustomButton from "../input/CustomButton.jsx";
 import Stack from "@mui/material/Stack";
+import {deleteReview} from "../../service/member/ApiService.js";
+import {useSelector} from "react-redux";
 
 
 function DetailComponent({tno}) {
     const [review, setReview] = useState(null);
     const { page, size,moveToList, moveToModify } = useCustomMove();
+
+    const memberId = useSelector((state) => state.member.memberId);
+
 
     useEffect(() => {
         getReview(tno).then((data) => {
@@ -15,6 +20,20 @@ function DetailComponent({tno}) {
             setReview(data);
         });
     }, [tno]);
+
+    const handleDelete = async () => {
+        const confirmed = window.confirm("정말 삭제하시겠습니까?");
+        if (!confirmed) return;
+
+        try {
+            await deleteReview(tno);
+            alert("삭제가 완료되었습니다.");
+            moveToList({ page, size });
+        } catch (err) {
+            console.error("삭제 실패", err);
+            alert("삭제 중 오류가 발생했습니다.");
+        }
+    };
 
 
     return (
@@ -29,7 +48,12 @@ function DetailComponent({tno}) {
 
                     <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end", mt: 2 }}>
                         <CustomButton type="button" color="primary" text="목록" onClick={() => moveToList({ page, size })} />
-                        <CustomButton type="button" color="default" text="수정" onClick={() => moveToModify(tno)} />
+                        {memberId === review.memberId && (
+                            <>
+                                <CustomButton type="button" color="default" text="수정" onClick={() => moveToModify(tno)} />
+                                <CustomButton type="button" color="error" text="삭제" onClick={handleDelete} />
+                            </>
+                        )}
                     </Stack>
                 </div>
             )}
