@@ -265,7 +265,7 @@ const RealisticMemberList = () => {
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
             <FilterIcon />
-            정렬 설정
+            필터
           </Typography>
 
           <Grid container spacing={2} alignItems="center">
