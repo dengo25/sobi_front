@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: sobi_front  # 리액트 소스가 있는 디렉토리
+    working-directory: .
 
 jobs:
   build-and-deploy:
