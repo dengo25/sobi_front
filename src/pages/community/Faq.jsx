@@ -10,7 +10,7 @@ import {
   getFaqList,
   deleteFaq,
   getFaqListWithPaging,
-} from "../../service/community/FaqApiService";
+} from "../../service/community/faqApiService";
 
 const Faq = () => {
   const [selectedFaqs, setSelectedFaqs] = useState([]);
