@@ -21,8 +21,8 @@ export const getFaqList = async (token) => {
   }
 };
 
-// Faq 페이징 목록 (새로 추가)
-export const getFaqListWithPaging = async (params = {}) => {
+// Faq 페이징 목록
+export const getFaqListWithPaging = async (params = {},token) => {
   try {
     const {
       page = 0,
@@ -42,10 +42,12 @@ export const getFaqListWithPaging = async (params = {}) => {
       sortDirection,
     });
 
-    const res = await jwtAxios.get(
-      `${API_BASE_URL}/api/faq/page?${queryParams.toString()}`
-    );
-    console.log("페이징 목록 조회:", res.data);
+    const instance = getInstance(token);
+    const res = await instance.get(`${API_BASE_URL}/api/faq/page?${queryParams.toString()}`);
+    // const res = await jwtAxios.get(
+    //   `${API_BASE_URL}/api/faq/page?${queryParams.toString()}`
+    // );
+    // console.log("페이징 목록 조회:", res.data);
     if (!res.data) {
       throw new Error("응답 데이터가 없습니다.");
     }
@@ -95,7 +97,7 @@ export const updateFaqList = async (faqNo, dto) => {
 export const deleteFaq = async (faqNo) => {
   try {
     const res = await jwtAxios.delete(`${API_BASE_URL}/api/faq/${faqNo}`);
-    // console.log("삭제 응답 데이터 : ", res.data);
+    console.log("삭제 응답 데이터 : ", res.data);
     return res;
   } catch (erro) {
     console.error("삭제 실패:", error);

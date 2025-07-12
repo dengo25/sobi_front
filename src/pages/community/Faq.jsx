@@ -25,6 +25,13 @@ const Faq = () => {
     hasNext: false,
     hasPrevious: false,
   });
+
+  // 정렬 상태
+  const [currentSort, setCurrentSort] = useState({
+    sortBy: "faqCreateDate",
+    sortDirection: "desc",
+  });
+  
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
   // const member = useSelector((state) => state.memberSlice);
@@ -48,10 +55,9 @@ const Faq = () => {
     const requestParams = {
       page: params.page !== undefined ? params.page : pageInfo.currentPage,
       //size: pageInfo.pageSize,
-      size: params.size !== undefined ? params.size : (pageInfo.pageSize || 10),
-      sortBy: "faqCreateDate",
-      sortDirection: "desc",
-      // ...searchParams,
+      size: params.size !== undefined ? params.size : pageInfo.pageSize || 10,
+      sortBy: params.sortBy || currentSort.sortBy,
+      sortDirection: params.sortDirection || currentSort.sortDirection,
       ...params,
     };
 
@@ -68,6 +74,12 @@ const Faq = () => {
       last: res.last || false,
       hasNext: res.hasNext || false,
       hasPrevious: res.hasPrevious || false,
+    });
+
+    // 현재 정렬 상태 업데이트
+    setCurrentSort({
+      sortBy: requestParams.sortBy,
+      sortDirection: requestParams.sortDirection,
     });
   };
 
@@ -90,7 +102,7 @@ const Faq = () => {
     fetchFaqs({ page: pageNumber });
   };
 
-  const handleClick = (e) => {
+  const handleClick = async (e) => {
     if (e === "insert") {
       navigate("/faq/insert");
     } else if (e === "update") {
@@ -118,25 +130,9 @@ const Faq = () => {
         for (let faqNo of selectedFaqs) {
           deleteFaq(faqNo).then(() => {
             console.log("삭제완료 : ", faqNo);
-
-            // 삭제 후 현재 페이지 다시 로드
-            // 만약 현재 페이지에 아이템이 없다면 이전 페이지로 이동
-            const currentPageItems = list.length - selectedFaqs.length;
-            const shouldGoToPrevPage =
-              currentPageItems === 0 && pageInfo.currentPage > 0;
-
-            setSelectedFaqs([]); // 선택 초기화
-
-            if (shouldGoToPrevPage) {
-              fetchFaqs({ page: pageInfo.currentPage - 1 });
-            } else {
-              fetchFaqs({ page: pageInfo.currentPage });
-            }
-
-            // getFaqList().then((data) => {
-            //   setList(data);
-            //   setSelectedFaqs([]); // 선택 초기화도 함께
-            // });
+            // 초기화 처리
+            // getFaqList 호출시, 정렬 안되는 이슈 발생
+            fetchFaqs({ page: 0, size: 10 });
           });
         }
       } catch (err) {
@@ -147,7 +143,7 @@ const Faq = () => {
   };
 
   let dataList = list.map((faq, index) => {
-    console.log(`FAQ ${index}:`, faq);
+    // console.log(`FAQ ${index}:`, faq);
     return (
       <CNTAccordion
         key={`${faq.faqNo}-${index}`}
