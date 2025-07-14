@@ -27,31 +27,52 @@ function useCustomMove() {
       size: String(params.size ?? size),
     };
 
+    // category 처리 - undefined로 명시적으로 전달된 경우 제외
     if (params.hasOwnProperty("category")) {
-      if (params.category && params.category > 0) {
+      if (
+        params.category !== undefined &&
+        params.category &&
+        params.category > 0
+      ) {
         defaultParams.category = String(params.category);
       }
+      // params.category가 undefined인 경우 defaultParams에 추가하지 않음
     } else {
+      // params에 category가 없는 경우 기존 값 사용
       if (category && category > 0) {
         defaultParams.category = String(category);
       }
     }
 
+    // keyword 처리 - undefined로 명시적으로 전달된 경우 제외
     if (params.hasOwnProperty("keyword")) {
-      if (params.keyword && params.keyword.trim()) {
+      if (
+        params.keyword !== undefined &&
+        params.keyword &&
+        params.keyword.trim()
+      ) {
         defaultParams.keyword = params.keyword.trim();
       }
+      // params.keyword가 undefined인 경우 defaultParams에 추가하지 않음
     } else {
+      // params에 keyword가 없는 경우 기존 값 사용
       if (keyword && keyword.trim()) {
         defaultParams.keyword = keyword.trim();
       }
     }
 
+    // sort 처리 - undefined로 명시적으로 전달된 경우 제외
     if (params.hasOwnProperty("sort")) {
-      if (params.sort && params.sort !== "latest") {
+      if (
+        params.sort !== undefined &&
+        params.sort &&
+        params.sort !== "latest"
+      ) {
         defaultParams.sort = params.sort;
       }
+      // params.sort가 undefined인 경우 defaultParams에 추가하지 않음
     } else {
+      // params에 sort가 없는 경우 기존 값 사용
       if (sort && sort !== "latest") {
         defaultParams.sort = sort;
       }

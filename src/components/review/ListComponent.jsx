@@ -345,7 +345,13 @@ function ListComponent() {
     setSelectedCategory("");
     setSortBy("latest");
 
-    moveToListWithFilter({});
+    moveToListWithFilter({
+      page: 1,
+      size: size,
+      category: undefined,
+      keyword: undefined,
+      sort: undefined,
+    });
   };
 
   // 날짜 포맷팅 함수
