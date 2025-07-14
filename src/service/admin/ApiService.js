@@ -169,15 +169,34 @@ export const getReportDetail = async (reportId) => {
   return res.data;
 };
 
-// 신고 처리 (승인/반려)
-export const processReport = async (reportId, processData) => {
-  const res = await jwtAxios.put(
-    `${API_BASE_URL}/api/admin/report/${reportId}/process`,
-    processData
-  );
-  return res.data;
+// 신고 승인
+export const approveReport = async (reportId, tno, detail) => {
+  try {
+    const res = await jwtAxios.put(
+      `${API_BASE_URL}/api/admin/report/${reportId}`,
+      {
+        tno: parseInt(tno),
+        detail: detail.trim(),
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("승인 요청 실패:", error.response?.data);
+    throw error;
+  }
 };
 
+export const rejectReport = async (reportId) => {
+  try {
+    const res = await jwtAxios.patch(
+      `${API_BASE_URL}/api/admin/report/${reportId}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("승인 요청 실패:", error.response?.data);
+    throw error;
+  }
+};
 // 블랙리스트 추가
 export const addToBlacklist = async (blacklistData) => {
   const res = await jwtAxios.post(

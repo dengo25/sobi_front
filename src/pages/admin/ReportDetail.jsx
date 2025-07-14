@@ -35,11 +35,7 @@ import {
   Assignment as AssignmentIcon,
   ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
-import {
-  getReportDetail,
-  processReport,
-  addToBlacklist,
-} from "../../service/admin/ApiService";
+import { getReportDetail } from "../../service/admin/ApiService";
 
 const sobiTheme = createTheme({
   palette: {
@@ -413,7 +409,9 @@ const ReportDetail = () => {
                       variant="outlined"
                       onClick={() => {
                         if (report.targetId) {
-                          navigate(`/admin/report/review/${report.targetId}`);
+                          navigate(
+                            `/admin/report/review/${report.targetId}/${report.reportId}`
+                          );
                         } else {
                           alert("타겟 ID가 없습니다.");
                         }
@@ -470,107 +468,6 @@ const ReportDetail = () => {
             />
           </CardContent>
         </DetailSection>
-
-        {/* 처리 액션 섹션 */}
-        {report.status === "PENDING" && (
-          <ActionSection>
-            <CardContent sx={{ p: 4 }}>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mb: 3, textAlign: "center" }}
-              >
-                이 신고에 대한 처리를 선택해주세요. 처리 후에는 되돌릴 수
-                없습니다.
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<CheckIcon />}
-                    fullWidth
-                    size="large"
-                    onClick={() => setApproveDialogOpen(true)}
-                    disabled={actionLoading || !reason.trim()}
-                  >
-                    승인 (블랙리스트 등록)
-                  </Button>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    startIcon={<CancelIcon />}
-                    fullWidth
-                    size="large"
-                    onClick={() => setRejectDialogOpen(true)}
-                    disabled={actionLoading}
-                  >
-                    신고 반려
-                  </Button>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </ActionSection>
-        )}
-
-        {/* 승인 확인 다이얼로그 */}
-        <Dialog
-          open={approveDialogOpen}
-          onClose={() => setApproveDialogOpen(false)}
-        >
-          <DialogTitle>신고 승인 확인</DialogTitle>
-          <DialogContent>
-            <Typography>
-              <strong>{report.reportedId}</strong> 사용자를 블랙리스트에
-              등록하고 신고를 승인하시겠습니까?
-            </Typography>
-            <Box sx={{ mt: 2, p: 2, bgcolor: "grey.100", borderRadius: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                블랙리스트 등록 사유:
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                {reason}
-              </Typography>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setApproveDialogOpen(false)}>취소</Button>
-            <Button
-              onClick={handleApprove}
-              variant="contained"
-              color="success"
-              disabled={actionLoading}
-            >
-              {actionLoading ? <CircularProgress size={20} /> : "승인"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* 반려 확인 다이얼로그 */}
-        <Dialog
-          open={rejectDialogOpen}
-          onClose={() => setRejectDialogOpen(false)}
-        >
-          <DialogTitle>신고 반려 확인</DialogTitle>
-          <DialogContent>
-            <Typography>이 신고를 반려하시겠습니까?</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setRejectDialogOpen(false)}>취소</Button>
-            <Button
-              onClick={handleReject}
-              variant="contained"
-              color="error"
-              disabled={actionLoading}
-            >
-              {actionLoading ? <CircularProgress size={20} /> : "반려"}
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Container>
     </ThemeProvider>
   );
