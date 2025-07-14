@@ -34,6 +34,8 @@ import {
   FilterList as FilterIcon,
   CheckCircle as ApprovedIcon,
   Pending as PendingIcon,
+  Block as BlockIcon,
+  Cancel as RejectIcon,
 } from "@mui/icons-material";
 import { getReviewList } from "../../service/admin/ApiService";
 import useCustomMove from "../../hooks/admin/UseCustomMove";
@@ -385,6 +387,22 @@ const AdminReviewList = () => {
                             color="success"
                             size="small"
                             variant="filled"
+                          />
+                        ) : review.confirmed === "B" ? (
+                          <Chip
+                            icon={<BlockIcon />}
+                            label="차단"
+                            color="error"
+                            size="small"
+                            variant="filled"
+                          />
+                        ) : review.confirmed === "R" ? (
+                          <Chip
+                            icon={<RejectIcon />}
+                            label="반려"
+                            color="error"
+                            size="small"
+                            variant="outlined"
                           />
                         ) : (
                           <Chip

@@ -423,31 +423,6 @@ const ReportDetail = () => {
                 </InfoRow>
               </Grid>
 
-              {/* 신고 내용 */}
-              <Grid item xs={12}>
-                <InfoRow>
-                  <InfoLabel>
-                    <DescriptionIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      신고 내용
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Typography
-                      variant="body2"
-                      fontWeight={500}
-                      sx={{ lineHeight: 1.6 }}
-                    >
-                      {report.detail || "상세 내용이 없습니다."}
-                    </Typography>
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
-
               {/* 신고일자 */}
               <Grid item xs={12}>
                 <InfoRow>
@@ -474,28 +449,27 @@ const ReportDetail = () => {
           </CardContent>
         </DetailSection>
 
-        {/* 블랙리스트 사유 입력 섹션 */}
-        {report.status === "PENDING" && (
-          <DetailSection>
-            <CardContent sx={{ p: 4 }}>
-              <SectionTitle variant="h6">
-                <BlockIcon />
-                블랙리스트 등록 사유
-              </SectionTitle>
+        {/* 신고 내용*/}
+        <DetailSection>
+          <CardContent sx={{ p: 4 }}>
+            <SectionTitle variant="h6">
+              <BlockIcon />
+              신고 내용
+            </SectionTitle>
 
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label="블랙리스트 등록 사유"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="블랙리스트 등록 사유를 입력해주세요..."
-                variant="outlined"
-              />
-            </CardContent>
-          </DetailSection>
-        )}
+            <TextField
+              fullWidth
+              multiline
+              rows={2}
+              label="신고 내용"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="블랙리스트 등록 사유를 입력해주세요..."
+              variant="outlined"
+              disabled
+            />
+          </CardContent>
+        </DetailSection>
 
         {/* 처리 액션 섹션 */}
         {report.status === "PENDING" && (

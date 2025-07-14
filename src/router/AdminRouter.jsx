@@ -7,6 +7,7 @@ import AdminRoute from "../components/common/AdminRoute.jsx";
 import ReportDetail from "../pages/admin/ReportDetail.jsx";
 import AdminReviewDetail from "../pages/admin/AdminReviewDetail.jsx";
 import AdminReviewList from "../pages/admin/AdminReviewList.jsx";
+import ReportReviewDetail from "../pages/admin/ReportReviewDetail.jsx";
 const AdminRouter = () => {
   return {
     path: "admin",
@@ -57,6 +58,16 @@ const AdminRouter = () => {
           <AdminRoute>
             <Suspense fallback={<LoadingSpinner />}>
               <AdminReviewList />
+            </Suspense>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "report/review/:tno",
+        element: (
+          <AdminRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReportReviewDetail />
             </Suspense>
           </AdminRoute>
         ),

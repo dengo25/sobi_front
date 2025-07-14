@@ -8,7 +8,7 @@ import {
 import Stack from "@mui/material/Stack";
 import { useParams } from "react-router-dom";
 
-const AdminReviewDetail = () => {
+const ReoprtReviewDetail = () => {
   const [review, setReview] = useState(null);
   const { tno } = useParams();
 
@@ -19,17 +19,6 @@ const AdminReviewDetail = () => {
       setReview(data);
     });
   }, [tno]);
-
-  const handleConfirm = async () => {
-    try {
-      await confirmedReview(review.tno);
-      alert("리뷰가 승인 처리되었습니다.");
-      setReview({ ...review, confirmed: "Y" });
-    } catch (err) {
-      console.error("승인 실패:", err);
-      alert("승인 중 오류가 발생했습니다.");
-    }
-  };
 
   const handleReject = async () => {
     if (!window.confirm("이 리뷰를 반려하시겠습니까?")) return;
@@ -73,13 +62,10 @@ const AdminReviewDetail = () => {
             spacing={1}
             sx={{ justifyContent: "flex-end", mt: 2 }}
           >
-            {review.confirmed === "N" && (
-              <>
-                <button onClick={handleConfirm}>승인</button>
-                <button onClick={handleReject}>반려</button>
-                <button onClick={handleBlock}>차단</button>
-              </>
-            )}
+            <>
+              <button onClick={handleBlock}>승인</button>
+              <button onClick={handleReject}>반려</button>
+            </>
           </Stack>
         </div>
       )}
@@ -96,4 +82,4 @@ const btnStyle = (bg) => ({
   cursor: "pointer",
 });
 
-export default AdminReviewDetail;
+export default ReoprtReviewDetail;
