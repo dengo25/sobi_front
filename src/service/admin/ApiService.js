@@ -198,12 +198,34 @@ export async function getReview(tno) {
 }
 //관리자 Review List
 export const getReviewList = async (pageParam) => {
-  const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/review/list`, {
-    params: pageParam,
-  });
-  return res.data;
-};
+  const {
+    page = 0,
+    size = 10,
+    sortBy = "memberReg",
+    sortDir = "desc",
+  } = pageParam || {};
 
+  console.log("리뷰 목록 API 요청 파라미터:", { page, size, sortBy, sortDir });
+
+  try {
+    const params = {
+      page: page,
+      size: size,
+      sortBy: sortBy,
+      sortDir: sortDir,
+    };
+
+    const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/review/list`, {
+      params: params,
+    });
+
+    console.log("리뷰 목록 API 응답:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("리뷰 목록 조회 API 오류:", error);
+    throw error;
+  }
+};
 // 리뷰 승인 (confirm = 'Y')
 export const confirmedReview = async (tno) => {
   const response = await jwtAxios.patch(

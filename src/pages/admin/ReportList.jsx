@@ -316,7 +316,7 @@ const EnhancedReportList = () => {
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
             <FilterIcon />
-            필터 및 검색
+            필터
           </Typography>
 
           <Grid container spacing={2} alignItems="center">
