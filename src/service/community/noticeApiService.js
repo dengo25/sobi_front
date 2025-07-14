@@ -4,8 +4,8 @@ import { API_BASE_URL } from "../util/api-config";
 
 // 토큰 판별 인스턴스 선택
 const getInstance = (token) => {
-    return token ? jwtAxios : axios.create({ baseURL: API_BASE_URL }); 
-}
+  return token ? jwtAxios : axios.create({ baseURL: API_BASE_URL });
+};
 
 // Notice 목록
 export const getNoticeList = async (token) => {
@@ -22,7 +22,7 @@ export const getNoticeList = async (token) => {
 };
 
 // Notice 페이징 목록
-export const getNoticeListWithPaging = async (params = {},token) => {
+export const getNoticeListWithPaging = async (params = {}, token) => {
   try {
     const {
       page = 0,
@@ -47,7 +47,9 @@ export const getNoticeListWithPaging = async (params = {},token) => {
     }
 
     const instance = getInstance(token);
-    const res = await instance.get(`${API_BASE_URL}/api/notice/page?${queryParams.toString()}`);
+    const res = await instance.get(
+      `${API_BASE_URL}/api/notice/page?${queryParams.toString()}`
+    );
     // const res = await jwtAxios.get(
     //   `${API_BASE_URL}/api/notice/page?${queryParams.toString()}`
     // );
@@ -106,11 +108,11 @@ export const getSearchCount = async (searchType, keyword) => {
 export const insertNoticeList = async (dto) => {
   try {
     const res = await jwtAxios.post(`${API_BASE_URL}/api/notice`, dto);
-    console.log("신규 응답 데이터 : ",res.data);
-    console.log("dto try : ",dto);
+    console.log("신규 응답 데이터 : ", res.data);
+    console.log("dto try : ", dto);
     return res.data;
   } catch (error) {
-    console.log("dto erro : ",dto);
+    console.log("dto erro : ", dto);
     console.error("신규 등록 실패:", error);
     throw error;
   }
