@@ -23,7 +23,6 @@ import {
 } from "@mui/icons-material";
 import { deleteMypage, signout } from "../../service/member/ApiService";
 
-// SOBI 브랜드 색상 테마
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -41,7 +40,6 @@ const sobiTheme = createTheme({
   },
 });
 
-// 스타일드 컴포넌트
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
     borderRadius: theme.spacing(2),
