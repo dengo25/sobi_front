@@ -110,7 +110,9 @@ export function socialLogin(provider) {
     "/oauth2/authorization/" +
     provider +
     "?redirect_url=" +
-    frontendUrl;
+      encodeURIComponent(frontendUrl); // 꼭 인코딩 해줄 것!
+
+  // frontendUrl;
 }
 
 // //ec2 배포용 함수
