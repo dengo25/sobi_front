@@ -120,8 +120,8 @@ const EnhancedReportList = () => {
   const statusOptions = [
     { value: "", label: "전체" },
     { value: "PENDING", label: "미해결" },
-    { value: "PROCESSED", label: "처리완료" },
-    { value: "REJECTED", label: "반려" },
+    { value: "APPROVE", label: "처리완료" },
+    { value: "REJECT", label: "반려" },
   ];
 
   // 신고 유형 옵션
@@ -250,9 +250,9 @@ const EnhancedReportList = () => {
     switch (status) {
       case "PENDING":
         return "warning";
-      case "PROCESSED":
+      case "APPROVE":
         return "success";
-      case "REJECTED":
+      case "REJECT":
         return "error";
       default:
         return "default";
@@ -263,9 +263,9 @@ const EnhancedReportList = () => {
     switch (status) {
       case "PENDING":
         return "미해결";
-      case "PROCESSED":
+      case "APPROVE":
         return "처리완료";
-      case "REJECTED":
+      case "REJECT":
         return "반려";
       default:
         return status;
