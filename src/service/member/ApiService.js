@@ -98,25 +98,25 @@ export function signup(memberDTO) {
 }
 
 //소셜 로그인 함수: provider에 따라 OAuth2 인증시작
-export function socialLogin(provider) {
-  //현재 프론트엔드 url을 구성
-  const frontendUrl = window.location.protocol + "//" + window.location.host;
-  console.log("frontendUrl = " + frontendUrl);
-
-  //소셜 로그인 url로 리다이렉트 (OAuth2 인증 시작)
-  //프론트엔드에서 처리하지않고 백엔드에서 처리하도록 위임하는 구조
-  window.location.href =
-    API_BASE_URL +
-    "/oauth2/authorization/" +
-    provider +
-    "?redirect_url=" +
-    frontendUrl;
-}
+// export function socialLogin(provider) {
+//   //현재 프론트엔드 url을 구성
+//   const frontendUrl = window.location.protocol + "//" + window.location.host;
+//   console.log("frontendUrl = " + frontendUrl);
+//
+//   //소셜 로그인 url로 리다이렉트 (OAuth2 인증 시작)
+//   //프론트엔드에서 처리하지않고 백엔드에서 처리하도록 위임하는 구조
+//   window.location.href =
+//     API_BASE_URL +
+//     "/oauth2/authorization/" +
+//     provider +
+//     "?redirect_url=" +
+//     frontendUrl;
+// }
 
 //ec2 배포용 함수
-// export function socialLogin(provider) {
-//   window.location.href = API_BASE_URL + "/oauth2/authorization/" + provider;
-// }
+export function socialLogin(provider) {
+  window.location.href = API_BASE_URL + "/oauth2/authorization/" + provider;
+}
 
 //로그인 후 헤더에서 로그인 삭제 함수
 export function isLoggedIn() {
