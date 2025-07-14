@@ -116,9 +116,21 @@ export function socialLogin(provider) {
 }*/
 
 //ec2 배포용 함수
+// export function socialLogin(provider) {
+//   window.location.href = API_BASE_URL + "/oauth2/authorization/" + provider;
+// }
+
 export function socialLogin(provider) {
-  window.location.href = API_BASE_URL + "/oauth2/authorization/" + provider;
+  const frontendUrl = window.location.protocol + "//" + window.location.host + "/mypage";
+
+  window.location.href =
+      API_BASE_URL +
+      "/oauth2/authorization/" +
+      provider +
+      "?redirect_url=" +
+      encodeURIComponent(frontendUrl); // ← 꼭 인코딩!
 }
+
 
 //로그인 후 헤더에서 로그인 삭제 함수
 export function isLoggedIn() {
