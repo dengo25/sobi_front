@@ -8,15 +8,15 @@ const getInstance = (token) => {
 };
 
 /* 메인 표출용 */
-// 공지사항 : 최신 3건
-export const noticeLimit3List = async (token) => {
+// 후기 : 최신 10건
+export const reviewLimit10List = async (token) => {
   try {
     const instance = getInstance(token);
-    const res = await instance.get(`${API_BASE_URL}/api/notice/main`);
-    console.log("최신 3건 조회 응답 데이터 : ", res.data);
+    const res = await instance.get(`${API_BASE_URL}/api/review/list?page=1&size=10`);
+    console.log("10건 조회 응답 데이터 : ", res.data);
     return res.data;
   } catch (error) {
-    console.error("최신 3건 조회 실패:", error);
+    console.error("10건 조회 실패:", error);
     throw error;
   }
 };
@@ -56,6 +56,19 @@ export const reviewLimit5ListfromCateogry2 = async (token) => {
     return res.data;
   } catch (error) {
     console.error("[c2] 최신 5건 조회 실패:", error);
+    throw error;
+  }
+};
+
+// 공지사항 : 최신 3건
+export const noticeLimit3List = async (token) => {
+  try {
+    const instance = getInstance(token);
+    const res = await instance.get(`${API_BASE_URL}/api/notice/main`);
+    console.log("최신 3건 조회 응답 데이터 : ", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("최신 3건 조회 실패:", error);
     throw error;
   }
 };

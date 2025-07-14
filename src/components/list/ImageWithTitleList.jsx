@@ -13,8 +13,8 @@ const ImageWithTitleList = ({
   return (
     <Box sx={{ width, height, overflowY: "auto" }}>
       <ImageList variant="masonry" cols={cols} gap={gap}>
-        {items.map((item) => (
-          <ImageListItem key={item.img}>
+        {items.map((item, idx) => (
+          <ImageListItem key={idx}>
             <img
               src={ item.img ? `${item.img}?w=248&fit=crop&auto=format` : `src/assets/images/img-noimg.png`}
               srcSet={item.img ? `${item.img}?w=248&fit=crop&auto=format&dpr=2 2x` : `src/assets/images/img-noimg.png`}
