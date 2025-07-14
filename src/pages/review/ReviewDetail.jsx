@@ -8,7 +8,6 @@ export default function ReviewDetail() {
 
   return (
     <div>
-      <h1>ReviewList</h1>
       <DetailComponent tno={Number(tno)} />
     </div>
   );
