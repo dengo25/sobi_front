@@ -1,9 +1,8 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import {
-  mainLimit3List,
-  getNoticeList,
-} from "../service/community/noticeApiService";
+import { getNoticeList } from "../service/community/NoticeApiService";
+import { noticeLimit3List, reviewLimit5List, reviewLimit5ListfromCateogry1, reviewLimit5ListfromCateogry2 } from "../service/main/MainApiService";
+
 import SwiperCarousel from "../components/swiper/SwiperCarousel";
 import ImageWithTitleList from "../components/list/ImageWithTitleList";
 import { stripHtml } from "../utils/common";
@@ -32,7 +31,7 @@ const MainPage = () => {
   useEffect(() => {
     console.log("현재 로그인 상태:", member);
 
-    mainLimit3List().then((res) => {
+    noticeLimit3List().then((res) => {
       console.log("불러왓!,", res);
       setNotice3List(res || []);
     });
@@ -54,15 +53,17 @@ const MainPage = () => {
   // 파싱 결과만 memoize
   const plainContents2 = useMemo(() => {
     if (!Array.isArray(noticeTest)) return [];
-    const firstImages =  noticeTest
-    //.filter(test => test.imageUrls && test.imageUrls.length > 0) // 이미지가 있는 게시글만
-    .sort((a,b) => new Date(b.noticeCreateDate) - new Date(a.noticeCreateDate)) // 최신순 정렬
-    .map((test) => ({
+    const firstImages = noticeTest
+      //.filter(test => test.imageUrls && test.imageUrls.length > 0) // 이미지가 있는 게시글만
+      .sort(
+        (a, b) => new Date(b.noticeCreateDate) - new Date(a.noticeCreateDate)
+      ) // 최신순 정렬
+      .map((test) => ({
         img: test.imageUrls[0],
         title: test.noticeTitle,
         author: test.memberId,
       }));
-      return firstImages;
+    return firstImages;
   }, [noticeTest]);
 
   // 불필요한 렌더링 줄이기 (useCallback)
@@ -118,11 +119,7 @@ const MainPage = () => {
             <Item>
               <h3 className="">📝 SOBI 리뷰</h3>
               {plainContents2.length > 0 ? (
-                <ImageWithTitleList
-                  items={plainContents2}
-                  cols={1}
-                  gap={10}
-                />
+                <ImageWithTitleList items={plainContents2} cols={1} gap={10} />
               ) : (
                 <p>리뷰가 없습니다.</p>
               )}

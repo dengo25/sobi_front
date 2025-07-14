@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { Stack } from '@mui/material';
 
 import CustomButton from '../../components/input/CustomButton.jsx';
-import { getNoticeDetail, deleteNotice } from '../../service/community/noticeApiService';
+import { getNoticeDetail, deleteNotice } from '../../service/community/NoticeApiService';
 
 const NoticeDetail = () => {
     const { noticeNo } = useParams();

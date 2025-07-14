@@ -20,7 +20,7 @@ import {
   incrementNoticeViewCount,
   getTotalCount,
   getSearchCount,
-} from "../../service/community/noticeApiService";
+} from "../../service/community/NoticeApiService";
 
 const Notice = () => {
   const [list, setList] = useState([]);

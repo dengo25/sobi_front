@@ -4,7 +4,7 @@ import { Stack } from '@mui/material';
 
 import CustomButton from '../../components/input/CustomButton';
 import BasicEditor from '../../components/editor/BasicEditor';
-import { insertNoticeList, updateNoticeList, deleteNotice } from '../../service/community/noticeApiService';
+import { insertNoticeList, updateNoticeList, deleteNotice } from '../../service/community/NoticeApiService';
 import { extractImageUrls } from '../../utils/extractImages'
 
 const NoticeForm = () => {

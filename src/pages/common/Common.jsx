@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { mainLimit3List } from "../../service/community/noticeApiService";
+import { noticeLimit3List } from "../../service/main/MainApiService";
 import { stripHtml } from "../../utils/common"
 import CustomCheckbox from "../../components/input/CustomCheckbox";
 import CustomButton from "../../components/input/CustomButton";
@@ -80,7 +80,7 @@ const Common = () => {
   // 스와이퍼
   const [notice3List, setNotice3List] = useState([]);
   useEffect(() => {
-    mainLimit3List().then((res) => {
+    noticeLimit3List().then((res) => {
       setNotice3List(res.data);
     });
   },[]);

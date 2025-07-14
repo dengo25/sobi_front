@@ -157,21 +157,3 @@ export const deleteNotice = async (noticeNo) => {
     throw error;
   }
 };
-
-// Main 표출용 : 최신 3건
-export const mainLimit3List = async (token) => {
-  try {
-    const instance = getInstance(token);
-    const res = await instance.get(`${API_BASE_URL}/api/notice/main`);
-    console.log("최신 3건 조회 응답 데이터 : ", res.data);
-    return res.data;
-  } catch (error) {
-    console.error("최신 3건 조회 실패:", error);
-    throw error;
-  }
-};
-
-
-// http://localhost:8080/api/review/list?page=1&size=5
-// http://localhost:8080/api/review/list?page=1&size=5&category=1
-// http://localhost:8080/api/review/list?page=1&size=5&category=2
