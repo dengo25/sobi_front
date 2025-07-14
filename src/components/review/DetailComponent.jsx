@@ -32,6 +32,7 @@ import {
 } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { getReview } from "../../service/review/ReviewService.js";
+import { deleteReview } from "../../service/review/ReviewService.js";
 
 const sobiTheme = createTheme({
   palette: {
@@ -252,10 +253,27 @@ function DetailComponent({ tno: propTno }) {
     navigate(`/review/modify/${tno}`);
   };
 
-  const handleDelete = () => {
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      console.log("후기 삭제:", tno);
+  const handleDelete = async () => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      console.log("후기 삭제 시작:", tno);
+
+      // 삭제 API 호출
+      await deleteReview(tno);
+
+      // 성공 메시지 표시
+      alert("삭제되었습니다.");
+
+      // 목록 페이지로 이동
       navigate("/review/list");
+    } catch (error) {
+      console.error("후기 삭제 실패:", error);
+
+      // 에러 메시지 표시
+      alert(error.message || "후기 삭제 중 오류가 발생했습니다.");
     }
   };
 
@@ -389,7 +407,6 @@ function DetailComponent({ tno: propTno }) {
   return (
     <ThemeProvider theme={sobiTheme}>
       <MainContainer>
-        {/* 헤더 섹션 */}
         <HeaderSection>
           <BackButton startIcon={<ArrowBackIcon />} onClick={handleBack}>
             목록으로
@@ -404,18 +421,13 @@ function DetailComponent({ tno: propTno }) {
             >
               후기 상세보기
             </Typography>
-            <Typography variant="body1" color="text.secondary">
-              작성된 후기의 상세 내용을 확인하세요
-            </Typography>
           </Box>
         </HeaderSection>
 
-        {/* 상세 정보 카드 */}
         <DetailCard>
           <InfoTable component={Paper} elevation={0}>
             <Table>
               <TableBody>
-                {/* 작성자와 날짜 행 */}
                 <TableRow>
                   <LabelCell>작성자</LabelCell>
                   <ContentCell>
@@ -431,18 +443,13 @@ function DetailComponent({ tno: propTno }) {
                   </ContentCell>
                 </TableRow>
 
-                {/* 제목 행 */}
                 <TableRow>
                   <LabelCell>제목</LabelCell>
                   <ContentCell colSpan={3}>
                     <Box
                       sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
                     >
-                      <Typography
-                        variant="h6"
-                        fontWeight={600}
-                        sx={{ flex: 1 }}
-                      >
+                      <Typography variant="body1" fontWeight={500}>
                         {reviewData.title}#{reviewData.tno}
                       </Typography>
                       {getStatusChip(reviewData.confirmed)}
@@ -450,7 +457,6 @@ function DetailComponent({ tno: propTno }) {
                   </ContentCell>
                 </TableRow>
 
-                {/* 카테고리 행 */}
                 <TableRow>
                   <LabelCell>카테고리</LabelCell>
                   <ContentCell colSpan={3}>
@@ -472,7 +478,6 @@ function DetailComponent({ tno: propTno }) {
 
           <Divider />
 
-          {/* 내용 섹션 */}
           <CardContent sx={{ p: 4 }}>
             <Typography
               variant="subtitle1"
@@ -488,7 +493,6 @@ function DetailComponent({ tno: propTno }) {
           </CardContent>
         </DetailCard>
 
-        {/* 액션 버튼들 */}
         <Box sx={{ mb: 4 }}>
           <Stack
             direction="row"
@@ -529,7 +533,6 @@ function DetailComponent({ tno: propTno }) {
           </Stack>
         </Box>
 
-        {/* 목록으로 버튼 */}
         <Box sx={{ textAlign: "center" }}>
           <Typography
             variant="body1"

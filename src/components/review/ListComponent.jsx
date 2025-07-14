@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getListWithoutToken } from "../../service/member/ApiService.js";
 import useCustomMove from "../../hooks/review/UseCustomMove.jsx";
 import { useNavigate } from "react-router-dom";
+import { getCategoryList } from "../../service/review/ReviewService.js";
 
 import {
   Box,
@@ -52,7 +53,6 @@ const sobiTheme = createTheme({
   },
 });
 
-// 스타일드 컴포넌트들
 const MainContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
   marginBottom: theme.spacing(4),
@@ -142,14 +142,6 @@ const StatsSection = styled(Box)(({ theme }) => ({
   borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
-const StatItem = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing(0.5),
-  color: theme.palette.text.secondary,
-  fontSize: "0.875rem",
-}));
-
 const CategoryChip = styled(Chip)(({ theme }) => ({
   backgroundColor: theme.palette.primary.light + "20",
   color: theme.palette.primary.dark,
@@ -198,100 +190,162 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 function ListComponent() {
-  const { page, size, moveToList, moveToDetail } = useCustomMove();
+  const {
+    page,
+    size,
+    category,
+    keyword,
+    sort,
+    moveToList,
+    moveToDetail,
+    moveToListWithFilter,
+  } = useCustomMove();
+
   const [serverData, setServerData] = useState();
-  const [filteredData, setFilteredData] = useState();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [sortBy, setSortBy] = useState("latest");
+  const [loading, setLoading] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState(keyword || "");
+  const [selectedCategory, setSelectedCategory] = useState(
+    category && category > 0 ? String(category) : ""
+  );
+  const [sortBy, setSortBy] = useState(sort || "latest");
+
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
   const memberId = useSelector((state) => state.member.memberId);
 
   useEffect(() => {
-    getListWithoutToken({ page, size }).then((data) => {
-      console.log(data);
-      setServerData(data);
-      setFilteredData(data);
+    getCategoryList()
+      .then((data) => {
+        console.log("카테고리 목록:", data);
+        setCategories(data);
+      })
+      .catch((err) => {
+        console.error("카테고리 목록 조회 실패:", err);
+      });
+  }, []);
 
-      // 카테고리 목록 추출
-      if (data?.rnoList) {
-        const uniqueCategories = [
-          ...new Set(
-            data.rnoList
-              .filter((review) => review.category)
-              .map((review) => review.category.name)
-          ),
-        ];
-        setCategories(uniqueCategories);
-      }
-    });
-  }, [page, size]);
-
-  // 필터링 및 정렬 로직
   useEffect(() => {
-    if (!serverData?.rnoList) return;
+    setLoading(true);
+    const params = {
+      page,
+      size,
+      ...(category && category > 0 && { category }),
+      ...(keyword && keyword.trim() && { keyword: keyword.trim() }),
+      ...(sort && sort !== "latest" && { sort }),
+    };
 
-    let filtered = [...serverData.rnoList];
+    console.log("API 요청 파라미터:", params);
 
-    // 검색 필터
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (review) =>
-          review.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          review.content.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+    getListWithoutToken(params)
+      .then((data) => {
+        console.log("서버 응답 데이터:", data);
+        setServerData(data);
+      })
+      .catch((error) => {
+        console.error("데이터 조회 실패:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [page, size, category, keyword, sort]);
 
-    // 카테고리 필터
-    if (selectedCategory) {
-      filtered = filtered.filter(
-        (review) => review.category?.name === selectedCategory
-      );
-    }
+  useEffect(() => {
+    console.log(
+      "URL 파라미터 동기화 - keyword:",
+      keyword,
+      "category:",
+      category,
+      "sort:",
+      sort
+    );
+    setSearchTerm(keyword || "");
+    setSelectedCategory(category && category > 0 ? String(category) : "");
+    setSortBy(sort || "latest");
 
-    // 정렬
-    switch (sortBy) {
-      case "latest":
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case "oldest":
-        filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-        break;
-      default:
-        break;
-    }
-
-    setFilteredData({
-      ...serverData,
-      rnoList: filtered,
-    });
-  }, [serverData, searchTerm, selectedCategory, sortBy]);
+    console.log(
+      "selectedCategory 설정됨:",
+      category && category > 0 ? String(category) : ""
+    );
+  }, [keyword, category, sort]);
 
   const handleWriteClick = () => {
     navigate("/review/insert");
   };
 
   const handleItemClick = (tno) => {
-    moveToDetail(tno, { page, size });
+    moveToDetail(tno, { page, size, category, keyword, sort });
+  };
+
+  const handleSearchSubmit = () => {
+    const searchKeyword = searchTerm.trim();
+    moveToListWithFilter({
+      page: 1, // 검색 시 첫 페이지로
+      keyword: searchKeyword || undefined,
+      category: selectedCategory || undefined,
+      sort: sortBy !== "latest" ? sortBy : undefined,
+    });
   };
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
+  const handleSearchKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSearchSubmit();
+    }
+  };
+
   const handleCategoryChange = (event) => {
-    setSelectedCategory(event.target.value);
+    const newCategory = event.target.value;
+    console.log("카테고리 변경:", newCategory); // 디버깅용
+    setSelectedCategory(newCategory);
+
+    const filterParams = {
+      page: 1, // 카테고리 변경 시 첫 페이지로
+    };
+
+    if (newCategory && newCategory !== "" && Number(newCategory) > 0) {
+      filterParams.category = Number(newCategory);
+    } else {
+      filterParams.category = undefined;
+    }
+
+    if (searchTerm.trim()) {
+      filterParams.keyword = searchTerm.trim();
+    } else {
+      filterParams.keyword = undefined;
+    }
+
+    if (sortBy !== "latest") {
+      filterParams.sort = sortBy;
+    } else {
+      filterParams.sort = undefined;
+    }
+
+    console.log("필터 파라미터:", filterParams); // 디버깅용
+    moveToListWithFilter(filterParams);
   };
 
   const handleSortChange = (event) => {
-    setSortBy(event.target.value);
+    const newSort = event.target.value;
+    setSortBy(newSort);
+
+    moveToListWithFilter({
+      page: 1, // 정렬 변경 시 첫 페이지로
+      sort: newSort !== "latest" ? newSort : undefined,
+      category: selectedCategory || undefined,
+      keyword: searchTerm.trim() || undefined,
+    });
   };
 
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedCategory("");
     setSortBy("latest");
+
+    moveToListWithFilter({});
   };
 
   // 날짜 포맷팅 함수
@@ -332,8 +386,19 @@ function ListComponent() {
       : text;
   };
 
-  const totalResults = filteredData?.rnoList?.length || 0;
-  const isFiltered = searchTerm || selectedCategory || sortBy !== "latest";
+  const getSelectedCategoryName = () => {
+    if (!selectedCategory || selectedCategory === "") return "전체 카테고리";
+    const categoryObj = categories.find(
+      (cat) => cat.id === Number(selectedCategory)
+    );
+    return categoryObj ? categoryObj.name : "전체 카테고리";
+  };
+
+  const totalResults = serverData?.totalCount || 0;
+  const isFiltered =
+    searchTerm ||
+    (selectedCategory && selectedCategory !== "") ||
+    sortBy !== "latest";
 
   return (
     <ThemeProvider theme={sobiTheme}>
@@ -358,7 +423,7 @@ function ListComponent() {
                 후기 게시판
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                다양한 경험과 후기를 공유해보세요
+                다양한 경험과 후기를 공유해보세요.
               </Typography>
             </Box>
             <WriteButton
@@ -401,17 +466,28 @@ function ListComponent() {
                     placeholder="제목, 내용 검색..."
                     value={searchTerm}
                     onChange={handleSearchChange}
+                    onKeyPress={handleSearchKeyPress}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
                           <SearchIcon color="action" />
                         </InputAdornment>
                       ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Button
+                            size="small"
+                            onClick={handleSearchSubmit}
+                            sx={{ minWidth: "auto", p: 0.5 }}
+                          >
+                            검색
+                          </Button>
+                        </InputAdornment>
+                      ),
                     }}
                   />
                 </Grid>
 
-                {/* 카테고리 필터 */}
                 <Grid item xs={12} md={4}>
                   <StyledTextField
                     select
@@ -419,12 +495,31 @@ function ListComponent() {
                     size="small"
                     value={selectedCategory}
                     onChange={handleCategoryChange}
-                    placeholder="카테고리"
+                    displayEmpty
+                    SelectProps={{
+                      renderValue: (selected) => {
+                        console.log(
+                          "renderValue - selected:",
+                          selected,
+                          "type:",
+                          typeof selected
+                        );
+                        if (!selected || selected === "" || selected === "0") {
+                          return "전체 카테고리";
+                        }
+                        const categoryObj = categories.find(
+                          (cat) => cat.id === Number(selected)
+                        );
+                        console.log("찾은 카테고리:", categoryObj);
+                        return categoryObj ? categoryObj.name : "전체 카테고리";
+                      },
+                      displayEmpty: true,
+                    }}
                   >
                     <MenuItem value="">전체 카테고리</MenuItem>
                     {categories.map((category) => (
-                      <MenuItem key={category} value={category}>
-                        {category}
+                      <MenuItem key={category.id} value={String(category.id)}>
+                        {category.name}
                       </MenuItem>
                     ))}
                   </StyledTextField>
@@ -438,6 +533,7 @@ function ListComponent() {
                     size="small"
                     value={sortBy}
                     onChange={handleSortChange}
+                    displayEmpty
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -452,22 +548,13 @@ function ListComponent() {
                 </Grid>
               </Grid>
 
-              {/* 결과 요약 */}
               <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: "divider" }}>
                 <Typography variant="body2" color="text.secondary">
-                  {isFiltered ? (
-                    <>
-                      <strong>{totalResults}개</strong>의 후기가 검색되었습니다
-                      {searchTerm && ` (검색어: "${searchTerm}")`}
-                      {selectedCategory && ` (카테고리: ${selectedCategory})`}
-                      {sortBy !== "latest" &&
-                        ` (정렬: ${sortBy === "oldest" ? "오래된순" : sortBy})`}
-                    </>
-                  ) : (
-                    <>
-                      총 <strong>{totalResults}개</strong>의 후기
-                    </>
-                  )}
+                  <strong>{getSelectedCategoryName()}</strong>에서 총{" "}
+                  <strong>{totalResults}개</strong>의 후기
+                  {searchTerm && ` (검색어: "${searchTerm}")`}
+                  {sortBy !== "latest" &&
+                    ` (정렬: ${sortBy === "oldest" ? "오래된순" : sortBy})`}
                 </Typography>
               </Box>
             </CardContent>
@@ -475,8 +562,14 @@ function ListComponent() {
         </HeaderSection>
 
         {/* 후기 목록 */}
-        {filteredData?.rnoList && filteredData.rnoList.length > 0 ? (
-          filteredData.rnoList.map((review) => {
+        {loading ? (
+          <Box sx={{ textAlign: "center", py: 8 }}>
+            <Typography variant="h6" color="text.secondary">
+              로딩 중...
+            </Typography>
+          </Box>
+        ) : serverData?.rnoList && serverData.rnoList.length > 0 ? (
+          serverData.rnoList.map((review) => {
             const thumbnailImage = getThumbnailImage(review.images);
             const hasImage = !!thumbnailImage;
 
@@ -585,29 +678,22 @@ function ListComponent() {
           </Card>
         )}
 
-        {/* 페이지네이션 */}
-        {filteredData &&
-          filteredData.rnoList &&
-          filteredData.rnoList.length > 0 &&
-          !isFiltered && (
-            <Box sx={{ mt: 4 }}>
-              <PageComponent serverData={serverData} movePage={moveToList} />
-            </Box>
-          )}
+        {serverData && serverData.rnoList && serverData.rnoList.length > 0 && (
+          <Box sx={{ mt: 4 }}>
+            <PageComponent
+              serverData={serverData}
+              movePage={(pageParam) =>
+                moveToList({
+                  ...pageParam,
+                  category,
+                  keyword,
+                  sort,
+                })
+              }
+            />
+          </Box>
+        )}
 
-        {/* 필터링된 상태에서도 페이지네이션 대신 결과 요약 표시 */}
-        {isFiltered &&
-          filteredData &&
-          filteredData.rnoList &&
-          filteredData.rnoList.length > 0 && (
-            <Box sx={{ mt: 4, textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary">
-                필터링된 결과입니다. 모든 결과를 보려면 필터를 초기화하세요.
-              </Typography>
-            </Box>
-          )}
-
-        {/* 플로팅 작성 버튼 (모바일) */}
         {memberId && (
           <Fade in={true}>
             <FloatingWriteButton

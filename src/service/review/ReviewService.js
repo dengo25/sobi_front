@@ -32,3 +32,24 @@ export const updateReview = async (reviewData) => {
   );
   return res.data;
 };
+
+export const deleteReview = async (tno) => {
+  try {
+    console.log("리뷰 삭제 API 호출 - tno:", tno);
+
+    const res = await jwtAxios.delete(`${API_BASE_URL}/api/review/${tno}`);
+    console.log("리뷰 삭제 성공:", res.data);
+
+    return res.data;
+  } catch (error) {
+    console.error("리뷰 삭제 실패:", error);
+
+    if (error.response?.data?.error) {
+      throw new Error(error.response.data.error);
+    } else if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    } else {
+      throw new Error("리뷰 삭제 중 오류가 발생했습니다.");
+    }
+  }
+};
