@@ -97,7 +97,7 @@ export function signup(memberDTO) {
   return call("/auth/signup", "POST", memberDTO);
 }
 
-//소셜 로그인 함수: provider에 따라 OAuth2 인증시작
+/*//소셜 로그인 함수: provider에 따라 OAuth2 인증시작
 export function socialLogin(provider) {
   //현재 프론트엔드 url을 구성
   const frontendUrl = window.location.protocol + "//" + window.location.host;
@@ -113,12 +113,12 @@ export function socialLogin(provider) {
       encodeURIComponent(frontendUrl); // 꼭 인코딩 해줄 것!
 
   // frontendUrl;
-}
+}*/
 
-// //ec2 배포용 함수
-// export function socialLogin(provider) {
-//   window.location.href = API_BASE_URL + "/oauth2/authorization/" + provider;
-// }
+//ec2 배포용 함수
+export function socialLogin(provider) {
+  window.location.href = API_BASE_URL + "/oauth2/authorization/" + provider;
+}
 
 //로그인 후 헤더에서 로그인 삭제 함수
 export function isLoggedIn() {
