@@ -1,11 +1,13 @@
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect, useState, useMemo, useCallback } from "react";
 
-import { styled } from "@mui/material/styles";
+import { styled, ThemeProvider } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import { sobiTheme, MainContainer } from "../assets/styles/sobiTheme";
 
 import {
   noticeLimit3List,
@@ -38,6 +40,8 @@ const MainPage = () => {
   const [reviewCT1List, setReviewCT1List] = useState([]);
   const [reviewCT2List, setReviewCT2List] = useState([]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     console.log("현재 로그인 상태:", member);
 
@@ -67,6 +71,19 @@ const MainPage = () => {
     });
   }, [member]);
 
+  // 페이지 이동
+  const handleClickMove = async (type, no) => {
+    if(type == 'notice'){
+      await incrementNoticeViewCount(noticeNo);
+      navigate(`/api/notice/detail/${no}`);
+    }else if(type == 'review'){
+      navigate(`/review/detail/${no}?page=1&size=10`);
+    }else if(type == 'faq'){
+      navigate(`/api/faq`);
+    }
+    console.log(`${type}! >>>> `, `/review/detail/${no}?page=1&size=10`);
+  };
+
   // 파싱 결과 : 공지사항 3건 스와이퍼용
   const noticeSwiperContent = useMemo(() => {
     if (!Array.isArray(notice3List)) return [];
@@ -82,10 +99,10 @@ const MainPage = () => {
     // const firstImages = reviewList
     return (
       reviewTrandList
-        //.filter(review => review.images && review.images.length > 0) // 이미지가 있는 게시글만
+        .filter(review => review.images && review.images.length > 0) // 이미지가 있는 게시글만
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 최신순 정렬
         .map((review) => ({
-          reviewId: review.reviewId || review.id,
+          tno: review.tno || review.id,
           reviewTitle: review.title,
           images: review.images || [],
           author: review.memberId || "익명",
@@ -166,36 +183,29 @@ const MainPage = () => {
   // 불필요한 렌더링 줄이기 (useCallback)
   // 슬라이더 : 최신리뷰
   const renderSlide = useCallback(
-    ({ reviewId, reviewTitle, images, content }, idx) => (
-      <ul key={reviewId || `slide-${idx}`}>
-        <li>
+    ({ tno, reviewTitle, images, content }, idx) => (
+      <div key={tno || `slide-${idx}`} className="slide-box">
+        <div className="slide-img">
           {images && images.length > 0 && (
-            <div style={{ textAlign: "center" }}>
+            <p>
               {images.map((url, imgIdx) => (
                 <img
                   // key={url || imgIdx}
-                  key={`${reviewId}-img-${imgIdx}`}
+                  key={`${tno}-img-${imgIdx}`}
                   src={url.fileUrl}
-                  alt={`review-${reviewId}-img-${imgIdx}`}
-                  // style={{
-                  //   maxWidth: "100%",
-                  //   height: "200px",
-                  //   objectFit: "cover",
-                  //   margin: "0.25rem",
-                  //   borderRadius: "4px",
-                  // }}
+                  alt={`review-${tno}-img-${imgIdx}`}
                 />
               ))}
-            </div>
+            </p>
           )}
-        </li>
-        <li>{reviewTitle}</li>
-        {/* <li>
-          {content && (
-            {stripHtml(content)}
-        )}
-        </li> */}
-      </ul>
+        </div>
+        <p className="text">
+          <a onClick={() => handleClickMove('review',tno)}>
+          <span>{reviewTitle}</span>
+          {stripHtml(content)}
+          </a>
+        </p>
+      </div>
     ),
     []
   );
@@ -222,22 +232,23 @@ const MainPage = () => {
   );
 
   return (
-    <>
-      <Box sx={{ flexGrow: 1 }} className="main-content">
+    <ThemeProvider theme={sobiTheme}>
+      <MainContainer maxWidth="xl">
+      <Box sx={{ flexGrow: 1 }} >
         <Grid container spacing={2}>
           <Grid size={12}>
             <Item>
-              <h1>메인 페이지</h1>
-              <p>환영합니다, {member?.memberName || "방문자"}님!</p>
-              <p>
+              {/* <h1 className="blind">메인 페이지</h1> */}
+              <p className="welcome-ment">👋👋 환영합니다, {member?.memberName || "방문자"}님!</p>
+              {/* <p>
                 {member?.memberName || "방문자"}은 '{member.role}' 회원 입니다.
-              </p>
+              </p> */}
             </Item>
           </Grid>
           <Grid size={8}>
             <Stack spacing={2}>
               <Item>
-                <h3 className="">📝 SOBI 최신 리뷰</h3>
+                <h3 className="main-title">📝 SOBI 최신 리뷰</h3>
                 {reviewTrandContent.length > 0 ? (
                   <SwiperCarousel
                     slides={reviewTrandContent}
@@ -250,23 +261,23 @@ const MainPage = () => {
                     enableLazyLoading={true}
                     slidesPerView={1}
                     slidesPerGroup={1}
+                    className="review-trand"
                   />
                 ) : (
                   <p>리뷰가 없습니다....</p>
                 )}
               </Item>
               <Item>
-                <h3 className="">📝 SOBI 카테고리별 1</h3>
+                <h3 className="main-title">📝 SOBI 카테고리별 1</h3>
                 <ImageCard items={reviewCT1Content} />
               </Item>
               <Item>
-                <h3 className="">📝 SOBI 카테고리별 2</h3>
+                <h3 className="main-title">📝 SOBI 카테고리별 2</h3>
                 <ImageCard items={reviewCT2Content} />
               </Item>
 
               <Item>
-                <h3 className="">📢 SOBI 공지사항</h3>
-                {/* <ImageCard items={noticeContent} /> */}
+                <h3 className="main-title">📢 SOBI 공지사항</h3>
                 {noticeSwiperContent.length > 0 ? (
                   <SwiperCarousel
                     slides={noticeSwiperContent}
@@ -284,14 +295,14 @@ const MainPage = () => {
               </Item>
 
               <Item>
-                <h3 className="">📢 SOBI FAQ 바로가기 테스트중</h3>
+                <h3 className="main-title">📢 SOBI FAQ 바로가기 테스트중</h3>
               </Item>
             </Stack>
           </Grid>
 
           <Grid size={4}>
             <Item>
-              <h3 className="">📝 SOBI 리뷰</h3>
+              <h3 className="main-title">📝 SOBI 리뷰</h3>
               {reviewAllContent.length > 0 ? (
                 <ImageWithTitleList
                   items={reviewAllContent}
@@ -305,7 +316,8 @@ const MainPage = () => {
           </Grid>
         </Grid>
       </Box>
-    </>
+      </MainContainer>
+    </ThemeProvider>
   );
 };
 

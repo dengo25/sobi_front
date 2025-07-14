@@ -6,17 +6,14 @@ import Typography from "@mui/material/Typography";
 import CustomButton from "../input/CustomButton";
 
 const ImageCard = ({
-  //articles,
   items,
   width,
   height,
-  // columns = 3,
-  // spacing = 2
 }) => {
   return (
     <>
       {items.map((item,idx) => (
-        <Card sx={{ minWidth: 345 }} key={idx}>
+        <Card sx={{ minWidth: 345 }} key={idx} className="card-basic">
           <CardMedia
             sx={{ width: 300, height: 300 }}
             image={
