@@ -97,7 +97,7 @@ export function signup(memberDTO) {
   return call("/auth/signup", "POST", memberDTO);
 }
 
-소셜 로그인 함수: provider에 따라 OAuth2 인증시작
+//소셜 로그인 함수: provider에 따라 OAuth2 인증시작
 export function socialLogin(provider) {
   //현재 프론트엔드 url을 구성
   const frontendUrl = window.location.protocol + "//" + window.location.host;
