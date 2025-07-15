@@ -75,12 +75,12 @@ const MainPage = () => {
   // 페이지 이동
   const handleClickMove = async (type, no) => {
     if (type == "notice") {
-      await incrementNoticeViewCount(noticeNo);
-      navigate(`/api/notice/detail/${no}`);
+      await incrementNoticeViewCount(no);
+      navigate(`/notice/${no}`);
     } else if (type == "review") {
       navigate(`/review/detail/${no}?page=1&size=10`);
     } else if (type == "faq") {
-      navigate(`/api/faq`);
+      navigate(`/faq`);
     }
     console.log(`${type}! -->>>> `, `/review/detail/${no}?page=1&size=10`);
   };
@@ -279,11 +279,19 @@ const MainPage = () => {
                 </Item>
                 <Item>
                   <h3 className="main-title">📝 SOBI 카테고리별 1</h3>
-                  <ImageCard items={reviewCT1Content} />
+                  <ImageCard
+                    items={reviewCT1Content}
+                    type="review"
+                    onItemClick={handleClickMove}
+                  />
                 </Item>
                 <Item>
                   <h3 className="main-title">📝 SOBI 카테고리별 2</h3>
-                  <ImageCard items={reviewCT2Content} />
+                  <ImageCard
+                    items={reviewCT2Content}
+                    type="review"
+                    onItemClick={handleClickMove}
+                  />
                 </Item>
 
                 <Item>
@@ -293,11 +301,13 @@ const MainPage = () => {
                       slides={noticeSwiperContent}
                       renderSlide={renderSlideNotice}
                       scrollbar={{ draggable: true }}
-                      autoplay={{ delay: 5000, disableOnInteraction: false }}
+                      autoplay={{ delay: 8000, disableOnInteraction: false }}
                       loop={true}
                       enableLazyLoading={true}
-                      slidesPerView={1}
+                      slidesPerView={2}
+                      spaceBetween={15}
                       slidesPerGroup={1}
+                      className="notice-swiper"
                     />
                   ) : (
                     <p>리뷰가 없습니다....</p>
@@ -305,7 +315,17 @@ const MainPage = () => {
                 </Item>
 
                 <Item>
-                  <h3 className="main-title">📢 SOBI FAQ 바로가기 테스트중</h3>
+                  <h3 className="main-title">
+                    <a
+                      href="#"
+                      onClick={() => {
+                        handleClickMove("faq");
+                      }}
+                      className=""
+                    >
+                      📢 SOBI FAQ 바로가기
+                    </a>
+                  </h3>
                 </Item>
               </Stack>
             </Grid>
@@ -318,6 +338,8 @@ const MainPage = () => {
                     items={reviewAllContent}
                     cols={1}
                     gap={10}
+                    type="review"
+                    onItemClick={handleClickMove}
                   />
                 ) : (
                   <p>리뷰가 없습니다.</p>
