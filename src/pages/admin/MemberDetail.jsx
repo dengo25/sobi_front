@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -9,19 +8,10 @@ import {
   CardContent,
   Avatar,
   Grid,
-  Container,
-  ThemeProvider,
-  createTheme,
   CircularProgress,
-  Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Chip,
+  Alert,
+  Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -32,24 +22,6 @@ import {
   CalendarToday as CalendarIcon,
   RateReview as ReviewIcon,
 } from "@mui/icons-material";
-import { getMember } from "../../service/admin/ApiService";
-
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
 
 const ProfileSection = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(3),
@@ -101,28 +73,20 @@ const InfoValue = styled(Box)({
   flex: 1,
 });
 
-const MemberDetail = () => {
+const MemberDetail = ({ data, onBack }) => {
   const [member, setMember] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { memberId } = useParams();
+  const [loading, setLoading] = useState(!data);
+  const [error, setError] = useState(data ? null : "데이터가 없습니다.");
 
   useEffect(() => {
-    const fetchMember = async () => {
-      try {
-        setLoading(true);
-        const data = await getMember(memberId);
-        setMember(data);
-      } catch (err) {
-        console.error("회원 정보 조회 오류:", err);
-        setError("회원 정보를 불러오는 중 오류가 발생했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMember();
-  }, [memberId]);
+    if (data) {
+      setMember(data);
+      setLoading(false);
+    } else {
+      setError("회원 데이터가 없습니다.");
+      setLoading(false);
+    }
+  }, [data]);
 
   const formatGender = (gender) => {
     if (gender === "M") return "남성";
@@ -132,255 +96,213 @@ const MemberDetail = () => {
 
   if (loading) {
     return (
-      <ThemeProvider theme={sobiTheme}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: 400,
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      </ThemeProvider>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 400,
+        }}
+      >
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <ThemeProvider theme={sobiTheme}>
-        <Container maxWidth="md" sx={{ py: 3 }}>
-          <Alert severity="error">{error}</Alert>
-        </Container>
-      </ThemeProvider>
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Alert severity="error">{error}</Alert>
+        {onBack && (
+          <Button onClick={onBack} sx={{ mt: 2 }}>
+            목록으로 돌아가기
+          </Button>
+        )}
+      </Box>
     );
   }
 
   return (
-    <ThemeProvider theme={sobiTheme}>
-      <Container maxWidth="md" sx={{ py: 3 }}>
-        {/* 프로필 섹션 */}
-        <ProfileSection>
-          <CardContent sx={{ textAlign: "center", p: 4 }}>
-            <StyledAvatar sx={{ mb: 3 }}>
-              {member?.memberName?.charAt(0).toUpperCase() || "U"}
-            </StyledAvatar>
+    <Box sx={{ p: 3, maxWidth: "md", margin: "0 auto" }}>
+      {/* 프로필 섹션 */}
+      <ProfileSection>
+        <CardContent sx={{ textAlign: "center", p: 4 }}>
+          <StyledAvatar sx={{ mb: 3 }}>
+            {member?.memberName?.charAt(0).toUpperCase() || "U"}
+          </StyledAvatar>
 
-            <Typography variant="h5" fontWeight={700} gutterBottom>
-              {member?.memberName || "사용자"}
-            </Typography>
+          <Typography variant="h5" fontWeight={700} gutterBottom>
+            {member?.memberName || "사용자"}
+          </Typography>
 
-            <Typography variant="body1" color="text.secondary" gutterBottom>
-              @{member?.memberId || "unknown"}
-            </Typography>
+          <Typography variant="body1" color="text.secondary" gutterBottom>
+            @{member?.memberId || "unknown"}
+          </Typography>
 
-            {/* <Chip
-              label={`게시글 ${member?.memberReviewCount || 0}개`}
-              color="primary"
-              sx={{ mt: 1 }}
-            /> */}
-          </CardContent>
-        </ProfileSection>
+          <Chip
+            label={`게시글 ${member?.memberReviewCount || 0}개`}
+            color="primary"
+            sx={{ mt: 1 }}
+          />
+        </CardContent>
+      </ProfileSection>
 
-        {/* 기본 정보 섹션 */}
-        <BasicInfoSection>
-          <CardContent sx={{ p: 4 }}>
-            <SectionTitle variant="h6">
-              <PersonIcon />
-              회원 정보
-            </SectionTitle>
+      {/* 기본 정보 섹션 */}
+      <BasicInfoSection>
+        <CardContent sx={{ p: 4 }}>
+          <SectionTitle variant="h6">
+            <PersonIcon />
+            회원 정보
+          </SectionTitle>
 
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={6}>
-                <InfoRow>
-                  <InfoLabel>
-                    <PersonIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      이름
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Typography variant="body2" fontWeight={500}>
-                      {member?.memberName || "설정 안함"}
-                    </Typography>
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <InfoRow>
-                  <InfoLabel>
-                    <PersonIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      아이디
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Typography variant="body2" fontWeight={500}>
-                      {member?.memberId || "설정 안함"}
-                    </Typography>
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <InfoRow>
-                  <InfoLabel>
-                    <GenderIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      성별
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Typography variant="body2" fontWeight={500}>
-                      {formatGender(member?.memberGender)}
-                    </Typography>
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <InfoRow>
-                  <InfoLabel>
-                    <EmailIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      이메일
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Typography variant="body2" fontWeight={500}>
-                      {member?.memberEmail || "설정 안함"}
-                    </Typography>
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
-
-              <Grid item xs={12}>
-                <InfoRow>
-                  <InfoLabel>
-                    <HomeIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      주소
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Typography variant="body2" fontWeight={500}>
-                      {member?.memberAddr || "설정 안함"}
-                    </Typography>
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <InfoRow>
-                  <InfoLabel>
-                    <CalendarIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      가입일
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Typography variant="body2" fontWeight={500}>
-                      {member?.memberReg
-                        ? new Date(member.memberReg).toLocaleDateString("ko-KR")
-                        : "정보 없음"}
-                    </Typography>
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <InfoRow>
-                  <InfoLabel>
-                    <ReviewIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      게시글수
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Chip
-                      label={`${member?.memberReviewCount || 0}개`}
-                      color="primary"
-                      size="small"
-                    />
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6}>
+              <InfoRow>
+                <InfoLabel>
+                  <PersonIcon color="primary" />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
+                    이름
+                  </Typography>
+                </InfoLabel>
+                <InfoValue>
+                  <Typography variant="body2" fontWeight={500}>
+                    {member?.memberName || "설정 안함"}
+                  </Typography>
+                </InfoValue>
+              </InfoRow>
             </Grid>
-          </CardContent>
-        </BasicInfoSection>
 
-        {/* 최근 게시물 섹션 */}
-        {/* {recentReviews.length > 0 && (
-          <Card>
-            <CardContent sx={{ p: 4 }}>
-              <SectionTitle variant="h6">
-                <ReviewIcon />
-                최근 작성한 게시물 ({recentReviews.length}개)
-              </SectionTitle>
+            <Grid item xs={12} md={6}>
+              <InfoRow>
+                <InfoLabel>
+                  <PersonIcon color="primary" />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
+                    아이디
+                  </Typography>
+                </InfoLabel>
+                <InfoValue>
+                  <Typography variant="body2" fontWeight={500}>
+                    {member?.memberId || "설정 안함"}
+                  </Typography>
+                </InfoValue>
+              </InfoRow>
+            </Grid>
 
-              <TableContainer component={Paper} variant="outlined">
-                <Table>
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: "grey.50" }}>
-                      <TableCell sx={{ fontWeight: 600 }}>제목</TableCell>
-                      <TableCell align="center" sx={{ fontWeight: 600 }}>
-                        작성일
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {recentReviews.map((review) => (
-                      <TableRow key={review.id} hover>
-                        <TableCell sx={{ fontWeight: 500 }}>
-                          {review.title}
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2" color="text.secondary">
-                            {new Date(review.createdAt).toLocaleDateString(
-                              "ko-KR"
-                            )}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
-        )} */}
-      </Container>
-    </ThemeProvider>
+            <Grid item xs={12} md={6}>
+              <InfoRow>
+                <InfoLabel>
+                  <GenderIcon color="primary" />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
+                    성별
+                  </Typography>
+                </InfoLabel>
+                <InfoValue>
+                  <Typography variant="body2" fontWeight={500}>
+                    {formatGender(member?.memberGender)}
+                  </Typography>
+                </InfoValue>
+              </InfoRow>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <InfoRow>
+                <InfoLabel>
+                  <EmailIcon color="primary" />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
+                    이메일
+                  </Typography>
+                </InfoLabel>
+                <InfoValue>
+                  <Typography variant="body2" fontWeight={500}>
+                    {member?.memberEmail || "설정 안함"}
+                  </Typography>
+                </InfoValue>
+              </InfoRow>
+            </Grid>
+
+            <Grid item xs={12}>
+              <InfoRow>
+                <InfoLabel>
+                  <HomeIcon color="primary" />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
+                    주소
+                  </Typography>
+                </InfoLabel>
+                <InfoValue>
+                  <Typography variant="body2" fontWeight={500}>
+                    {member?.memberAddr || "설정 안함"}
+                  </Typography>
+                </InfoValue>
+              </InfoRow>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <InfoRow>
+                <InfoLabel>
+                  <CalendarIcon color="primary" />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
+                    가입일
+                  </Typography>
+                </InfoLabel>
+                <InfoValue>
+                  <Typography variant="body2" fontWeight={500}>
+                    {member?.memberReg
+                      ? new Date(member.memberReg).toLocaleDateString("ko-KR")
+                      : "정보 없음"}
+                  </Typography>
+                </InfoValue>
+              </InfoRow>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <InfoRow>
+                <InfoLabel>
+                  <ReviewIcon color="primary" />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    color="text.secondary"
+                  >
+                    게시글수
+                  </Typography>
+                </InfoLabel>
+                <InfoValue>
+                  <Chip
+                    label={`${member?.memberReviewCount || 0}개`}
+                    color="primary"
+                    size="small"
+                  />
+                </InfoValue>
+              </InfoRow>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </BasicInfoSection>
+    </Box>
   );
 };
 

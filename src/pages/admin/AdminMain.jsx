@@ -21,6 +21,8 @@ import {
   Tab,
   Badge,
   Button,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -29,13 +31,23 @@ import {
   RateReview as ReviewIcon,
   Report as ReportIcon,
   Block as BlockIcon,
+  ArrowBack as ArrowBackIcon,
+  NavigateNext as NavigateNextIcon,
 } from "@mui/icons-material";
 import { getStatus } from "../../service/admin/ApiService";
 
 import MemberList from "./MemberList";
 import AdminReviewList from "./AdminReviewList";
 import ReportList from "./ReportList";
+
+//상세 페이지 컴포넌트들 import
+import MemberDetail from "./MemberDetail";
+import AdminReviewDetail from "./AdminReviewDetail";
+import ReportDetail from "./ReportDetail";
+import ReportReviewDetail from "./ReportReviewDetail";
+
 import { unblockUser } from "../../service/admin/ApiService";
+
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -120,14 +132,25 @@ const ContentArea = styled(Box)({
   minHeight: 0,
 });
 
+const BreadcrumbContainer = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2, 3),
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.grey[50],
+}));
+
 const AdminMain = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // 상태 관리
+  // 기존 상태 관리
   const [selectedTab, setSelectedTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // 상세 페이지 상태 관리 추가
+  const [currentView, setCurrentView] = useState("list"); // 'list' 또는 'detail'
+  const [detailData, setDetailData] = useState(null);
+  const [detailType, setDetailType] = useState(""); // 'member', 'review', 'report', 'reportReview'
 
   // 통계 데이터
   const [memberNotBlockedCount, setMemberNotBlockedCount] = useState(0);
@@ -163,6 +186,21 @@ const AdminMain = () => {
       icon: <ReportIcon />,
     },
   ];
+
+  // 상세 페이지로 이동하는 함수
+  const handleViewDetail = (type, data) => {
+    setDetailType(type);
+    setDetailData(data);
+    setCurrentView("detail");
+  };
+
+  // 리스트로 돌아가는 함수
+  const handleBackToList = () => {
+    setCurrentView("list");
+    setDetailData(null);
+    setDetailType("");
+  };
+
   const handleUnblockUser = async (blacklistNo, reason) => {
     try {
       await unblockUser(blacklistNo, reason);
@@ -174,6 +212,7 @@ const AdminMain = () => {
       throw error;
     }
   };
+
   useEffect(() => {
     // URL 파라미터에서 탭 정보 확인
     const tabParam = searchParams.get("tab");
@@ -211,15 +250,109 @@ const AdminMain = () => {
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
+    // 탭 변경 시 상세 페이지에서 리스트로 돌아가기
+    if (currentView === "detail") {
+      handleBackToList();
+    }
   };
 
   const handleSidebarItemClick = (index) => {
     setSelectedTab(index);
+    // 사이드바 클릭 시 상세 페이지에서 리스트로 돌아가기
+    if (currentView === "detail") {
+      handleBackToList();
+    }
+  };
+
+  // Breadcrumb 렌더링 함수
+  const renderBreadcrumb = () => {
+    if (currentView === "list") return null;
+
+    const getDetailTitle = () => {
+      switch (detailType) {
+        case "member":
+          return `회원 상세 (${
+            detailData?.memberName || detailData?.memberId || detailData?.id
+          })`;
+        case "review":
+          return `리뷰 상세 (${detailData?.reviewId || detailData?.id})`;
+        case "report":
+          return `신고 상세 (${detailData?.reportId || detailData?.id})`;
+        case "reportReview":
+          return `신고된 리뷰 상세 (${detailData?.targetId || detailData?.id})`;
+        default:
+          return "상세 정보";
+      }
+    };
+
+    return (
+      <BreadcrumbContainer>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={handleBackToList}
+            size="small"
+            variant="outlined"
+          >
+            목록으로
+          </Button>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link
+              component="button"
+              variant="body2"
+              onClick={handleBackToList}
+              sx={{ textDecoration: "none" }}
+            >
+              {tabLabels[selectedTab]}
+            </Link>
+            <Typography variant="body2" color="text.primary">
+              {getDetailTitle()}
+            </Typography>
+          </Breadcrumbs>
+        </Box>
+      </BreadcrumbContainer>
+    );
   };
 
   const renderTabContent = () => {
+    // 상세 페이지인 경우
+    if (currentView === "detail") {
+      switch (detailType) {
+        case "member":
+          return <MemberDetail data={detailData} onBack={handleBackToList} />;
+        case "review":
+          return (
+            <AdminReviewDetail data={detailData} onBack={handleBackToList} />
+          );
+        case "report":
+          return (
+            <ReportDetail
+              data={detailData}
+              onBack={handleBackToList}
+              onViewReportReview={(data) =>
+                handleViewDetail("reportReview", data)
+              }
+            />
+          );
+        case "reportReview":
+          return (
+            <ReportReviewDetail data={detailData} onBack={handleBackToList} />
+          );
+        default:
+          return (
+            <Box sx={{ p: 3, textAlign: "center" }}>
+              <Typography>상세 정보를 찾을 수 없습니다.</Typography>
+              <Button onClick={handleBackToList} sx={{ mt: 2 }}>
+                목록으로 돌아가기
+              </Button>
+            </Box>
+          );
+      }
+    }
+
+    // 기존 리스트 페이지 (onViewDetail 함수 전달)
     switch (selectedTab) {
-      case 0: // 대시보드
+      case 0:
         return (
           <AdminDashboard
             memberNotBlockedCount={memberNotBlockedCount}
@@ -231,12 +364,27 @@ const AdminMain = () => {
             onUnblockUser={handleUnblockUser}
           />
         );
-      case 1: // 회원 관리
-        return <MemberList />;
-      case 2: // 리뷰 관리
-        return <AdminReviewList />;
-      case 3: // 신고 관리
-        return <ReportList />;
+      case 1:
+        return (
+          <MemberList
+            onViewDetail={(data) => handleViewDetail("member", data)}
+          />
+        );
+      case 2:
+        return (
+          <AdminReviewList
+            onViewDetail={(data) => handleViewDetail("review", data)}
+          />
+        );
+      case 3:
+        return (
+          <ReportList
+            onViewDetail={(data) => handleViewDetail("report", data)}
+            onViewReportReview={(data) =>
+              handleViewDetail("reportReview", data)
+            }
+          />
+        );
       default:
         return <AdminDashboard />;
     }
@@ -367,29 +515,34 @@ const AdminMain = () => {
 
           {/* 메인 콘텐츠 영역 */}
           <MainContent>
-            {/* 상단 탭 메뉴 */}
-            <TabsContainer>
-              <Tabs
-                value={selectedTab}
-                onChange={handleTabChange}
-                variant="fullWidth"
-              >
-                {tabLabels.map((label, index) => (
-                  <Tab
-                    key={index}
-                    label={
-                      index === 3 && unresolvedReports > 0 ? (
-                        <Badge badgeContent={unresolvedReports} color="error">
-                          {label}
-                        </Badge>
-                      ) : (
-                        label
-                      )
-                    }
-                  />
-                ))}
-              </Tabs>
-            </TabsContainer>
+            {/* Breadcrumb 추가 */}
+            {renderBreadcrumb()}
+
+            {/* 상단 탭 메뉴 - 상세 페이지에서는 숨김 */}
+            {currentView === "list" && (
+              <TabsContainer>
+                <Tabs
+                  value={selectedTab}
+                  onChange={handleTabChange}
+                  variant="fullWidth"
+                >
+                  {tabLabels.map((label, index) => (
+                    <Tab
+                      key={index}
+                      label={
+                        index === 3 && unresolvedReports > 0 ? (
+                          <Badge badgeContent={unresolvedReports} color="error">
+                            {label}
+                          </Badge>
+                        ) : (
+                          label
+                        )
+                      }
+                    />
+                  ))}
+                </Tabs>
+              </TabsContainer>
+            )}
 
             {/* 콘텐츠 영역 */}
             <ContentArea>{renderTabContent()}</ContentArea>

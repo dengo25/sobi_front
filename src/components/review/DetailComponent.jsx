@@ -28,6 +28,7 @@ import {
   ArrowBack as ArrowBackIcon,
   Share as ShareIcon,
   Edit as EditIcon,
+  Report as ReportIcon, //추가
   Delete as DeleteIcon,
 } from "@mui/icons-material";
 import { useSelector } from "react-redux";
@@ -232,6 +233,29 @@ function DetailComponent({ tno: propTno }) {
 
     fetchReviewDetail();
   }, [tno]);
+
+  const handleReport = () => {
+    // 로그인 체크
+    if (!currentUser?.memberId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    // 본인 글 신고 방지
+    if (currentUser.memberId === reviewData.memberId) {
+      alert("본인이 작성한 글은 신고할 수 없습니다.");
+      return;
+    }
+
+    // ReportForm으로 이동하면서 필요한 데이터 전달
+    navigate("/report", {
+      state: {
+        reviewId: reviewData.tno, // 후기 번호
+        writerId: reviewData.memberId, // 작성자 ID
+        reporterId: currentUser.memberId, // 신고자 ID
+      },
+    });
+  };
 
   const handleBack = () => {
     navigate("/review/list");
@@ -510,7 +534,6 @@ function DetailComponent({ tno: propTno }) {
                 수정
               </ActionButton>
             )}
-
             {isAuthor && (
               <ActionButton
                 variant="contained"
@@ -521,7 +544,6 @@ function DetailComponent({ tno: propTno }) {
                 삭제
               </ActionButton>
             )}
-
             <ActionButton
               variant="outlined"
               color="primary"
@@ -530,6 +552,17 @@ function DetailComponent({ tno: propTno }) {
             >
               공유
             </ActionButton>
+
+            {currentUser?.memberId && (
+              <ActionButton
+                variant="outlined"
+                color="warning"
+                onClick={handleReport}
+                startIcon={<ReportIcon />}
+              >
+                신고
+              </ActionButton>
+            )}
           </Stack>
         </Box>
 

@@ -16,27 +16,40 @@ import {
   Typography,
 } from "@mui/material";
 import Stack from "@mui/material/Stack";
-import { useParams } from "react-router-dom";
-const ReoprtReviewDetail = () => {
+import { Card, CardContent, Paper, Divider, Chip } from "@mui/material";
+import {
+  RateReview as ReviewIcon,
+  Report as ReportIcon,
+  Person as PersonIcon,
+  CheckCircle as ApprovedIcon,
+  Cancel as RejectIcon,
+} from "@mui/icons-material";
+
+const ReportReviewDetail = ({ data, onBack }) => {
   const [review, setReview] = useState(null);
-  const { tno, reportId } = useParams();
+  const [report, setReport] = useState(null);
   const [openBlockModal, setOpenBlockModal] = useState(false);
   const [blockReason, setBlockReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   useEffect(() => {
-    const id = parseInt(tno);
-    getReview(id).then((data) => {
-      console.log(data);
-      setReview(data);
-    });
-  }, [tno]);
+    if (data && data.targetId) {
+      const id = parseInt(data.targetId);
+      getReview(id).then((reviewData) => {
+        console.log(reviewData);
+        setReview(reviewData);
+      });
+      setReport(data);
+    }
+  }, [data]);
 
   const handleReject = async () => {
     if (!window.confirm("이 신고를 반려하시겠습니까?")) return;
     try {
-      await rejectReport(reportId);
+      await rejectReport(report.reportId);
       alert("신고가 반려 처리되었습니다.");
+      if (onBack) onBack();
     } catch (err) {
       console.error("반려 실패:", err);
       alert("반려 중 오류가 발생했습니다.");
@@ -65,41 +78,118 @@ const ReoprtReviewDetail = () => {
     setError("");
 
     try {
-      await approveReport(reportId, tno, blockReason);
+      await approveReport(report.reportId, report.targetId, blockReason);
       alert("리뷰가 차단되고 블랙리스트에 등록되었습니다.");
       setReview({ ...review, confirmed: "B", isDeleted: "Y" });
       handleCloseModal();
+      if (onBack) onBack();
     } catch (err) {
       console.error("차단 실패:", err);
       setError("차단 중 오류가 발생했습니다.");
       setLoading(false);
     }
   };
+  if (!data) {
+    return (
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Alert severity="error">신고 데이터를 찾을 수 없습니다.</Alert>
+        {onBack && (
+          <Button onClick={onBack} sx={{ mt: 2 }}>
+            목록으로 돌아가기
+          </Button>
+        )}
+      </Box>
+    );
+  }
 
+  if (!review) {
+    return (
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Typography>리뷰 데이터를 불러오는 중...</Typography>
+      </Box>
+    );
+  }
   return (
-    <div>
-      <h2>리뷰 상세 보기</h2>
+    <Box sx={{ p: 3, maxWidth: "lg", margin: "0 auto" }}>
+      {/* 신고 정보 섹션 추가 */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <ReportIcon />
+            신고 정보 #{report.reportId}
+          </Typography>
 
-      {review && (
-        <div className="content-area">
-          <h3>{review.title}</h3>
-          <div
-            className="content"
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+            <Chip
+              icon={<PersonIcon />}
+              label={`신고자: ${report.reporterId}`}
+              variant="outlined"
+            />
+            <Chip label={report.reportType} color="warning" variant="filled" />
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* 리뷰 내용 섹션 */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <ReviewIcon />
+            신고된 리뷰
+          </Typography>
+
+          <Typography variant="h5" fontWeight={600} gutterBottom>
+            {review.title}
+          </Typography>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Paper
+            sx={{ p: 2, backgroundColor: "grey.50", minHeight: 200 }}
             dangerouslySetInnerHTML={{ __html: review.content }}
           />
+        </CardContent>
+      </Card>
+
+      {/* 관리 액션 버튼 */}
+      <Card>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            신고 처리
+          </Typography>
 
           <Stack
             direction="row"
-            spacing={1}
-            sx={{ justifyContent: "flex-end", mt: 2 }}
+            spacing={2}
+            sx={{ justifyContent: "center", mt: 2 }}
           >
-            <>
-              <button onClick={handleOpenBlockModal}>승인</button>
-              <button onClick={handleReject}>반려</button>
-            </>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<ApprovedIcon />}
+              onClick={handleOpenBlockModal}
+            >
+              승인 (차단)
+            </Button>
+            <Button
+              variant="outlined"
+              color="warning"
+              startIcon={<RejectIcon />}
+              onClick={handleReject}
+            >
+              반려
+            </Button>
           </Stack>
-        </div>
-      )}
+        </CardContent>
+      </Card>
       {/* 차단 승인 모달 */}
       <Dialog
         open={openBlockModal}
@@ -148,17 +238,8 @@ const ReoprtReviewDetail = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 
-const btnStyle = (bg) => ({
-  padding: "8px 16px",
-  backgroundColor: bg,
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-});
-
-export default ReoprtReviewDetail;
+export default ReportReviewDetail;

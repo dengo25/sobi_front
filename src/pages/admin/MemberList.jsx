@@ -35,7 +35,6 @@ import {
   FilterList as FilterIcon,
 } from "@mui/icons-material";
 import { getList } from "../../service/admin/ApiService";
-import useCustomMove from "../../hooks/admin/UseCustomMove";
 
 const sobiTheme = createTheme({
   palette: {
@@ -88,7 +87,7 @@ const PaginationContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
 }));
 
-const RealisticMemberList = () => {
+const MemberList = ({ onViewDetail }) => {
   // 회원 목록과 페이징 상태
   const [memberList, setMemberList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -111,7 +110,19 @@ const RealisticMemberList = () => {
   const [tempFilters, setTempFilters] = useState({ ...filters });
 
   const navigate = useNavigate();
-  const { moveToList } = useCustomMove();
+
+  const handleMemberClick = (member, event) => {
+    event.preventDefault();
+
+    // onViewDetail prop이 있으면 상세 페이지로, 없으면 기존 방식으로
+    if (onViewDetail) {
+      console.log("회원 상세 페이지로 이동:", member);
+      onViewDetail(member);
+    } else {
+      // AdminMain 밖에서 사용될 때는 기존 방식 유지
+      navigate(`/admin/member/${member.memberId}`);
+    }
+  };
 
   // 정렬 옵션 (계산된 필드 제외)
   const sortOptions = [
@@ -351,9 +362,7 @@ const RealisticMemberList = () => {
                   memberList.map((member) => (
                     <StyledTableRow
                       key={member.memberId}
-                      onClick={() =>
-                        navigate(`/admin/member/${member.memberId}`)
-                      }
+                      onClick={(event) => handleMemberClick(member, event)}
                     >
                       <TableCell sx={{ fontWeight: 500 }}>
                         {member.memberName || "N/A"}
@@ -453,4 +462,4 @@ const RealisticMemberList = () => {
   );
 };
 
-export default RealisticMemberList;
+export default MemberList;

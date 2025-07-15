@@ -82,7 +82,6 @@ const ReportForm = () => {
   const [detail, setDetail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const reportOptions = [
     "가짜/조작된 리뷰",
@@ -111,17 +110,12 @@ const ReportForm = () => {
     try {
       setLoading(true);
       setError("");
-      setSuccess("");
 
       // 직접 API 호출
       await report(reportDto);
 
-      setSuccess("신고가 성공적으로 제출되었습니다.");
-
-      // 2초 후 이전 페이지로 이동
-      setTimeout(() => {
-        navigate(-1);
-      }, 2000);
+      alert("신고가 성공적으로 제출되었습니다.");
+      navigate(-1);
     } catch (error) {
       console.error("신고 제출 실패: ", error);
       setError("신고 제출 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -134,7 +128,6 @@ const ReportForm = () => {
     setReportType("");
     setDetail("");
     setError("");
-    setSuccess("");
   };
 
   return (
@@ -151,12 +144,6 @@ const ReportForm = () => {
             {error && (
               <Alert severity="error" sx={{ mb: 3 }}>
                 {error}
-              </Alert>
-            )}
-
-            {success && (
-              <Alert severity="success" sx={{ mb: 3 }}>
-                {success}
               </Alert>
             )}
 

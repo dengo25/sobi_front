@@ -56,7 +56,7 @@ const StatCard = styled(Card)(({ theme }) => ({
 
 const StatCardContent = styled(CardContent)(({ theme }) => ({
   textAlign: "center",
-  padding: theme.spacing(3),
+  padding: theme.spacing(5),
 }));
 
 const StatNumber = styled(Typography)(({ theme }) => ({
@@ -174,7 +174,7 @@ const AdminDashboard = ({
       </Box>
 
       {/* 통계 카드들 */}
-      <StatsGrid container spacing={3}>
+      <StatsGrid container spacing={4}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard onClick={handleMemberClick}>
             <StatCardContent>
