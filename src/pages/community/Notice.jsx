@@ -1,6 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+import {
+  MainContainer,
+  MainCard,
+  Sidebar,
+  ProfileSection,
+  StyledAvatar,
+  MenuSection,
+  MenuLabel,
+  MainContent,
+  TabsContainer,
+  ContentArea,
+  MessageTabsContainer,
+  DefaultContent,
+  sobiTheme,
+} from "../../assets/styles/sobiTheme";
+
 import {
   Stack,
   Box,
@@ -10,6 +27,7 @@ import {
   FormControl,
   InputLabel,
   Typography,
+  ThemeProvider,
 } from "@mui/material";
 
 import CustomButton from "../../components/input/CustomButton";
@@ -184,123 +202,141 @@ const Notice = () => {
 
   return (
     <>
-      <h2>공지사항</h2>
+      <ThemeProvider theme={sobiTheme}>
+        <MainContainer maxWidth="lg">
+          {/* <HeaderSection> */}
+          <Box>
+              <Typography
+                variant="h4"
+                fontWeight={700}
+                color="text.primary"
+                gutterBottom
+              >
+                공지사항
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                SOBI의 공지사항 입니다.
+              </Typography>
+            </Box>
 
-      {/* ── 전체/검색 카운트 영역 ── */}
-      <Box sx={{ mb: 2, display: "flex", gap: 4, alignItems: "center" }}>
-        {/* 검색 키워드 없으면 전체, 있으면 검색 건수 API 결과 */}
-        {!searchParams.searchKeyword ? (
-          <Typography>
-            전체 게시글 수: <strong>{totalCount}</strong> 건
-          </Typography>
-        ) : (
-          <Typography>
-            검색 결과: <strong>{searchCount}</strong> 건
-          </Typography>
-        )}
-      </Box>
+          {/* ── 전체/검색 카운트 영역 ── */}
+          <Box sx={{ mb: 2, display: "flex", gap: 4, alignItems: "center" }}>
+            {/* 검색 키워드 없으면 전체, 있으면 검색 건수 API 결과 */}
+            {!searchParams.searchKeyword ? (
+              <Typography>
+                전체 게시글 수: <strong>{totalCount}</strong> 건
+              </Typography>
+            ) : (
+              <Typography>
+                검색 결과: <strong>{searchCount}</strong> 건
+              </Typography>
+            )}
+          </Box>
 
-      <Box sx={{ mb: 2, display: "flex", gap: 2, alignItems: "center" }}>
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>검색 유형</InputLabel>
-          <Select
-            value={searchParams.searchType}
-            label="검색 유형"
-            onChange={(e) =>
-              setSearchParams((prev) => ({
-                ...prev,
-                searchType: e.target.value,
-              }))
-            }
-          >
-            <MenuItem value="all">전체</MenuItem>
-            <MenuItem value="title">제목</MenuItem>
-            <MenuItem value="content">내용</MenuItem>
-          </Select>
-        </FormControl>
+          <Box sx={{ mb: 2, display: "flex", gap: 2, alignItems: "center" }}>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>검색 유형</InputLabel>
+              <Select
+                value={searchParams.searchType}
+                label="검색 유형"
+                onChange={(e) =>
+                  setSearchParams((prev) => ({
+                    ...prev,
+                    searchType: e.target.value,
+                  }))
+                }
+              >
+                <MenuItem value="all">전체</MenuItem>
+                <MenuItem value="title">제목</MenuItem>
+                <MenuItem value="content">내용</MenuItem>
+              </Select>
+            </FormControl>
 
-        <TextField
-          size="small"
-          placeholder="검색어를 입력하세요"
-          value={searchParams.searchKeyword}
-          onChange={(e) =>
-            setSearchParams((prev) => ({
-              ...prev,
-              searchKeyword: e.target.value,
-            }))
-          }
-          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-          sx={{ minWidth: 200 }}
-        />
+            <TextField
+              size="small"
+              placeholder="검색어를 입력하세요"
+              value={searchParams.searchKeyword}
+              onChange={(e) =>
+                setSearchParams((prev) => ({
+                  ...prev,
+                  searchKeyword: e.target.value,
+                }))
+              }
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              sx={{ minWidth: 200 }}
+            />
 
-        <CustomButton
-          type="button"
-          onClick={handleSearch}
-          size="small"
-          variant="contained"
-          color="primary"
-          text="검색"
-        />
+            <CustomButton
+              type="button"
+              onClick={handleSearch}
+              size="small"
+              variant="contained"
+              color="primary"
+              text="검색"
+            />
 
-        <CustomButton
-          type="button"
-          onClick={handleSearchReset}
-          size="small"
-          variant="outlined"
-          color="secondary"
-          text="초기화"
-        />
-      </Box>
+            <CustomButton
+              type="button"
+              onClick={handleSearchReset}
+              size="small"
+              variant="outlined"
+              color="secondary"
+              text="초기화"
+            />
+          </Box>
+          
 
-      <table>
-        <colgroup>
-          <col width={"100px"}></col>
-          <col width={"auto"}></col>
-          <col width={"200px"}></col>
-        </colgroup>
-        <thead>
-          <tr>
-            <th>글번호</th>
-            <th>제목</th>
-            <th>조회수</th>
-            <th>작성일</th>
-          </tr>
-        </thead>
-        <tbody>{dataList}</tbody>
-      </table>
+          <table>
+            <colgroup>
+              <col width={"100px"}></col>
+              <col width={"auto"}></col>
+              <col width={"200px"}></col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>글번호</th>
+                <th>제목</th>
+                <th>조회수</th>
+                <th>작성일</th>
+              </tr>
+            </thead>
+            <tbody>{dataList}</tbody>
+          </table>
 
-      {/* 페이징 컴포넌트 */}
-      {pageInfo.totalPages > 1 && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-          <BasicPagination
-            count={pageInfo.totalPages}
-            page={pageInfo.currentPage + 1} // MUI는 1부터 시작하므로 +1
-            onChange={handlePageChange}
-            color="primary"
-            useCustomStyle={true}
-            customColor="primary"
-            showFirstButton={true}
-            showLastButton={true}
-            siblingCount={1}
-            boundaryCount={1}
-          />
-        </Box>
-      )}
+          {/* 페이징 컴포넌트 */}
+          {pageInfo.totalPages > 1 && (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+              <BasicPagination
+                count={pageInfo.totalPages}
+                page={pageInfo.currentPage + 1} // MUI는 1부터 시작하므로 +1
+                onChange={handlePageChange}
+                color="primary"
+                useCustomStyle={true}
+                customColor="primary"
+                showFirstButton={true}
+                showLastButton={true}
+                siblingCount={1}
+                boundaryCount={1}
+              />
+            </Box>
+          )}
 
-      {member?.role === "ROLE_ADMIN" && (
-        <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
-          <CustomButton
-            type="button"
-            onClick={() => {
-              handleClick("insert");
-            }}
-            size="medium"
-            variant="contained"
-            color="success"
-            text="새글 등록"
-          />
-        </Stack>
-      )}
+          {member?.role === "ROLE_ADMIN" && (
+            <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
+              <CustomButton
+                type="button"
+                onClick={() => {
+                  handleClick("insert");
+                }}
+                size="medium"
+                variant="contained"
+                color="success"
+                text="새글 등록"
+              />
+            </Stack>
+          )}
+        </MainContainer>
+      </ThemeProvider>
     </>
   );
 };
