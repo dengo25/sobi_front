@@ -23,6 +23,8 @@
 ========================================================*/
 .css-yfrx4k-MuiAccordionSummary-content{align-items:center;}
 .css-yfrx4k-MuiAccordionSummary-content img{margin:0 5px;}
+.basic-acc.MuiAccordion-root{margin-bottom:20px;border-radius:10px;}
+.basic-acc.MuiAccordion-root::before{content:none;}
 
 
 /*========================================================
