@@ -73,12 +73,12 @@ const MainPage = () => {
 
   // 페이지 이동
   const handleClickMove = async (type, no) => {
-    if(type == 'notice'){
+    if (type == "notice") {
       await incrementNoticeViewCount(noticeNo);
       navigate(`/api/notice/detail/${no}`);
-    }else if(type == 'review'){
+    } else if (type == "review") {
       navigate(`/review/detail/${no}?page=1&size=10`);
-    }else if(type == 'faq'){
+    } else if (type == "faq") {
       navigate(`/api/faq`);
     }
     console.log(`${type}! >>>> `, `/review/detail/${no}?page=1&size=10`);
@@ -97,18 +97,16 @@ const MainPage = () => {
   const reviewTrandContent = useMemo(() => {
     if (!Array.isArray(reviewTrandList)) return [];
     // const firstImages = reviewList
-    return (
-      reviewTrandList
-        .filter(review => review.images && review.images.length > 0) // 이미지가 있는 게시글만
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 최신순 정렬
-        .map((review) => ({
-          tno: review.tno || review.id,
-          reviewTitle: review.title,
-          images: review.images || [],
-          author: review.memberId || "익명",
-          content: review.content || "",
-        }))
-    );
+    return reviewTrandList
+      .filter((review) => review.images && review.images.length > 0) // 이미지가 있는 게시글만
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 최신순 정렬
+      .map((review) => ({
+        tno: review.tno || review.id,
+        reviewTitle: review.title,
+        images: review.images || [],
+        author: review.memberId || "익명",
+        content: review.content || "",
+      }));
     // return firstImages;
   }, [reviewTrandList]);
 
@@ -200,9 +198,9 @@ const MainPage = () => {
           )}
         </div>
         <p className="text">
-          <a onClick={() => handleClickMove('review',tno)}>
-          <span>{reviewTitle}</span>
-          {stripHtml(content)}
+          <a onClick={() => handleClickMove("review", tno)}>
+            <span>{reviewTitle}</span>
+            {stripHtml(content)}
           </a>
         </p>
       </div>
@@ -234,88 +232,90 @@ const MainPage = () => {
   return (
     <ThemeProvider theme={sobiTheme}>
       <MainContainer maxWidth="xl">
-      <Box sx={{ flexGrow: 1 }} >
-        <Grid container spacing={2}>
-          <Grid size={12}>
-            <Item>
-              {/* <h1 className="blind">메인 페이지</h1> */}
-              <p className="welcome-ment">👋👋 환영합니다, {member?.memberName || "방문자"}님!</p>
-              {/* <p>
+        <Box sx={{ flexGrow: 1 }}>
+          <Grid container spacing={2}>
+            <Grid size={12}>
+              <Item>
+                {/* <h1 className="blind">메인 페이지</h1> */}
+                <p className="welcome-ment">
+                  👋👋 환영합니다, {member?.memberName || "방문자"}님!
+                </p>
+                {/* <p>
                 {member?.memberName || "방문자"}은 '{member.role}' 회원 입니다.
               </p> */}
-            </Item>
-          </Grid>
-          <Grid size={8}>
-            <Stack spacing={2}>
+              </Item>
+            </Grid>
+            <Grid size={8}>
+              <Stack spacing={2}>
+                <Item>
+                  <h3 className="main-title">📝 SOBI 최신 리뷰</h3>
+                  {reviewTrandContent.length > 0 ? (
+                    <SwiperCarousel
+                      slides={reviewTrandContent}
+                      renderSlide={renderSlide}
+                      // navigation
+                      // pagination={{ clickable: true }}
+                      scrollbar={{ draggable: true }}
+                      autoplay={{ delay: 5000, disableOnInteraction: false }}
+                      loop={true}
+                      enableLazyLoading={true}
+                      slidesPerView={1}
+                      slidesPerGroup={1}
+                      className="review-trand"
+                    />
+                  ) : (
+                    <p>리뷰가 없습니다....</p>
+                  )}
+                </Item>
+                <Item>
+                  <h3 className="main-title">📝 SOBI 카테고리별 1</h3>
+                  <ImageCard items={reviewCT1Content} />
+                </Item>
+                <Item>
+                  <h3 className="main-title">📝 SOBI 카테고리별 2</h3>
+                  <ImageCard items={reviewCT2Content} />
+                </Item>
+
+                <Item>
+                  <h3 className="main-title">📢 SOBI 공지사항</h3>
+                  {noticeSwiperContent.length > 0 ? (
+                    <SwiperCarousel
+                      slides={noticeSwiperContent}
+                      renderSlide={renderSlideNotice}
+                      scrollbar={{ draggable: true }}
+                      autoplay={{ delay: 5000, disableOnInteraction: false }}
+                      loop={true}
+                      enableLazyLoading={true}
+                      slidesPerView={1}
+                      slidesPerGroup={1}
+                    />
+                  ) : (
+                    <p>리뷰가 없습니다....</p>
+                  )}
+                </Item>
+
+                <Item>
+                  <h3 className="main-title">📢 SOBI FAQ 바로가기 테스트중</h3>
+                </Item>
+              </Stack>
+            </Grid>
+
+            <Grid size={4}>
               <Item>
-                <h3 className="main-title">📝 SOBI 최신 리뷰</h3>
-                {reviewTrandContent.length > 0 ? (
-                  <SwiperCarousel
-                    slides={reviewTrandContent}
-                    renderSlide={renderSlide}
-                    // navigation
-                    // pagination={{ clickable: true }}
-                    scrollbar={{ draggable: true }}
-                    autoplay={{ delay: 5000, disableOnInteraction: false }}
-                    loop={true}
-                    enableLazyLoading={true}
-                    slidesPerView={1}
-                    slidesPerGroup={1}
-                    className="review-trand"
+                <h3 className="main-title">📝 SOBI 리뷰</h3>
+                {reviewAllContent.length > 0 ? (
+                  <ImageWithTitleList
+                    items={reviewAllContent}
+                    cols={1}
+                    gap={10}
                   />
                 ) : (
-                  <p>리뷰가 없습니다....</p>
+                  <p>리뷰가 없습니다.</p>
                 )}
               </Item>
-              <Item>
-                <h3 className="main-title">📝 SOBI 카테고리별 1</h3>
-                <ImageCard items={reviewCT1Content} />
-              </Item>
-              <Item>
-                <h3 className="main-title">📝 SOBI 카테고리별 2</h3>
-                <ImageCard items={reviewCT2Content} />
-              </Item>
-
-              <Item>
-                <h3 className="main-title">📢 SOBI 공지사항</h3>
-                {noticeSwiperContent.length > 0 ? (
-                  <SwiperCarousel
-                    slides={noticeSwiperContent}
-                    renderSlide={renderSlideNotice}
-                    scrollbar={{ draggable: true }}
-                    autoplay={{ delay: 5000, disableOnInteraction: false }}
-                    loop={true}
-                    enableLazyLoading={true}
-                    slidesPerView={1}
-                    slidesPerGroup={1}
-                  />
-                ) : (
-                  <p>리뷰가 없습니다....</p>
-                )}
-              </Item>
-
-              <Item>
-                <h3 className="main-title">📢 SOBI FAQ 바로가기 테스트중</h3>
-              </Item>
-            </Stack>
+            </Grid>
           </Grid>
-
-          <Grid size={4}>
-            <Item>
-              <h3 className="main-title">📝 SOBI 리뷰</h3>
-              {reviewAllContent.length > 0 ? (
-                <ImageWithTitleList
-                  items={reviewAllContent}
-                  cols={1}
-                  gap={10}
-                />
-              ) : (
-                <p>리뷰가 없습니다.</p>
-              )}
-            </Item>
-          </Grid>
-        </Grid>
-      </Box>
+        </Box>
       </MainContainer>
     </ThemeProvider>
   );
