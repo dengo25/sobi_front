@@ -4,12 +4,21 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import CustomButton from "../input/CustomButton";
+import { stripHtml } from "../../utils/common";
 
 const ImageCard = ({
   items,
   width,
   height,
+  type,
+  onItemClick,
 }) => {
+    const handleItemClick = (item, index) => {
+    if (onItemClick) {
+      onItemClick(type, item.no || item.id, item, index);
+    }
+  };
+
   return (
     <>
       {items.map((item,idx) => (
@@ -28,9 +37,9 @@ const ImageCard = ({
               {item.title}
             </Typography>
             <div
-              variant="body2"
-              sx={{ color: "text.secondary" }}
-              dangerouslySetInnerHTML={{ __html: item.content }}
+              // variant="body2"
+              // sx={{ color: "text.secondary" }}
+              dangerouslySetInnerHTML={{ __html: stripHtml(item.content) }}
               className="custom-body"
             ></div>
           </CardContent>
@@ -41,6 +50,7 @@ const ImageCard = ({
               variant="contained"
               color="success"
               text="더보기"
+              onClick={() => handleItemClick(item, idx)}
             />
           </CardActions>
         </Card>

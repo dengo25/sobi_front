@@ -16,6 +16,7 @@ import {
   reviewLimit5ListfromCateogry1,
   reviewLimit5ListfromCateogry2,
 } from "../service/main/MainApiService";
+import { incrementNoticeViewCount } from "../service/community/NoticeApiService";
 import SwiperCarousel from "../components/swiper/SwiperCarousel";
 import ImageWithTitleList from "../components/list/ImageWithTitleList";
 import ImageCard from "../components/list/ImageCard";
@@ -81,7 +82,7 @@ const MainPage = () => {
     } else if (type == "faq") {
       navigate(`/api/faq`);
     }
-    console.log(`${type}! >>>> `, `/review/detail/${no}?page=1&size=10`);
+    console.log(`${type}! -->>>> `, `/review/detail/${no}?page=1&size=10`);
   };
 
   // 파싱 결과 : 공지사항 3건 스와이퍼용
@@ -116,12 +117,14 @@ const MainPage = () => {
     const category1 = reviewCT1List
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 최신순 정렬
       .map((review) => ({
+        no: review.tno,
         img:
           review.images && review.images.length > 0
             ? review.images[0].fileUrl
             : null, // null 체크 추가
         title: review.title,
         author: review.memberId,
+        content: review.content,
       }));
     return category1;
   }, [reviewCT1List]);
@@ -132,12 +135,14 @@ const MainPage = () => {
     const category2 = reviewCT2List
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 최신순 정렬
       .map((review) => ({
+        no: review.tno,
         img:
           review.images && review.images.length > 0
             ? review.images[0].fileUrl
             : null, // null 체크 추가
         title: review.title,
         author: review.memberId,
+        content: review.content,
       }));
     return category2;
   }, [reviewCT2List]);
@@ -149,12 +154,14 @@ const MainPage = () => {
       //.filter(review => review.images && review.images.length > 0) // 이미지가 있는 게시글만
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 최신순 정렬
       .map((review) => ({
+        no: review.tno,
         img:
           review.images && review.images.length > 0
             ? review.images[0].fileUrl
             : null, // null 체크 추가
         title: review.title,
         author: review.memberId,
+        content: review.content,
       }));
     return firstImages;
   }, [reviewList]);
@@ -168,6 +175,7 @@ const MainPage = () => {
           new Date(b.notice_create_date) - new Date(a.notice_create_date)
       ) // 최신순 정렬
       .map((notice3List) => ({
+        no: notice3List.noticeNo,
         img:
           notice3List.imageUrls && notice3List.imageUrls.length > 0
             ? notice3List.imageUrls[0]
@@ -213,16 +221,18 @@ const MainPage = () => {
     ({ noticeNo, noticeTitle, imageUrls, plain }, idx) => (
       <ul key={noticeNo || `slide-${idx}`}>
         {/* <li>{plain}</li> */}
-        <li>{noticeTitle}</li>
+        {/* <li>{noticeTitle}</li> */}
         <li>
-          {(imageUrls || []).map((url, idx) => (
-            <img
-              key={url ?? idx}
-              src={url}
-              alt={`revive-${noticeNo}-img-${idx}`}
-              // style={{ maxWidth: "100%", margin: "0.5rem 0" }}
-            />
-          ))}
+          <a onClick={() => handleClickMove("notice", noticeNo)}>
+            {(imageUrls || []).map((url, idx) => (
+              <img
+                key={url ?? idx}
+                src={url}
+                alt={`revive-${noticeNo}-img-${idx}`}
+                // style={{ maxWidth: "100%", margin: "0.5rem 0" }}
+              />
+            ))}
+          </a>
         </li>
       </ul>
     ),
