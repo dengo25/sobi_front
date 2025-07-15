@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+import { noticeLimit3List } from "../../service/main/MainApiService";
+import { stripHtml } from "../../utils/common"
 import CustomCheckbox from "../../components/input/CustomCheckbox";
 import CustomButton from "../../components/input/CustomButton";
 import BasicEditor from "../../components/editor/BasicEditor";
 import CustomInput from "../../components/input/CustomInput";
 import BasicPagination from "../../components/list/BasicPagination";
+import SwiperCarousel from "../../components/swiper/SwiperCarousel";
+import ImageWithTitleList from "../../components/list/ImageWithTitleList";
 
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -67,6 +71,19 @@ const Common = () => {
       });
     }
   };
+
+  const myImages = [
+  { img: 'https://images.unsplash.com/photo-xxxx', title: 'Bed', author: 'swabdesign' },
+  { img: 'https://images.unsplash.com/photo-yyyy', title: 'Books', author: 'Pavel Nekoranec' },
+  ];
+
+  // 스와이퍼
+  const [notice3List, setNotice3List] = useState([]);
+  useEffect(() => {
+    noticeLimit3List().then((res) => {
+      setNotice3List(res.data);
+    });
+  },[]);
 
   // 페이지네이션 상태 + 핸들러
   const [page, setPage] = useState(1);
@@ -461,6 +478,37 @@ const Common = () => {
       <hr />
 
       <section>
+        <h3>Swiper</h3>
+        <SwiperCarousel
+          slides={notice3List}
+          renderSlide={(n3) => (
+            <ul>
+              <li>{n3.noticeTitle}</li>
+              <li>{stripHtml(n3.noticeContent)}</li>
+              <li>
+                {(n3.imageUrls || []).map((url, idx) => (
+                  <img
+                    key={url ?? idx}
+                    src={url}
+                    alt={`notice-${n3.noticeNo}-img-${idx}`}
+                    style={{ maxWidth: "100%", margin: "0.5rem 0" }}
+                  />
+                ))}
+              </li>
+            </ul>
+          )}
+          navigation
+          pagination={{ clickable: true }}
+          scrollbar={{ draggable: true }}
+          autoplay={{ delay: 5000, disableOnInteraction: false }}
+          loop={true}
+          enableLazyLoading={true}
+          slidesPerView={1}
+          slidesPerGroup={1}
+        />
+      </section>
+
+      <section>
         <h3>Editor : ReactQuill</h3>
         <form>
           {" "}
@@ -495,6 +543,16 @@ const Common = () => {
         </form>
       </section>
       <hr />
+
+      <section>
+        <ImageWithTitleList 
+            items={myImages}
+            width={600}
+            height={500}
+            cols={4}
+            gap={10}
+        />
+      </section>
 
       <section>
         <h3>Pagination</h3>

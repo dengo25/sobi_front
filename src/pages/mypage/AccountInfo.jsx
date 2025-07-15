@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react"; // useEffect 추가
 import {
   Box,
   Typography,
@@ -17,10 +17,10 @@ import {
   ThemeProvider,
   createTheme,
   FormControl,
-  Select,
   MenuItem,
   Alert,
   CircularProgress,
+  Modal, // Modal 추가
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {
@@ -36,9 +36,12 @@ import {
   VisibilityOff as VisibilityOffIcon,
   Security as SecurityIcon,
   Save as SaveIcon,
+  Close as CloseIcon, // CloseIcon 추가
 } from "@mui/icons-material";
-import { updateMypage } from "../../service/member/ApiService";
+import DaumPostcode from "react-daum-postcode"; // DaumPostcode 추가
+import { updateMypage } from "../../service/member/ApiService"; // 경로 확인
 
+// SOBI 테마 설정 (기존과 동일)
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -56,6 +59,7 @@ const sobiTheme = createTheme({
   },
 });
 
+// 기존 스타일드 컴포넌트 유지
 const ProfileSection = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(3),
   borderRadius: theme.spacing(2),
@@ -115,11 +119,51 @@ const ActionButtons = styled(Box)(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
+// SignUpPage.jsx에서 가져온 StyledTextField
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  marginBottom: theme.spacing(2), // 기존 InfoRow 내부에서는 mb를 0으로 설정할 수 있음
+  "& .MuiOutlinedInput-root": {
+    borderRadius: theme.spacing(1),
+    backgroundColor: "#fafafa",
+    height: 56, // 높이 고정
+    transition: "all 0.3s ease",
+    "&:hover": {
+      backgroundColor: "#f5f5f5",
+    },
+    "&.Mui-focused": {
+      backgroundColor: "white",
+      "& .MuiOutlinedInput-notchedOutline": {
+        borderColor: theme.palette.primary.main,
+        borderWidth: "2px",
+      },
+    },
+  },
+}));
+
+// SignUpPage.jsx에서 가져온 ActionButton
+const ActionButton = styled(Button)(({ theme }) => ({
+  borderRadius: theme.spacing(1),
+  padding: theme.spacing(1.5),
+  fontSize: "1rem",
+  fontWeight: 500,
+  textTransform: "none",
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+  height: 56,
+  boxShadow: `0 4px 14px ${theme.palette.primary.main}40`,
+  transition: "all 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: `0 6px 20px ${theme.palette.primary.main}60`,
+  },
+}));
+
 const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false); // 주소 검색 모달 상태
 
   const [formData, setFormData] = useState({
     memberName: userInfo?.memberName || "",
@@ -128,9 +172,25 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
     memberBirth: userInfo?.memberBirth || "",
     memberAddr: userInfo?.memberAddr || "",
     memberZip: userInfo?.memberZip || "",
+    detailAddress: "", // 상세 주소 필드 추가
     password: "",
     confirmPassword: "",
   });
+
+  // userInfo prop이 변경될 때 formData 업데이트
+  useEffect(() => {
+    setFormData({
+      memberName: userInfo?.memberName || "",
+      memberEmail: userInfo?.memberEmail || "",
+      memberGender: userInfo?.memberGender || "",
+      memberBirth: userInfo?.memberBirth || "",
+      memberAddr: userInfo?.memberAddr || "",
+      memberZip: userInfo?.memberZip || "",
+      detailAddress: "", // 상세 주소는 수정 모드 진입 시 초기화
+      password: "",
+      confirmPassword: "",
+    });
+  }, [userInfo]);
 
   const handleEditToggle = () => {
     if (editMode) {
@@ -142,6 +202,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
         memberBirth: userInfo?.memberBirth || "",
         memberAddr: userInfo?.memberAddr || "",
         memberZip: userInfo?.memberZip || "",
+        detailAddress: "",
         password: "",
         confirmPassword: "",
       });
@@ -210,12 +271,15 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
     setError("");
 
     try {
+      const finalAddress =
+        `${formData.memberAddr} ${formData.detailAddress}`.trim();
+
       const updateData = {
         memberName: formData.memberName,
         memberEmail: formData.memberEmail,
         memberGender: formData.memberGender,
         memberBirth: formData.memberBirth,
-        memberAddr: formData.memberAddr,
+        memberAddr: finalAddress, // 상세 주소 포함하여 전송
         memberZip: formData.memberZip,
       };
 
@@ -232,6 +296,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
           ...prev,
           password: "",
           confirmPassword: "",
+          detailAddress: "", // 저장 후 상세 주소 초기화
         }));
       }
     } catch (err) {
@@ -256,10 +321,23 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
     return `${year}년 ${month}월 ${day}일`;
   };
 
+  // Daum 주소 검색 처리
+  const handleAddressSelect = (data) => {
+    const fullAddress = data.address;
+    const zonecode = data.zonecode;
+
+    setFormData((prev) => ({
+      ...prev,
+      memberAddr: fullAddress,
+      memberZip: zonecode,
+    }));
+    setIsPostcodeOpen(false);
+  };
+
   return (
     <ThemeProvider theme={sobiTheme}>
       <Container maxWidth="md" sx={{ py: 3 }}>
-        {/* 프로필 섹션 */}
+        {/* 프로필 섹션 (기존과 동일) */}
         <ProfileSection>
           <CardContent sx={{ textAlign: "center", p: 4 }}>
             <StyledAvatar sx={{ mb: 3 }}>
@@ -267,7 +345,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
             </StyledAvatar>
 
             {editMode ? (
-              <TextField
+              <StyledTextField
                 fullWidth
                 label="이름"
                 name="memberName"
@@ -275,6 +353,13 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                 onChange={handleChange}
                 sx={{ mb: 2, maxWidth: 300 }}
                 size="small"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonIcon color="action" />
+                    </InputAdornment>
+                  ),
+                }}
               />
             ) : (
               <Typography variant="h5" fontWeight={700} gutterBottom>
@@ -314,15 +399,16 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                 <PersonIcon />
                 기본 정보
               </SectionTitle>
-              <Button
+              <ActionButton
                 onClick={handleEditToggle}
                 startIcon={editMode ? <CancelIcon /> : <EditIcon />}
                 variant={editMode ? "outlined" : "contained"}
                 color={editMode ? "inherit" : "primary"}
                 disabled={loading}
+                sx={{ height: 40, mt: 0, mb: 0 }} // 버튼 높이 조정
               >
                 {editMode ? "취소" : "수정"}
-              </Button>
+              </ActionButton>
             </Box>
 
             {/* 첫 번째 행: 이메일, 성별, 생년월일 */}
@@ -341,13 +427,21 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                   </InfoLabel>
                   <InfoValue>
                     {editMode ? (
-                      <TextField
+                      <StyledTextField
                         fullWidth
                         type="email"
                         name="memberEmail"
                         value={formData.memberEmail}
                         onChange={handleChange}
                         size="small"
+                        sx={{ mb: 0 }} // InfoRow 내부이므로 margin 조정
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <EmailIcon color="action" />
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                     ) : (
                       <Typography variant="body2" fontWeight={500}>
@@ -373,15 +467,24 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                   <InfoValue>
                     {editMode ? (
                       <FormControl fullWidth size="small">
-                        <Select
+                        <StyledTextField
+                          select
                           name="memberGender"
                           value={formData.memberGender}
                           onChange={handleChange}
+                          sx={{ mb: 0 }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <GenderIcon color="action" />
+                              </InputAdornment>
+                            ),
+                          }}
                         >
-                          <MenuItem value="">선택</MenuItem>
+                          <MenuItem value="">선택 안함</MenuItem>
                           <MenuItem value="M">남성</MenuItem>
                           <MenuItem value="F">여성</MenuItem>
-                        </Select>
+                        </StyledTextField>
                       </FormControl>
                     ) : (
                       <Typography variant="body2" fontWeight={500}>
@@ -406,7 +509,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                   </InfoLabel>
                   <InfoValue>
                     {editMode ? (
-                      <TextField
+                      <StyledTextField
                         fullWidth
                         name="memberBirth"
                         value={formData.memberBirth}
@@ -414,6 +517,14 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                         placeholder="YYMMDD"
                         size="small"
                         helperText="6자리 숫자"
+                        sx={{ mb: 0 }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <CakeIcon color="action" />
+                            </InputAdornment>
+                          ),
+                        }}
                       />
                     ) : (
                       <Typography variant="body2" fontWeight={500}>
@@ -425,41 +536,53 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
               </Grid>
             </Grid>
 
-            {/* 두 번째 행: 우편번호, 주소 */}
+            {/* 두 번째 행: 우편번호, 주소, 상세주소 */}
             <Grid container spacing={4}>
-              <Grid item xs={12} md={4}>
-                <InfoRow>
-                  <InfoLabel>
-                    <LocationIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      우편번호
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    {editMode ? (
-                      <TextField
+              {editMode && ( // editMode일 때만 우편번호 필드 표시
+                <Grid item xs={12} md={4}>
+                  <InfoRow>
+                    <InfoLabel>
+                      <LocationIcon color="primary" />
+                      <Typography
+                        variant="body2"
+                        fontWeight={600}
+                        color="text.secondary"
+                      >
+                        우편번호
+                      </Typography>
+                    </InfoLabel>
+                    <InfoValue>
+                      <StyledTextField
                         fullWidth
                         name="memberZip"
                         value={formData.memberZip}
-                        onChange={handleChange}
-                        placeholder="12345"
-                        size="small"
-                        helperText="5자리 숫자"
+                        placeholder="우편번호 검색"
+                        disabled={loading}
+                        InputProps={{
+                          readOnly: true,
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <LocationIcon color="action" />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          mb: 0,
+                          cursor: "pointer",
+                          "& .MuiOutlinedInput-root": {
+                            cursor: "pointer",
+                          },
+                        }}
+                        onClick={() => setIsPostcodeOpen(true)}
                       />
-                    ) : (
-                      <Typography variant="body2" fontWeight={500}>
-                        {userInfo?.memberZip || "설정 안함"}
-                      </Typography>
-                    )}
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
+                    </InfoValue>
+                  </InfoRow>
+                </Grid>
+              )}
 
-              <Grid item xs={12} md={8}>
+              <Grid item xs={12} md={editMode ? 8 : 12}>
+                {" "}
+                {/* editMode에 따라 Grid 크기 조정 */}
                 <InfoRow>
                   <InfoLabel>
                     <HomeIcon color="primary" />
@@ -473,12 +596,17 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                   </InfoLabel>
                   <InfoValue>
                     {editMode ? (
-                      <TextField
+                      <StyledTextField
                         fullWidth
                         name="memberAddr"
                         value={formData.memberAddr}
                         onChange={handleChange}
-                        size="small"
+                        placeholder="주소를 검색으로 입력하세요"
+                        disabled={loading}
+                        InputProps={{
+                          readOnly: true,
+                        }}
+                        sx={{ mb: 0 }}
                       />
                     ) : (
                       <Typography variant="body2" fontWeight={500}>
@@ -487,6 +615,33 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                     )}
                   </InfoValue>
                 </InfoRow>
+              </Grid>
+              <Grid item xs={12}>
+                {editMode && (
+                  <InfoRow>
+                    <InfoLabel>
+                      <HomeIcon color="primary" />
+                      <Typography
+                        variant="body2"
+                        fontWeight={600}
+                        color="text.secondary"
+                      >
+                        상세주소
+                      </Typography>
+                    </InfoLabel>
+                    <InfoValue>
+                      <StyledTextField
+                        fullWidth
+                        name="detailAddress"
+                        value={formData.detailAddress}
+                        onChange={handleChange}
+                        placeholder="상세 주소를 입력하세요"
+                        disabled={loading}
+                        sx={{ mb: 0 }}
+                      />
+                    </InfoValue>
+                  </InfoRow>
+                )}
               </Grid>
             </Grid>
 
@@ -501,7 +656,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
 
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
-                    <TextField
+                    <StyledTextField
                       fullWidth
                       type={showPassword ? "text" : "password"}
                       label="새 비밀번호"
@@ -511,6 +666,11 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                       size="small"
                       helperText="변경하지 않으려면 비워두세요"
                       InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SecurityIcon color="action" />
+                          </InputAdornment>
+                        ),
                         endAdornment: (
                           <InputAdornment position="end">
                             <IconButton
@@ -530,7 +690,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <TextField
+                    <StyledTextField
                       fullWidth
                       type={showPassword ? "text" : "password"}
                       label="비밀번호 확인"
@@ -548,6 +708,13 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                           ? "비밀번호가 일치하지 않습니다"
                           : ""
                       }
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SecurityIcon color="action" />
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   </Grid>
                 </Grid>
@@ -557,22 +724,52 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
             {/* 저장 버튼 (편집 모드일 때만 표시) */}
             {editMode && (
               <ActionButtons>
-                <Button
+                <ActionButton
                   onClick={handleSave}
                   variant="contained"
                   startIcon={
-                    loading ? <CircularProgress size={16} /> : <SaveIcon />
+                    loading ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : (
+                      <SaveIcon />
+                    )
                   }
                   disabled={loading}
-                  size="large"
+                  sx={{ height: 56, mt: 0, mb: 0 }}
                 >
                   {loading ? "저장 중..." : "저장"}
-                </Button>
+                </ActionButton>
               </ActionButtons>
             )}
           </CardContent>
         </BasicInfoSection>
       </Container>
+
+      {/* Daum 주소 검색 모달 */}
+      <Modal open={isPostcodeOpen} onClose={() => setIsPostcodeOpen(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+            width: "90%",
+            maxWidth: 500,
+          }}
+        >
+          <IconButton
+            onClick={() => setIsPostcodeOpen(false)}
+            sx={{ position: "absolute", top: 8, right: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <DaumPostcode onComplete={handleAddressSelect} />
+        </Box>
+      </Modal>
     </ThemeProvider>
   );
 };

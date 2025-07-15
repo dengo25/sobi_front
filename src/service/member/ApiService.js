@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "../util/api-config.js";
 import jwtAxios from "../util/JwtUtil.jsx";
 import store from "../../store.jsx";
-import {logout} from "../../slice/memberSlice.jsx";
+import { logout } from "../../slice/memberSlice.jsx";
 import axios from "axios";
 
 //API 호출을 위한 공통 함수 정의
@@ -85,7 +85,6 @@ export function signout() {
   localStorage.removeItem("ACCESS_TOKEN");
   localStorage.removeItem("LOGIN_USER");
   localStorage.removeItem("persist:root");
-
 
   // Redux 상태 초기화
   store.dispatch(logout());
@@ -186,9 +185,45 @@ export const getListWithoutToken = async (pageParam) => {
   return res.data;
 };
 
-export const deleteReview = async (tno) => {
-  const res = await jwtAxios.delete(`${API_BASE_URL}/api/review/${tno}`);
-  return res.data;
-};
+/**
+ * 이메일 중복 확인 함수
+ * @param {string} email - 확인할 이메일 주소
+ * @returns {Promise<Object>} - { available: boolean, message: string }
+ */
+export async function checkEmailDuplicate(email) {
+  try {
+    const encodedEmail = encodeURIComponent(email);
 
+    const response = await fetch(
+      `${API_BASE_URL}/auth/check-email?email=${encodedEmail}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
+    console.log("이메일 중복 확인 API 응답 상태:", response.status);
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("이메일 중복 확인 결과:", data);
+      return data;
+    } else {
+      // 에러 응답 처리
+      const errorData = await response.json();
+      console.error("이메일 중복 확인 API 에러:", errorData);
+      return {
+        available: false,
+        message: errorData.message || "이메일 확인 중 오류가 발생했습니다.",
+      };
+    }
+  } catch (error) {
+    console.error("이메일 중복 확인 네트워크 오류:", error);
+    return {
+      available: false,
+      message: "네트워크 오류가 발생했습니다. 다시 시도해주세요.",
+    };
+  }
+}
