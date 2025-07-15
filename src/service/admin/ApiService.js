@@ -116,14 +116,6 @@ export const report = async (reportParam) => {
   return res.data;
 };
 
-const handleReportSubmit = async (reportDto) => {
-  try {
-    await report(reportDto);
-    alert("신고가 접수되었습니다.");
-  } catch (error) {
-    alert("다시 시도해주세요.");
-  }
-};
 // 신고 목록 조회 (페이징 + 필터링)
 export const getReportList = async (searchParams) => {
   const {

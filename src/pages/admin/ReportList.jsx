@@ -15,8 +15,6 @@ import {
   Container,
   Card,
   Chip,
-  ThemeProvider,
-  createTheme,
   TextField,
   Select,
   MenuItem,
@@ -39,22 +37,6 @@ import {
 } from "@mui/icons-material";
 import { getReportList } from "../../service/admin/ApiService";
 import { useNavigate } from "react-router-dom";
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
@@ -90,8 +72,32 @@ const PaginationContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
 }));
 
-const EnhancedReportList = () => {
+const ReportList = ({ onViewDetail, onViewReportReview }) => {
   const navigate = useNavigate();
+
+  const handleReportClick = (report, event) => {
+    event.preventDefault();
+    // onViewDetail prop이 있으면 상세 페이지로, 없으면 기존 방식으로
+    if (onViewDetail) {
+      console.log("신고 상세 페이지로 이동:", report);
+      onViewDetail(report);
+    } else {
+      // AdminMain 밖에서 사용될 때는 기존 방식 유지
+      navigate(`/admin/report/${report.reportId}`);
+    }
+  };
+  const handleReportReviewClick = (report, event) => {
+    event.preventDefault();
+    event.stopPropagation(); // 부모 클릭 이벤트 방지
+
+    if (onViewReportReview) {
+      console.log("신고된 리뷰 보기:", report);
+      onViewReportReview(report);
+    } else {
+      `/admin/report/review/${report.targetId}/${report.reportId}`;
+    }
+  };
+
   // 신고 목록과 페이징 상태
   const [reportList, setReportList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -274,283 +280,278 @@ const EnhancedReportList = () => {
 
   if (loading) {
     return (
-      <ThemeProvider theme={sobiTheme}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: 400,
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      </ThemeProvider>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 400,
+        }}
+      >
+        <CircularProgress />
+      </Box>
     );
   }
-
   if (error) {
     return (
-      <ThemeProvider theme={sobiTheme}>
-        <Container maxWidth="xl" sx={{ p: 2 }}>
-          <Alert severity="error">{error}</Alert>
-        </Container>
-      </ThemeProvider>
+      <Container maxWidth="xl" sx={{ p: 2 }}>
+        <Alert severity="error">{error}</Alert>
+      </Container>
     );
   }
 
   return (
-    <ThemeProvider theme={sobiTheme}>
-      <Container maxWidth="xl" sx={{ p: 2 }}>
-        {/* 헤더 */}
-        <SectionTitle variant="h6">
-          <ReportIcon />
-          신고 관리 ({pageInfo.totalElements}건)
-        </SectionTitle>
+    <Container maxWidth="xl" sx={{ p: 2 }}>
+      {/* 헤더 */}
+      <SectionTitle variant="h6">
+        <ReportIcon />
+        신고 관리 ({pageInfo.totalElements}건)
+      </SectionTitle>
 
-        {/* 필터링 섹션 */}
-        <FilterSection>
-          <Typography
-            variant="subtitle1"
-            gutterBottom
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
-          >
-            <FilterIcon />
-            필터
-          </Typography>
+      {/* 필터링 섹션 */}
+      <FilterSection>
+        <Typography
+          variant="subtitle1"
+          gutterBottom
+          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+        >
+          <FilterIcon />
+          필터
+        </Typography>
 
-          <Grid container spacing={2} alignItems="center">
-            {/* 첫 번째 행: 필터 선택 */}
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small">
-                <InputLabel>처리 상태</InputLabel>
-                <Select
-                  value={tempFilters.status}
-                  label="처리 상태"
-                  onChange={(e) =>
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      status: e.target.value,
-                    }))
-                  }
-                >
-                  {statusOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+        <Grid container spacing={2} alignItems="center">
+          {/* 첫 번째 행: 필터 선택 */}
+          <Grid item xs={12} sm={6} md={4}>
+            <FormControl fullWidth size="small">
+              <InputLabel>처리 상태</InputLabel>
+              <Select
+                value={tempFilters.status}
+                label="처리 상태"
+                onChange={(e) =>
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    status: e.target.value,
+                  }))
+                }
+              >
+                {statusOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small">
-                <InputLabel>신고 유형</InputLabel>
-                <Select
-                  value={tempFilters.reportType}
-                  label="신고 유형"
-                  onChange={(e) =>
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      reportType: e.target.value,
-                    }))
-                  }
-                >
-                  {reportTypeOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <FormControl fullWidth size="small">
+              <InputLabel>신고 유형</InputLabel>
+              <Select
+                value={tempFilters.reportType}
+                label="신고 유형"
+                onChange={(e) =>
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    reportType: e.target.value,
+                  }))
+                }
+              >
+                {reportTypeOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-            <Grid item xs={12} sm={6} md={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel>정렬 기준</InputLabel>
-                <Select
-                  value={tempFilters.sortBy}
-                  label="정렬 기준"
-                  onChange={(e) =>
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      sortBy: e.target.value,
-                    }))
-                  }
-                >
-                  {sortOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+          <Grid item xs={12} sm={6} md={2}>
+            <FormControl fullWidth size="small">
+              <InputLabel>정렬 기준</InputLabel>
+              <Select
+                value={tempFilters.sortBy}
+                label="정렬 기준"
+                onChange={(e) =>
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    sortBy: e.target.value,
+                  }))
+                }
+              >
+                {sortOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-            <Grid item xs={12} sm={6} md={2}>
+          <Grid item xs={12} sm={6} md={2}>
+            <Button
+              variant="outlined"
+              onClick={handleSortToggle}
+              size="small"
+              fullWidth
+            >
+              {filters.sortDir === "desc" ? "내림차순" : "오름차순"}
+            </Button>
+          </Grid>
+
+          {/* 두 번째 행: 버튼들 */}
+          <Grid item xs={12} md={12}>
+            <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+              <Button
+                variant="contained"
+                startIcon={<SearchIcon />}
+                onClick={handleApplyFilters}
+                size="small"
+              >
+                검색
+              </Button>
               <Button
                 variant="outlined"
-                onClick={handleSortToggle}
+                startIcon={<RefreshIcon />}
+                onClick={handleResetFilters}
                 size="small"
-                fullWidth
               >
-                {filters.sortDir === "desc" ? "내림차순" : "오름차순"}
+                초기화
               </Button>
-            </Grid>
-
-            {/* 두 번째 행: 버튼들 */}
-            <Grid item xs={12} md={12}>
-              <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-                <Button
-                  variant="contained"
-                  startIcon={<SearchIcon />}
-                  onClick={handleApplyFilters}
-                  size="small"
-                >
-                  검색
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<RefreshIcon />}
-                  onClick={handleResetFilters}
-                  size="small"
-                >
-                  초기화
-                </Button>
-              </Box>
-            </Grid>
+            </Box>
           </Grid>
-        </FilterSection>
+        </Grid>
+      </FilterSection>
 
-        {/* 신고 목록 테이블 */}
-        <Card>
-          <StyledTableContainer>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "grey.50" }}>
-                  <TableCell sx={{ fontWeight: 600 }}>신고자 ID</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>신고 대상 ID</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    신고일자
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    신고 유형
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    타겟 번호
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    처리 상태
+      {/* 신고 목록 테이블 */}
+      <Card>
+        <StyledTableContainer>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "grey.50" }}>
+                <TableCell sx={{ fontWeight: 600 }}>신고자 ID</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>신고 대상 ID</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600 }}>
+                  신고일자
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600 }}>
+                  신고 유형
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600 }}>
+                  타겟 번호
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600 }}>
+                  처리 상태
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {reportList.length > 0 ? (
+                reportList.map((report, index) => (
+                  <StyledTableRow
+                    key={index}
+                    onClick={(event) => handleReportClick(report, event)}
+                  >
+                    <TableCell sx={{ fontWeight: 500 }}>
+                      {report.reporterId || "N/A"}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 500 }}>
+                      {report.reportedId || "N/A"}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography variant="body2" color="text.secondary">
+                        {report.createdAt
+                          ? new Date(report.createdAt).toLocaleDateString(
+                              "ko-KR"
+                            )
+                          : "N/A"}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        label={report.reportType || "N/A"}
+                        color={getReportTypeColor(report.reportType)}
+                        size="small"
+                        variant="filled"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        label={report.targetId || "N/A"}
+                        color="primary"
+                        size="small"
+                        variant="outlined"
+                        onClick={(event) =>
+                          handleReportReviewClick(report, event)
+                        }
+                        sx={{ cursor: "pointer" }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        label={getStatusLabel(report.status)}
+                        color={getStatusColor(report.status)}
+                        size="small"
+                        variant="outlined"
+                      />
+                    </TableCell>
+                  </StyledTableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    <Box sx={{ py: 4 }}>
+                      <WarningIcon
+                        sx={{ fontSize: 48, color: "grey.400", mb: 1 }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        조건에 맞는 신고 내역이 없습니다.
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {reportList.length > 0 ? (
-                  reportList.map((report, index) => (
-                    <StyledTableRow
-                      key={index}
-                      onClick={() =>
-                        navigate(`/admin/report/${report.reportId}`)
-                      }
-                    >
-                      <TableCell sx={{ fontWeight: 500 }}>
-                        {report.reporterId || "N/A"}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 500 }}>
-                        {report.reportedId || "N/A"}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Typography variant="body2" color="text.secondary">
-                          {report.createdAt
-                            ? new Date(report.createdAt).toLocaleDateString(
-                                "ko-KR"
-                              )
-                            : "N/A"}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          label={report.reportType || "N/A"}
-                          color={getReportTypeColor(report.reportType)}
-                          size="small"
-                          variant="filled"
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          label={report.targetId || "N/A"}
-                          color="primary"
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Chip
-                          label={getStatusLabel(report.status)}
-                          color={getStatusColor(report.status)}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                    </StyledTableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      <Box sx={{ py: 4 }}>
-                        <WarningIcon
-                          sx={{ fontSize: 48, color: "grey.400", mb: 1 }}
-                        />
-                        <Typography variant="body2" color="text.secondary">
-                          조건에 맞는 신고 내역이 없습니다.
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </StyledTableContainer>
+              )}
+            </TableBody>
+          </Table>
+        </StyledTableContainer>
 
-          {/* 페이징 컨트롤 */}
-          <PaginationContainer>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                총 {pageInfo.totalElements}건 | 페이지{" "}
-                {pageInfo.currentPage + 1} / {pageInfo.totalPages}
-              </Typography>
+        {/* 페이징 컨트롤 */}
+        <PaginationContainer>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              총 {pageInfo.totalElements}건 | 페이지 {pageInfo.currentPage + 1}{" "}
+              / {pageInfo.totalPages}
+            </Typography>
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>페이지 크기</InputLabel>
-                <Select
-                  value={pageInfo.pageSize}
-                  label="페이지 크기"
-                  onChange={handlePageSizeChange}
-                >
-                  {pageSizeOptions.map((size) => (
-                    <MenuItem key={size} value={size}>
-                      {size}개씩
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>페이지 크기</InputLabel>
+              <Select
+                value={pageInfo.pageSize}
+                label="페이지 크기"
+                onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <MenuItem key={size} value={size}>
+                    {size}개씩
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
 
-            {pageInfo.totalPages > 1 && (
-              <Pagination
-                count={pageInfo.totalPages}
-                page={pageInfo.currentPage + 1}
-                onChange={handlePageChange}
-                color="primary"
-                variant="outlined"
-                shape="rounded"
-              />
-            )}
-          </PaginationContainer>
-        </Card>
-      </Container>
-    </ThemeProvider>
+          {pageInfo.totalPages > 1 && (
+            <Pagination
+              count={pageInfo.totalPages}
+              page={pageInfo.currentPage + 1}
+              onChange={handlePageChange}
+              color="primary"
+              variant="outlined"
+              shape="rounded"
+            />
+          )}
+        </PaginationContainer>
+      </Card>
+    </Container>
   );
 };
 
-export default EnhancedReportList;
+export default ReportList;

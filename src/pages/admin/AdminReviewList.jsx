@@ -20,8 +20,6 @@ import {
   MenuItem,
   InputLabel,
   Chip,
-  ThemeProvider,
-  createTheme,
   Paper,
   Button,
   Grid,
@@ -38,24 +36,6 @@ import {
   Cancel as RejectIcon,
 } from "@mui/icons-material";
 import { getReviewList } from "../../service/admin/ApiService";
-import useCustomMove from "../../hooks/admin/UseCustomMove";
-
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
@@ -91,7 +71,7 @@ const PaginationContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
 }));
 
-const AdminReviewList = () => {
+const AdminReviewList = ({ onViewDetail }) => {
   // 리뷰 목록과 페이징 상태
   const [reviewList, setReviewList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +94,19 @@ const AdminReviewList = () => {
   const [tempFilters, setTempFilters] = useState({ ...filters });
 
   const navigate = useNavigate();
-  const { moveToList } = useCustomMove();
+
+  const handleReviewClick = (review, event) => {
+    event.preventDefault();
+
+    // onViewDetail prop이 있으면 상세 페이지로, 없으면 기존 방식으로
+    if (onViewDetail) {
+      console.log("리뷰 상세 페이지로 이동:", review);
+      onViewDetail(review);
+    } else {
+      // AdminMain 밖에서 사용될 때는 기존 방식 유지
+      navigate(`/admin/review/${review.tno}`);
+    }
+  };
 
   // 정렬 옵션 (Review 엔티티 기준)
   const sortOptions = [
@@ -240,250 +232,235 @@ const AdminReviewList = () => {
 
   if (loading) {
     return (
-      <ThemeProvider theme={sobiTheme}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: 400,
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      </ThemeProvider>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 400,
+        }}
+      >
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <ThemeProvider theme={sobiTheme}>
-        <Container maxWidth="xl" sx={{ p: 2 }}>
-          <Alert severity="error">{error}</Alert>
-        </Container>
-      </ThemeProvider>
+      <Container maxWidth="xl" sx={{ p: 2 }}>
+        <Alert severity="error">{error}</Alert>
+      </Container>
     );
   }
-
   return (
-    <ThemeProvider theme={sobiTheme}>
-      <Container maxWidth="xl" sx={{ p: 2 }}>
-        {/* 헤더 */}
-        <SectionTitle variant="h6">
-          <ReviewIcon />
-          리뷰 관리 ({pageInfo.totalElements.toLocaleString()}개)
-        </SectionTitle>
+    <Container maxWidth="xl" sx={{ p: 2 }}>
+      {/* 헤더 */}
+      <SectionTitle variant="h6">
+        <ReviewIcon />
+        리뷰 관리 ({pageInfo.totalElements.toLocaleString()}개)
+      </SectionTitle>
 
-        {/* 정렬 섹션 */}
-        <FilterSection>
-          <Typography
-            variant="subtitle1"
-            gutterBottom
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
-          >
-            <FilterIcon />
-            필터
-          </Typography>
+      {/* 정렬 섹션 */}
+      <FilterSection>
+        <Typography
+          variant="subtitle1"
+          gutterBottom
+          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+        >
+          <FilterIcon />
+          필터
+        </Typography>
 
-          <Grid container spacing={2} alignItems="center">
-            {/* 정렬 기준 */}
-            <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small">
-                <InputLabel>정렬 기준</InputLabel>
-                <Select
-                  value={tempFilters.sortBy}
-                  label="정렬 기준"
-                  onChange={(e) =>
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      sortBy: e.target.value,
-                    }))
-                  }
-                >
-                  {sortOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+        <Grid container spacing={2} alignItems="center">
+          {/* 정렬 기준 */}
+          <Grid item xs={12} sm={6} md={4}>
+            <FormControl fullWidth size="small">
+              <InputLabel>정렬 기준</InputLabel>
+              <Select
+                value={tempFilters.sortBy}
+                label="정렬 기준"
+                onChange={(e) =>
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    sortBy: e.target.value,
+                  }))
+                }
+              >
+                {sortOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-            {/* 정렬 방향 */}
-            <Grid item xs={12} sm={6} md={3}>
+          {/* 정렬 방향 */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Button
+              variant="outlined"
+              onClick={handleSortToggle}
+              size="small"
+              fullWidth
+            >
+              {filters.sortDir === "desc" ? "내림차순" : "오름차순"}
+            </Button>
+          </Grid>
+
+          {/* 버튼들 */}
+          <Grid item xs={12} sm={6} md={5}>
+            <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+              <Button
+                variant="contained"
+                onClick={handleApplySort}
+                size="small"
+              >
+                적용
+              </Button>
               <Button
                 variant="outlined"
-                onClick={handleSortToggle}
+                startIcon={<RefreshIcon />}
+                onClick={handleResetFilters}
                 size="small"
-                fullWidth
               >
-                {filters.sortDir === "desc" ? "내림차순" : "오름차순"}
+                초기화
               </Button>
-            </Grid>
-
-            {/* 버튼들 */}
-            <Grid item xs={12} sm={6} md={5}>
-              <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-                <Button
-                  variant="contained"
-                  onClick={handleApplySort}
-                  size="small"
-                >
-                  적용
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<RefreshIcon />}
-                  onClick={handleResetFilters}
-                  size="small"
-                >
-                  초기화
-                </Button>
-              </Box>
-            </Grid>
+            </Box>
           </Grid>
-        </FilterSection>
+        </Grid>
+      </FilterSection>
 
-        {/* 리뷰 목록 테이블 */}
-        <Paper>
-          <StyledTableContainer>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "grey.50" }}>
-                  <TableCell sx={{ fontWeight: 600 }}>제목</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>작성자</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    작성일
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    승인상태
-                  </TableCell>
-                  {/* <TableCell align="center" sx={{ fontWeight: 600 }}>
+      {/* 리뷰 목록 테이블 */}
+      <Paper>
+        <StyledTableContainer>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "grey.50" }}>
+                <TableCell sx={{ fontWeight: 600 }}>제목</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>작성자</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600 }}>
+                  작성일
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: 600 }}>
+                  승인상태
+                </TableCell>
+                {/* <TableCell align="center" sx={{ fontWeight: 600 }}>
                     글번호
                   </TableCell> */}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {reviewList.length > 0 ? (
-                  reviewList.map((review) => (
-                    <StyledTableRow
-                      key={review.tno}
-                      onClick={() => navigate(`/admin/review/${review.tno}`)}
-                    >
-                      <TableCell sx={{ fontWeight: 500 }}>
-                        {truncateTitle(review.title)}
-                      </TableCell>
-                      <TableCell>{review.memberId || "N/A"}</TableCell>
-                      <TableCell align="center">
-                        <Typography variant="body2" color="text.secondary">
-                          {formatDate(review.createdAt)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        {review.confirmed === "Y" ? (
-                          <Chip
-                            icon={<ApprovedIcon />}
-                            label="승인"
-                            color="success"
-                            size="small"
-                            variant="filled"
-                          />
-                        ) : review.confirmed === "B" ? (
-                          <Chip
-                            icon={<BlockIcon />}
-                            label="차단"
-                            color="error"
-                            size="small"
-                            variant="filled"
-                          />
-                        ) : review.confirmed === "R" ? (
-                          <Chip
-                            icon={<RejectIcon />}
-                            label="반려"
-                            color="error"
-                            size="small"
-                            variant="outlined"
-                          />
-                        ) : (
-                          <Chip
-                            icon={<PendingIcon />}
-                            label="대기"
-                            color="warning"
-                            size="small"
-                            variant="outlined"
-                          />
-                        )}
-                      </TableCell>
-                      {/* <TableCell align="center">
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {reviewList.length > 0 ? (
+                reviewList.map((review) => (
+                  <StyledTableRow
+                    key={review.tno}
+                    onClick={(event) => handleReviewClick(review, event)}
+                  >
+                    <TableCell sx={{ fontWeight: 500 }}>
+                      {truncateTitle(review.title)}
+                    </TableCell>
+                    <TableCell>{review.memberId || "N/A"}</TableCell>
+                    <TableCell align="center">
+                      <Typography variant="body2" color="text.secondary">
+                        {formatDate(review.createdAt)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      {review.confirmed === "Y" ? (
                         <Chip
-                          label={review.tno}
-                          color="primary"
+                          icon={<ApprovedIcon />}
+                          label="승인"
+                          color="success"
+                          size="small"
+                          variant="filled"
+                        />
+                      ) : review.confirmed === "B" ? (
+                        <Chip
+                          icon={<BlockIcon />}
+                          label="차단"
+                          color="error"
+                          size="small"
+                          variant="filled"
+                        />
+                      ) : review.confirmed === "R" ? (
+                        <Chip
+                          icon={<RejectIcon />}
+                          label="반려"
+                          color="error"
                           size="small"
                           variant="outlined"
                         />
-                      </TableCell> */}
-                    </StyledTableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      <Box sx={{ py: 4 }}>
-                        <WarningIcon
-                          sx={{ fontSize: 48, color: "grey.400", mb: 1 }}
+                      ) : (
+                        <Chip
+                          icon={<PendingIcon />}
+                          label="대기"
+                          color="warning"
+                          size="small"
+                          variant="outlined"
                         />
-                        <Typography variant="body2" color="text.secondary">
-                          리뷰가 없습니다.
-                        </Typography>
-                      </Box>
+                      )}
                     </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </StyledTableContainer>
+                  </StyledTableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    <Box sx={{ py: 4 }}>
+                      <WarningIcon
+                        sx={{ fontSize: 48, color: "grey.400", mb: 1 }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        리뷰가 없습니다.
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </StyledTableContainer>
 
-          {/* 페이징 컨트롤 */}
-          <PaginationContainer>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                총 {pageInfo.totalElements.toLocaleString()}개 | 페이지{" "}
-                {currentDisplayPage} / {pageInfo.totalPages}
-              </Typography>
+        {/* 페이징 컨트롤 */}
+        <PaginationContainer>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              총 {pageInfo.totalElements.toLocaleString()}개 | 페이지{" "}
+              {currentDisplayPage} / {pageInfo.totalPages}
+            </Typography>
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>페이지 크기</InputLabel>
-                <Select
-                  value={pageInfo.pageSize}
-                  label="페이지 크기"
-                  onChange={handlePageSizeChange}
-                >
-                  {pageSizeOptions.map((size) => (
-                    <MenuItem key={size} value={size}>
-                      {size}개씩
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>페이지 크기</InputLabel>
+              <Select
+                value={pageInfo.pageSize}
+                label="페이지 크기"
+                onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <MenuItem key={size} value={size}>
+                    {size}개씩
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
 
-            {pageInfo.totalPages > 1 && (
-              <Pagination
-                count={pageInfo.totalPages}
-                page={currentDisplayPage}
-                onChange={handlePageChange}
-                color="primary"
-                variant="outlined"
-                shape="rounded"
-                showFirstButton
-                showLastButton
-                siblingCount={1}
-                boundaryCount={1}
-              />
-            )}
-          </PaginationContainer>
-        </Paper>
-      </Container>
-    </ThemeProvider>
+          {pageInfo.totalPages > 1 && (
+            <Pagination
+              count={pageInfo.totalPages}
+              page={currentDisplayPage}
+              onChange={handlePageChange}
+              color="primary"
+              variant="outlined"
+              shape="rounded"
+              showFirstButton
+              showLastButton
+              siblingCount={1}
+              boundaryCount={1}
+            />
+          )}
+        </PaginationContainer>
+      </Paper>
+    </Container>
   );
 };
 
