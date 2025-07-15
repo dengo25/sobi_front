@@ -32,6 +32,7 @@ import {
   PaginationContainer,
 } from "../../assets/styles/sobiTheme";
 import { getMyReviews } from "../../service/mypage/ApiService";
+import { stripHtml } from "../../utils/common";
 
 const MyReviews = ({ onReviewAction }) => {
   const [reviews, setReviews] = useState([]);
@@ -221,7 +222,7 @@ const MyReviews = ({ onReviewAction }) => {
                           paddingRight: 1, // 우측 여백 추가
                         }}
                       >
-                        {review.title}
+                        {stripHtml(review.title)} {/* HTML 태그 제거 적용 */}
                       </TableCell>
                       <TableCell align="center">
                         {getStatusChip(review.confirmed)}
@@ -283,7 +284,7 @@ const MyReviews = ({ onReviewAction }) => {
           <>
             <DialogTitle>
               <Typography variant="h6" component="div" fontWeight={600}>
-                {selectedReview.title}
+                {stripHtml(selectedReview.title)} {/* HTML 태그 제거 적용 */}
               </Typography>
               <Box sx={{ mt: 1 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -321,7 +322,8 @@ const MyReviews = ({ onReviewAction }) => {
                     lineHeight: 1.6,
                   }}
                 >
-                  {selectedReview.content}
+                  {stripHtml(selectedReview.content)}{" "}
+                  {/* HTML 태그 제거 적용 */}
                 </Typography>
               </Paper>
             </DialogContent>
