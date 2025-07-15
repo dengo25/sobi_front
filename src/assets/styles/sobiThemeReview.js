@@ -16,9 +16,17 @@ import {
   InputAdornment,
   Fab,
   Fade,
+  Table,
+  TableBody,
   TableContainer,
-  TableCell,
+  TableHead,
   TableRow,
+  TableCell,
+  Paper,
+  TablePagination,
+  TableSortLabel,
+  Checkbox,
+  IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
@@ -295,4 +303,89 @@ export const GalleryImage = styled("img")(({ theme }) => ({
     transform: "scale(1.02)",
     boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
   },
+}));
+
+/* 테이블 CSS */
+// 기본 테이블 컨테이너
+export const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  borderRadius: theme.spacing(2),
+  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+  border: "1px solid #f0f0f0",
+  overflow: "hidden",
+  backgroundColor: "white",
+}));
+
+// 메인 테이블 스타일
+export const StyledTable = styled(Table)(({ theme }) => ({
+  minWidth: 650,
+  "& .MuiTableCell-root": {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    padding: theme.spacing(2),
+  },
+}));
+
+// 테이블 헤더
+export const StyledTableHead = styled(TableHead)(({ theme }) => ({
+  backgroundColor: `${theme.palette.primary.main}08`,
+  "& .MuiTableCell-head": {
+    backgroundColor: `${theme.palette.primary.main}08`,
+    color: theme.palette.primary.dark,
+    fontWeight: 700,
+    fontSize: "0.875rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+    padding: theme.spacing(2.5),
+    borderBottom: `2px solid ${theme.palette.primary.light}30`,
+  },
+}));
+
+// 테이블 바디
+export const StyledTableBody = styled(TableBody)(({ theme }) => ({
+  "& .MuiTableRow-root": {
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: `${theme.palette.primary.light}05`,
+      transform: "translateX(2px)",
+    },
+    "&:last-child .MuiTableCell-root": {
+      borderBottom: "none",
+    },
+  },
+}));
+
+// 넘버링 셀
+export const NumberTableCell = styled(TableCell)(({ theme }) => ({
+  width: "90px",
+  textAlign: "center",
+  fontWeight: 600,
+  backgroundColor: `${theme.palette.primary.main}05`,
+  color: theme.palette.primary.dark,
+  fontSize: "0.875rem",
+}));
+
+// 메인 콘텐츠 셀
+export const ContentTableCell = styled(TableCell)(({ theme }) => ({
+  width: "300px",
+  fontSize: "0.95rem",
+  lineHeight: 1.6,
+  color: theme.palette.text.primary,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+}));
+
+// 조회수 셀
+export const ViewCountCell = styled(TableCell)(({ theme }) => ({
+  width: "100px",
+  textAlign: "center",
+  fontSize: "0.875rem",
+  color: theme.palette.text.secondary,
+}));
+
+// 날짜 셀
+export const DateTableCell = styled(TableCell)(({ theme }) => ({
+  width: "200px",
+  fontSize: "0.875rem",
+  color: theme.palette.text.secondary,
+  textAlign: "center",
 }));

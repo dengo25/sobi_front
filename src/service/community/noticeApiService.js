@@ -75,6 +75,7 @@ export const incrementNoticeViewCount = async (noticeNo) => {
     );
     return res.data;
   } catch (error) {
+    alert("로그인을 해주세요!")
     console.error("조회수 증가 실패:", error);
     throw error;
   }
