@@ -74,9 +74,9 @@ const ReportForm = () => {
   // 전달받은 데이터 추출
   const { reviewId, writerId, reporterId } = location.state || {};
 
-  console.log("reviewId:", reviewId);
-  console.log("writerId:", writerId);
-  console.log("reporterId:", reporterId);
+  // console.log("reviewId:", reviewId);
+  // console.log("writerId:", writerId);
+  // console.log("reporterId:", reporterId);
 
   const [reportType, setReportType] = useState("");
   const [detail, setDetail] = useState("");

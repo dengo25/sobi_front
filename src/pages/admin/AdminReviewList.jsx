@@ -86,6 +86,7 @@ const AdminReviewList = ({ onViewDetail }) => {
 
   // 필터링 상태 (검색 제외, 정렬만)
   const [filters, setFilters] = useState({
+    confirmed: "",
     sortBy: "createdAt",
     sortDir: "desc",
   });
@@ -100,7 +101,7 @@ const AdminReviewList = ({ onViewDetail }) => {
 
     // onViewDetail prop이 있으면 상세 페이지로, 없으면 기존 방식으로
     if (onViewDetail) {
-      console.log("리뷰 상세 페이지로 이동:", review);
+      // console.log("리뷰 상세 페이지로 이동:", review);
       onViewDetail(review);
     } else {
       // AdminMain 밖에서 사용될 때는 기존 방식 유지
@@ -111,12 +112,16 @@ const AdminReviewList = ({ onViewDetail }) => {
   // 정렬 옵션 (Review 엔티티 기준)
   const sortOptions = [
     { value: "createdAt", label: "작성일" },
-    { value: "updatedAt", label: "수정일" },
     { value: "title", label: "제목" },
     { value: "confirmed", label: "승인상태" },
     // { value: "rno", label: "글번호" },
   ];
-
+  const confirmedOptions = [
+    { value: "all", label: "전체" },
+    { value: "Y", label: "승인" },
+    { value: "N", label: "대기" },
+    { value: "R", label: "반려" },
+  ];
   // 페이지 크기 옵션
   const pageSizeOptions = [5, 10, 20, 50];
 
@@ -131,31 +136,54 @@ const AdminReviewList = ({ onViewDetail }) => {
         size: pageInfo.pageSize,
         sortBy: filters.sortBy,
         sortDir: filters.sortDir,
+        //빈 문자열일 때는 undefined로 설정하여 파라미터에서 제외
+        confirmed: filters.confirmed,
       };
 
-      console.log("🔍 리뷰 목록 API 호출 파라미터:", searchParams);
+      //      console.log("🔍 리뷰 목록 API 호출 파라미터:", searchParams);
       const response = await getReviewList(searchParams);
-      console.log("📥 리뷰 목록 API 응답:", response);
+      // console.log("📥 리뷰 목록 API 응답:", response);
+      // console.log(
+      //   "🔍 confirmed 값:",
+      //   filters.confirmed,
+      //   "(빈 문자열?",
+      //   filters.confirmed === "",
+      //   ")"
+      // );
 
       if (response) {
-        setReviewList(response.content || []);
+        // 응답 구조 확인 - reviews 속성 사용
+        const reviewContent = response.reviews || response.content || [];
+        setReviewList(reviewContent);
+
         setPageInfo({
           totalElements: response.totalElements || 0,
           totalPages: response.totalPages || 0,
-          currentPage: response.number || 0, // 백엔드는 0부터 시작
-          pageSize: response.size || 10,
+          currentPage:
+            response.currentPage !== undefined
+              ? response.currentPage
+              : response.number || 0,
+          pageSize: response.pageSize || response.size || 10,
         });
-        console.log(
-          "✅ 리뷰 목록 설정 완료:",
-          (response.content || []).length,
-          "개"
-        );
+
+        // console.log("✅ 리뷰 목록 설정 완료:", reviewContent.length, "개");
+        // console.log("📊 페이지 정보:", {
+        //   totalElements: response.totalElements,
+        //   totalPages: response.totalPages,
+        //   currentPage: response.currentPage,
+        //   pageSize: response.pageSize,
+        // });
       } else {
         console.log("❌ 예상하지 못한 응답 구조:", response);
         setReviewList([]);
       }
     } catch (err) {
       console.error("❌ 리뷰 목록 조회 오류:", err);
+      console.error("❌ 오류 세부 정보:", {
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+      });
       setError("리뷰 목록을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -166,18 +194,19 @@ const AdminReviewList = ({ onViewDetail }) => {
   useEffect(() => {
     setCurrentDisplayPage(1); // 초기 표시 페이지 설정
     fetchReviews(1); // 첫 페이지부터 시작
-  }, [filters, pageInfo.pageSize]);
+  }, [filters.confirmed, filters.sortBy, filters.sortDir, pageInfo.pageSize]);
 
   // 정렬 적용
   const handleApplySort = () => {
+    // console.log("🔥 tempFilters.confirmed:", tempFilters.confirmed);
     setFilters({ ...tempFilters });
     setCurrentDisplayPage(1); // 첫 페이지로 표시 변경
-    setTimeout(() => fetchReviews(1), 0); // 첫 페이지 명시적 호출
   };
 
   // 필터 초기화
   const handleResetFilters = () => {
     const resetFilters = {
+      confirmed: "all",
       sortBy: "createdAt",
       sortDir: "desc",
     };
@@ -188,7 +217,7 @@ const AdminReviewList = ({ onViewDetail }) => {
 
   // 페이지 변경
   const handlePageChange = (event, newPage) => {
-    console.log("🔥 페이지 클릭:", newPage);
+    // console.log("🔥 페이지 클릭:", newPage);
     setCurrentDisplayPage(newPage); // 표시 페이지 즉시 업데이트
     fetchReviews(newPage);
   };
@@ -272,8 +301,29 @@ const AdminReviewList = ({ onViewDetail }) => {
         </Typography>
 
         <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControl fullWidth size="small">
+              <InputLabel>승인상태</InputLabel>
+              <Select
+                value={tempFilters.confirmed}
+                label="승인상태"
+                onChange={(e) =>
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    confirmed: e.target.value,
+                  }))
+                }
+              >
+                {confirmedOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
           {/* 정렬 기준 */}
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <FormControl fullWidth size="small">
               <InputLabel>정렬 기준</InputLabel>
               <Select
@@ -296,7 +346,7 @@ const AdminReviewList = ({ onViewDetail }) => {
           </Grid>
 
           {/* 정렬 방향 */}
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={2}>
             <Button
               variant="outlined"
               onClick={handleSortToggle}
@@ -371,14 +421,6 @@ const AdminReviewList = ({ onViewDetail }) => {
                           icon={<ApprovedIcon />}
                           label="승인"
                           color="success"
-                          size="small"
-                          variant="filled"
-                        />
-                      ) : review.confirmed === "B" ? (
-                        <Chip
-                          icon={<BlockIcon />}
-                          label="차단"
-                          color="error"
                           size="small"
                           variant="filled"
                         />

@@ -116,7 +116,7 @@ const MemberList = ({ onViewDetail }) => {
 
     // onViewDetail prop이 있으면 상세 페이지로, 없으면 기존 방식으로
     if (onViewDetail) {
-      console.log("회원 상세 페이지로 이동:", member);
+      // console.log("회원 상세 페이지로 이동:", member);
       onViewDetail(member);
     } else {
       // AdminMain 밖에서 사용될 때는 기존 방식 유지
@@ -148,9 +148,9 @@ const MemberList = ({ onViewDetail }) => {
         sortDir: filters.sortDir,
       };
 
-      console.log("🔍 회원 목록 API 호출 파라미터:", searchParams);
+      // console.log("🔍 회원 목록 API 호출 파라미터:", searchParams);
       const response = await getList(searchParams);
-      console.log("📥 회원 목록 API 응답:", response);
+      // console.log("📥 회원 목록 API 응답:", response);
 
       if (response) {
         setMemberList(response.content || []);
@@ -160,11 +160,11 @@ const MemberList = ({ onViewDetail }) => {
           currentPage: response.number || 0, // 백엔드는 0부터 시작
           pageSize: response.size || 10,
         });
-        console.log(
-          "✅ 회원 목록 설정 완료:",
-          (response.content || []).length,
-          "명"
-        );
+        // console.log(
+        //   "✅ 회원 목록 설정 완료:",
+        //   (response.content || []).length,
+        //   "명"
+        // );
       } else {
         console.log("❌ 예상하지 못한 응답 구조:", response);
         setMemberList([]);
@@ -203,7 +203,7 @@ const MemberList = ({ onViewDetail }) => {
 
   // 페이지 변경
   const handlePageChange = (event, newPage) => {
-    console.log("🔥 페이지 클릭:", newPage);
+    // console.log("🔥 페이지 클릭:", newPage);
     setCurrentDisplayPage(newPage); // 표시 페이지 즉시 업데이트
     fetchMembers(newPage);
   };
