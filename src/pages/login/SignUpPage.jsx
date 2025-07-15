@@ -30,13 +30,11 @@ import {
 } from "@mui/icons-material";
 import DaumPostcode from "react-daum-postcode";
 
-// 실제 API 서비스 import
 import {
   signup,
   checkEmailDuplicate,
 } from "../../service/member/ApiService.js";
 
-// SOBI 테마 설정
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -54,7 +52,6 @@ const sobiTheme = createTheme({
   },
 });
 
-// 스타일드 컴포넌트
 const MainContainer = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
   display: "flex",

@@ -33,49 +33,18 @@ import {
   Mail as UnreadIcon,
 } from "@mui/icons-material";
 import {
+  sobiTheme,
+  HeaderBox,
+  StyledTableContainer,
+  StyledTableRow,
+  ReadTableRow,
+  EmptyStateBox,
+  LoadingBox,
+} from "../../assets/styles/sobiTheme";
+import {
   getSentMessages,
   deleteMessageBySender,
 } from "../../service/member/ApiService";
-
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  cursor: "pointer",
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-const ReadTableRow = styled(TableRow)(({ theme }) => ({
-  cursor: "pointer",
-  backgroundColor: theme.palette.action.selected,
-  "&:hover": {
-    backgroundColor: theme.palette.action.focus,
-  },
-}));
-
-const EmptyStateBox = styled(Box)(({ theme }) => ({
-  textAlign: "center",
-  padding: theme.spacing(4),
-  color: theme.palette.text.secondary,
-}));
-
-const LoadingBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: 200,
-}));
-
-const HeaderBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: theme.spacing(2),
-}));
 
 const SentMessages = () => {
   const [messages, setMessages] = useState([]);

@@ -12,18 +12,28 @@ import {
   Paper,
   Divider,
   Badge,
-  Alert,
   Snackbar,
-  CircularProgress,
   Button,
   Container,
   Card,
   CardContent,
   ThemeProvider,
   createTheme,
+  Dialog,
+  TextField,
+  Alert,
+  IconButton,
+  CircularProgress,
+  DialogContent,
+  DialogActions,
+  TableContainer,
+  TableRow,
+  Table,
+  TableHead,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
+// Theme
 export const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -41,6 +51,7 @@ export const sobiTheme = createTheme({
   },
 });
 
+// Layout & Card
 export const MainContainer = styled(Container)(({ theme }) => ({
   minHeight: "100vh",
   paddingTop: theme.spacing(3),
@@ -120,4 +131,160 @@ export const DefaultContent = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+}));
+
+// Dialogs & Sections
+export const HeaderSection = styled(Box)(({ theme }) => ({
+  background: "linear-gradient(135deg, #ff4757, #ff3742)",
+  color: "white",
+  padding: theme.spacing(3, 3, 4, 3),
+  position: "relative",
+  textAlign: "center",
+}));
+
+export const ContentSection = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(3),
+}));
+
+export const DangerZone = styled(Box)(({ theme }) => ({
+  background: "linear-gradient(135deg, #ffebee, #fce4ec)",
+  border: "2px solid #f48fb1",
+  borderRadius: theme.spacing(1.5),
+  padding: theme.spacing(2.5),
+  marginBottom: theme.spacing(3),
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "4px",
+    background: "linear-gradient(90deg, #ff4757, #ff6b7a)",
+    borderRadius: `${theme.spacing(1.5)} ${theme.spacing(1.5)} 0 0`,
+  },
+}));
+
+export const InputContainer = styled(Box)(({ theme }) => ({
+  backgroundColor: "#f8f9fa",
+  borderRadius: theme.spacing(1.5),
+  padding: theme.spacing(2.5),
+  border: "1px solid #e9ecef",
+}));
+
+export const ActionButtons = styled(Box)(({ theme }) => ({
+  display: "flex",
+  gap: theme.spacing(1.5),
+  marginTop: theme.spacing(3),
+  paddingTop: theme.spacing(2),
+  borderTop: "1px solid #f0f0f0",
+}));
+
+export const StyledDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialog-paper": {
+    borderRadius: theme.spacing(1),
+    maxWidth: 600,
+    width: "100%",
+  },
+}));
+
+export const HeaderBox = styled(Box)(({ theme }) => ({
+  position: "relative",
+  padding: theme.spacing(3, 3, 2, 3),
+  textAlign: "center",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  background: `linear-gradient(135deg, ${theme.palette.primary.light}20, ${theme.palette.primary.main}10)`,
+}));
+
+export const CloseButton = styled(IconButton)(({ theme }) => ({
+  position: "absolute",
+  right: theme.spacing(2),
+  top: theme.spacing(2),
+  color: theme.palette.grey[500],
+}));
+
+export const ContentBox = styled(DialogContent)(({ theme }) => ({
+  padding: theme.spacing(4),
+}));
+
+export const ActionsBox = styled(DialogActions)(({ theme }) => ({
+  padding: theme.spacing(2, 4),
+  borderTop: `1px solid ${theme.palette.divider}`,
+  gap: theme.spacing(1.5),
+}));
+
+// Table & Pagination
+export const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  "& .MuiTable-root": {
+    tableLayout: "fixed",
+  },
+}));
+
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: "pointer",
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+export const EmptyStateBox = styled(Box)(({ theme }) => ({
+  textAlign: "center",
+  padding: theme.spacing(4),
+  color: theme.palette.text.secondary,
+}));
+
+export const LoadingBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: 200,
+}));
+
+export const PaginationContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: theme.spacing(2),
+  borderTop: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  position: "sticky",
+  bottom: 0,
+  zIndex: 1,
+  boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
+}));
+
+export const UnreadTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: "pointer",
+  backgroundColor: theme.palette.primary.light + "20",
+  "&:hover": {
+    backgroundColor: theme.palette.primary.light + "40",
+  },
+}));
+
+export const StyledCard = styled(Card)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  marginTop: theme.spacing(2),
+  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  borderRadius: theme.spacing(1.5),
+}));
+
+export const InfoCard = styled(Card)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+  color: theme.palette.primary.contrastText,
+  marginTop: theme.spacing(3),
+  boxShadow: "0 4px 12px rgba(68,195,170,0.3)",
+}));
+
+export const StyledButton = styled(Button)(({ theme }) => ({
+  minWidth: 120,
+}));
+
+export const ReadTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: "pointer",
+  backgroundColor: theme.palette.action.selected,
+  "&:hover": {
+    backgroundColor: theme.palette.action.focus,
+  },
 }));

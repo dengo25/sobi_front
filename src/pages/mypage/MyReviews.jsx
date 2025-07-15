@@ -26,48 +26,15 @@ import {
   Stack,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import {
+  sobiTheme,
+  StyledTableContainer,
+  StyledTableRow,
+  EmptyStateBox,
+  LoadingBox,
+  PaginationContainer,
+} from "../../assets/styles/sobiTheme";
 import { getMyReviews } from "../../service/mypage/ApiService";
-
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-  "& .MuiTable-root": {
-    tableLayout: "fixed",
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  cursor: "pointer",
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-const EmptyStateBox = styled(Box)(({ theme }) => ({
-  textAlign: "center",
-  padding: theme.spacing(4),
-  color: theme.palette.text.secondary,
-}));
-
-const LoadingBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: 200,
-}));
-
-const PaginationContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  padding: theme.spacing(2),
-  borderTop: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.background.paper,
-  position: "sticky",
-  bottom: 0,
-  zIndex: 1,
-  boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
-}));
 
 const MyReviews = ({ onReviewAction }) => {
   const [reviews, setReviews] = useState([]);

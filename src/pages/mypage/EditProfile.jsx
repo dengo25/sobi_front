@@ -22,48 +22,15 @@ import {
 import { styled } from "@mui/material/styles";
 import { Close as CloseIcon, Save as SaveIcon } from "@mui/icons-material";
 import { updateMypage } from "../../service/member/ApiService";
-
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialog-paper": {
-    borderRadius: theme.spacing(1),
-    maxWidth: 600,
-    width: "100%",
-  },
-}));
-
-const HeaderBox = styled(Box)(({ theme }) => ({
-  position: "relative",
-  padding: theme.spacing(3, 3, 2, 3),
-  textAlign: "center",
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  background: `linear-gradient(135deg, ${theme.palette.primary.light}20, ${theme.palette.primary.main}10)`,
-}));
-
-const CloseButton = styled(IconButton)(({ theme }) => ({
-  position: "absolute",
-  right: theme.spacing(2),
-  top: theme.spacing(2),
-  color: theme.palette.grey[500],
-}));
-
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  width: 64,
-  height: 64,
-  margin: "0 auto 16px",
-  backgroundColor: theme.palette.primary.main,
-  fontSize: 24,
-  fontWeight: "bold",
-}));
-
-const ContentBox = styled(DialogContent)(({ theme }) => ({
-  padding: theme.spacing(4),
-}));
-
-const ActionsBox = styled(DialogActions)(({ theme }) => ({
-  padding: theme.spacing(2, 4),
-  borderTop: `1px solid ${theme.palette.divider}`,
-  gap: theme.spacing(1.5),
-}));
+import {
+  sobiTheme,
+  StyledDialog,
+  HeaderBox,
+  CloseButton,
+  StyledAvatar,
+  ContentBox,
+  ActionsBox,
+} from "../../assets/styles/sobiTheme";
 
 const EditProfile = ({ open, onClose, userInfo, onUpdate }) => {
   const [formData, setFormData] = useState({

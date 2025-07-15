@@ -30,7 +30,6 @@ import { signin, socialLogin } from "../../service/member/ApiService.js";
 import { useDispatch } from "react-redux";
 import { login } from "../../slice/memberSlice.jsx";
 
-// 색상 테마
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -48,7 +47,6 @@ const sobiTheme = createTheme({
   },
 });
 
-// 스타일드 컴포넌트
 const MainContainer = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
   display: "flex",
