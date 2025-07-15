@@ -9,7 +9,7 @@ const MainPage = () => {
     }, [member]);
   return (
       <div>
-        <h1>배포성공 !!!</h1>
+        <h1>배포성공 cloudFront!!!!!!!!!!!!!!!!! !!!</h1>
           <p>환영합니다, {member?.memberName || "방문자"}님!</p>
           <p>{member.role}</p>
       </div>
