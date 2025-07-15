@@ -17,6 +17,7 @@ const SwiperCarousel = ({
   slidesPerView = 1,
   slidesPerGroup = 1,
   spaceBetween = 0, // 슬라이드 간격 추가
+  centeredSlides= false,
   breakpoints, // 반응형 설정 추가
   onSlideChange,
   className = "",
