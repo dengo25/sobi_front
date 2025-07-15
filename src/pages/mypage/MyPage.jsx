@@ -160,7 +160,7 @@ const Mypage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedMessageTab, setSelectedMessageTab] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
-  const [reviewCount, setReviewCount] = useState(0); // 후기 수 상태 추가
+  const [reviewCount, setReviewCount] = useState(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -174,9 +174,9 @@ const Mypage = () => {
   const menuItems = [
     { text: "계정 정보", count: "", icon: <CommentIcon /> },
     { text: "내가 쓴 후기", count: `${reviewCount}건`, icon: <ReviewIcon /> },
-    { text: "포인트", count: "0P", icon: <PointIcon /> },
-    { text: "뱃지", count: "0개", icon: <BadgeIcon /> },
-    { text: "체험단", count: "0건?", icon: <ExperimentIcon /> },
+    // { text: "포인트", count: "0P", icon: <PointIcon /> },
+    // { text: "뱃지", count: "0개", icon: <BadgeIcon /> },
+    // { text: "체험단", count: "0건?", icon: <ExperimentIcon /> },
     {
       text: "쪽지",
       count:
@@ -190,9 +190,9 @@ const Mypage = () => {
   const tabLabels = [
     "계정 정보",
     "내가 쓴 후기",
-    "포인트",
-    "뱃지",
-    "체험단",
+    // "포인트",
+    // "뱃지",
+    // "체험단",
     "쪽지",
   ];
   const messageTabLabels = ["받은쪽지", "보낸쪽지", "쪽지보내기"];
@@ -413,7 +413,7 @@ const Mypage = () => {
     }
 
     // 쪽지 탭
-    if (selectedTab === 5) {
+    if (selectedTab === 2) {
       return (
         <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
           <MessageTabsContainer>
