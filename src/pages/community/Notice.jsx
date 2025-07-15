@@ -64,7 +64,8 @@ import {
   incrementNoticeViewCount,
   getTotalCount,
   getSearchCount,
-} from "../../service/community/NoticeApiService";
+} from "../../service/community/noticeApiService";
+import { formatDate } from "../../utils/common";
 
 const Notice = () => {
   const [list, setList] = useState([]);
@@ -219,7 +220,7 @@ const Notice = () => {
             {notice.noticeTitle}
         </ContentTableCell>
         <ContentTableCell sx={{ textAlign: "center" }}>{notice.count}</ContentTableCell>
-        <ContentTableCell sx={{ textAlign: "center" }}>{notice.noticeCreateDate}</ContentTableCell>
+        <ContentTableCell sx={{ textAlign: "center" }}>{formatDate(notice.noticeCreateDate)}</ContentTableCell>
       </TableRow>
     );
   });

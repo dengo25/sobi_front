@@ -34,7 +34,7 @@ import {
   insertNoticeList,
   updateNoticeList,
   deleteNotice,
-} from "../../service/community/NoticeApiService";
+} from "../../service/community/noticeApiService";
 import { extractImageUrls } from "../../utils/extractImages";
 
 const NoticeForm = () => {

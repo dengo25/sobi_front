@@ -16,7 +16,7 @@ import {
   reviewLimit5ListfromCateogry1,
   reviewLimit5ListfromCateogry2,
 } from "../service/main/MainApiService";
-import { incrementNoticeViewCount } from "../service/community/NoticeApiService";
+import { incrementNoticeViewCount } from "../service/community/noticeApiService";
 import SwiperCarousel from "../components/swiper/SwiperCarousel";
 import ImageWithTitleList from "../components/list/ImageWithTitleList";
 import ImageCard from "../components/list/ImageCard";
