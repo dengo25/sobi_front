@@ -35,11 +35,7 @@ import {
   Assignment as AssignmentIcon,
   ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
-import {
-  getReportDetail,
-  processReport,
-  addToBlacklist,
-} from "../../service/admin/ApiService";
+import { getReportDetail } from "../../service/admin/ApiService";
 
 const sobiTheme = createTheme({
   palette: {
@@ -413,37 +409,14 @@ const ReportDetail = () => {
                       variant="outlined"
                       onClick={() => {
                         if (report.targetId) {
-                          navigate(`/admin/report/review/${report.targetId}`);
+                          navigate(
+                            `/admin/report/review/${report.targetId}/${report.reportId}`
+                          );
                         } else {
                           alert("타겟 ID가 없습니다.");
                         }
                       }}
                     />
-                  </InfoValue>
-                </InfoRow>
-              </Grid>
-
-              {/* 신고 내용 */}
-              <Grid item xs={12}>
-                <InfoRow>
-                  <InfoLabel>
-                    <DescriptionIcon color="primary" />
-                    <Typography
-                      variant="body2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      신고 내용
-                    </Typography>
-                  </InfoLabel>
-                  <InfoValue>
-                    <Typography
-                      variant="body2"
-                      fontWeight={500}
-                      sx={{ lineHeight: 1.6 }}
-                    >
-                      {report.detail || "상세 내용이 없습니다."}
-                    </Typography>
                   </InfoValue>
                 </InfoRow>
               </Grid>
@@ -474,129 +447,27 @@ const ReportDetail = () => {
           </CardContent>
         </DetailSection>
 
-        {/* 블랙리스트 사유 입력 섹션 */}
-        {report.status === "PENDING" && (
-          <DetailSection>
-            <CardContent sx={{ p: 4 }}>
-              <SectionTitle variant="h6">
-                <BlockIcon />
-                블랙리스트 등록 사유
-              </SectionTitle>
+        {/* 신고 내용*/}
+        <DetailSection>
+          <CardContent sx={{ p: 4 }}>
+            <SectionTitle variant="h6">
+              <BlockIcon />
+              신고 내용
+            </SectionTitle>
 
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label="블랙리스트 등록 사유"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="블랙리스트 등록 사유를 입력해주세요..."
-                variant="outlined"
-              />
-            </CardContent>
-          </DetailSection>
-        )}
-
-        {/* 처리 액션 섹션 */}
-        {report.status === "PENDING" && (
-          <ActionSection>
-            <CardContent sx={{ p: 4 }}>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mb: 3, textAlign: "center" }}
-              >
-                이 신고에 대한 처리를 선택해주세요. 처리 후에는 되돌릴 수
-                없습니다.
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<CheckIcon />}
-                    fullWidth
-                    size="large"
-                    onClick={() => setApproveDialogOpen(true)}
-                    disabled={actionLoading || !reason.trim()}
-                  >
-                    승인 (블랙리스트 등록)
-                  </Button>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    startIcon={<CancelIcon />}
-                    fullWidth
-                    size="large"
-                    onClick={() => setRejectDialogOpen(true)}
-                    disabled={actionLoading}
-                  >
-                    신고 반려
-                  </Button>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </ActionSection>
-        )}
-
-        {/* 승인 확인 다이얼로그 */}
-        <Dialog
-          open={approveDialogOpen}
-          onClose={() => setApproveDialogOpen(false)}
-        >
-          <DialogTitle>신고 승인 확인</DialogTitle>
-          <DialogContent>
-            <Typography>
-              <strong>{report.reportedId}</strong> 사용자를 블랙리스트에
-              등록하고 신고를 승인하시겠습니까?
-            </Typography>
-            <Box sx={{ mt: 2, p: 2, bgcolor: "grey.100", borderRadius: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                블랙리스트 등록 사유:
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                {reason}
-              </Typography>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setApproveDialogOpen(false)}>취소</Button>
-            <Button
-              onClick={handleApprove}
-              variant="contained"
-              color="success"
-              disabled={actionLoading}
-            >
-              {actionLoading ? <CircularProgress size={20} /> : "승인"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* 반려 확인 다이얼로그 */}
-        <Dialog
-          open={rejectDialogOpen}
-          onClose={() => setRejectDialogOpen(false)}
-        >
-          <DialogTitle>신고 반려 확인</DialogTitle>
-          <DialogContent>
-            <Typography>이 신고를 반려하시겠습니까?</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setRejectDialogOpen(false)}>취소</Button>
-            <Button
-              onClick={handleReject}
-              variant="contained"
-              color="error"
-              disabled={actionLoading}
-            >
-              {actionLoading ? <CircularProgress size={20} /> : "반려"}
-            </Button>
-          </DialogActions>
-        </Dialog>
+            <TextField
+              fullWidth
+              multiline
+              rows={2}
+              label="신고 내용"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="블랙리스트 등록 사유를 입력해주세요..."
+              variant="outlined"
+              disabled
+            />
+          </CardContent>
+        </DetailSection>
       </Container>
     </ThemeProvider>
   );

@@ -188,10 +188,11 @@ const ReportForm = () => {
                 onChange={(e) => setDetail(e.target.value)}
                 placeholder="신고 내용을 자세히 입력해주세요"
                 multiline
-                rows={6}
+                rows={3}
                 required
                 disabled={loading}
-                helperText="신고 사유에 대한 구체적인 설명을 작성해주세요."
+                inputProps={{ maxLength: 200 }} // 200글자 제한
+                helperText={`신고 사유에 대한 구체적인 설명을 작성해주세요. (${detail.length}/200)`}
                 sx={{ mb: 3 }}
               />
 

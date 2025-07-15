@@ -112,10 +112,7 @@ export const getMember = async (memberId) => {
 
 //신고
 export const report = async (reportParam) => {
-  const res = await jwtAxios.put(
-    `${API_BASE_URL}/api/admin/report`,
-    reportParam
-  );
+  const res = await jwtAxios.put(`${API_BASE_URL}/api/report`, reportParam);
   return res.data;
 };
 
@@ -172,15 +169,34 @@ export const getReportDetail = async (reportId) => {
   return res.data;
 };
 
-// 신고 처리 (승인/반려)
-export const processReport = async (reportId, processData) => {
-  const res = await jwtAxios.put(
-    `${API_BASE_URL}/api/admin/report/${reportId}/process`,
-    processData
-  );
-  return res.data;
+// 신고 승인
+export const approveReport = async (reportId, tno, detail) => {
+  try {
+    const res = await jwtAxios.put(
+      `${API_BASE_URL}/api/admin/report/${reportId}`,
+      {
+        tno: parseInt(tno),
+        detail: detail.trim(),
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("승인 요청 실패:", error.response?.data);
+    throw error;
+  }
 };
 
+export const rejectReport = async (reportId) => {
+  try {
+    const res = await jwtAxios.patch(
+      `${API_BASE_URL}/api/admin/report/${reportId}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("승인 요청 실패:", error.response?.data);
+    throw error;
+  }
+};
 // 블랙리스트 추가
 export const addToBlacklist = async (blacklistData) => {
   const res = await jwtAxios.post(
@@ -189,6 +205,23 @@ export const addToBlacklist = async (blacklistData) => {
   );
   return res.data;
 };
+
+//블랙리스트(차단) 해제
+export const unblockUser = async (blacklistNo, reason) => {
+  try {
+    const response = await jwtAxios.post(
+      `${API_BASE_URL}/api/admin/blacklist/unblock/${blacklistNo}`,
+      {
+        reason: reason,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("차단 해제 실패:", error);
+    throw error;
+  }
+};
+
 //관리자 review 조회
 export async function getReview(tno) {
   const response = await jwtAxios.get(

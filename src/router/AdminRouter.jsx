@@ -7,6 +7,7 @@ import AdminRoute from "../components/common/AdminRoute.jsx";
 import ReportDetail from "../pages/admin/ReportDetail.jsx";
 import AdminReviewDetail from "../pages/admin/AdminReviewDetail.jsx";
 import AdminReviewList from "../pages/admin/AdminReviewList.jsx";
+import ReportReviewDetail from "../pages/admin/ReportReviewDetail.jsx";
 const AdminRouter = () => {
   return {
     path: "admin",
@@ -27,6 +28,16 @@ const AdminRouter = () => {
           <AdminRoute>
             <Suspense fallback={<LoadingSpinner />}>
               <ReportList />
+            </Suspense>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "report/review/:tno/:reportId",
+        element: (
+          <AdminRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReportReviewDetail />
             </Suspense>
           </AdminRoute>
         ),
@@ -61,24 +72,8 @@ const AdminRouter = () => {
           </AdminRoute>
         ),
       },
+
       AdminMemberRouter,
-      // {
-      //   path: "read/:tno",//아이디를 tno로 사용한다.
-      //   element: <Suspense fallback={<LoadingSpinner/>}><ReviewRead/></Suspense>
-      // },
-      // {
-      //   path: "modify/:rno",//아이디를 rno로 사용한다.
-      //   element: <Suspense fallback={<LoadingSpinner/>}><ReviewModify/></Suspense>
-      // },
-      // {
-      //   path: "add",//아이디를 tno로 사용한다.
-      //   element: <Suspense fallback={<LoadingSpinner/>}><ReviewAdd/></Suspense>
-      // },
-      // {
-      //   //아무것도 없는 경로로 들어오면 review의 list로 이동시켜
-      //   path: "",
-      //   element: <Navigate to={'/review/list'}></Navigate>
-      // },
     ],
   };
 };

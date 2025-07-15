@@ -35,7 +35,7 @@ import AdminDashboard from "./AdminDashBoard";
 import MemberList from "./MemberList";
 import AdminReviewList from "./AdminReviewList";
 import ReportList from "./ReportList";
-
+import { unblockUser } from "../../service/admin/ApiService";
 const sobiTheme = createTheme({
   palette: {
     primary: {
@@ -130,7 +130,7 @@ const AdminMain = () => {
   const [error, setError] = useState(null);
 
   // 통계 데이터
-  const [memberCount, setMemberCount] = useState(0);
+  const [memberNotBlockedCount, setMemberNotBlockedCount] = useState(0);
   const [blockedCount, setBlockedCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [unresolvedReports, setUnresolvedReports] = useState(0);
@@ -148,7 +148,7 @@ const AdminMain = () => {
     },
     {
       text: "회원 관리",
-      count: `${memberCount.toLocaleString()}명`,
+      count: `${memberNotBlockedCount.toLocaleString()}명`,
       icon: <PeopleIcon />,
     },
     {
@@ -163,7 +163,17 @@ const AdminMain = () => {
       icon: <ReportIcon />,
     },
   ];
-
+  const handleUnblockUser = async (blacklistNo, reason) => {
+    try {
+      await unblockUser(blacklistNo, reason);
+      // 성공 시 데이터 새로고침
+      await fetchAdminStatus();
+      return true;
+    } catch (error) {
+      console.error("차단 해제 실패:", error);
+      throw error;
+    }
+  };
   useEffect(() => {
     // URL 파라미터에서 탭 정보 확인
     const tabParam = searchParams.get("tab");
@@ -186,7 +196,7 @@ const AdminMain = () => {
 
       const res = await getStatus();
 
-      setMemberCount(res.totalMemberCount || 0);
+      setMemberNotBlockedCount(res.memberNotBlockedCount || 0);
       setBlockedCount(res.blockedCount || 0);
       setReviewCount(res.reviewCount || 0);
       setUnresolvedReports(res.unSolvedReportCount || 0);
@@ -212,12 +222,13 @@ const AdminMain = () => {
       case 0: // 대시보드
         return (
           <AdminDashboard
-            memberCount={memberCount}
+            memberNotBlockedCount={memberNotBlockedCount}
             blockedCount={blockedCount}
             reviewCount={reviewCount}
             unresolvedReports={unresolvedReports}
             blacklist={blacklist}
             onRefresh={fetchAdminStatus}
+            onUnblockUser={handleUnblockUser}
           />
         );
       case 1: // 회원 관리

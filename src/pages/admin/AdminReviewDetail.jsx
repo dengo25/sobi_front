@@ -75,15 +75,9 @@ const AdminReviewDetail = () => {
           >
             {review.confirmed === "N" && (
               <>
-                <button onClick={handleConfirm} style={btnStyle("#44C3AA")}>
-                  승인
-                </button>
-                <button onClick={handleReject} style={btnStyle("#FFA000")}>
-                  반려
-                </button>
-                <button onClick={handleBlock} style={btnStyle("#E53935")}>
-                  차단
-                </button>
+                <button onClick={handleConfirm}>승인</button>
+                <button onClick={handleReject}>반려</button>
+                <button onClick={handleBlock}>차단</button>
               </>
             )}
           </Stack>
