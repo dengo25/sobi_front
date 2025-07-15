@@ -5,32 +5,19 @@ import {
   Box,
   Typography,
   TextField,
-  Button,
   Alert,
   Grid,
   CircularProgress,
-  Card,
   CardContent,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Container,
   ThemeProvider,
-  createTheme,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import {
-  Send as SendIcon,
-  Refresh as RefreshIcon,
-  Info as InfoIcon,
-} from "@mui/icons-material";
+import { Send as SendIcon, Refresh as RefreshIcon } from "@mui/icons-material";
 import { sendMessage } from "../../service/member/ApiService";
 import {
   sobiTheme,
   StyledCard,
   StyledButton,
-  InfoCard,
 } from "../../assets/styles/sobiTheme";
 
 const SendMessage = ({ onMessageSent }) => {

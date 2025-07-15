@@ -25,7 +25,6 @@ import {
   IconButton,
   Chip,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import {
   Delete as DeleteIcon,
   Close as CloseIcon,
@@ -33,7 +32,6 @@ import {
   Mail as UnreadIcon,
 } from "@mui/icons-material";
 import {
-  sobiTheme,
   HeaderBox,
   StyledTableContainer,
   StyledTableRow,

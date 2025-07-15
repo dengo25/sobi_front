@@ -7,7 +7,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Paper,
@@ -25,9 +24,7 @@ import {
   Pagination,
   Stack,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import {
-  sobiTheme,
   StyledTableContainer,
   StyledTableRow,
   EmptyStateBox,
