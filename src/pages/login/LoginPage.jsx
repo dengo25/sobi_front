@@ -77,10 +77,13 @@ function Login() {
     } catch (err) {
       console.error("로그인 오류:", err);
       // 블랙리스트 에러 처리 추가
-      if (err.message && err.message.includes("이용이 제한되어 있습니다")) {
-        alert(
-          "해당 계정은 이용이 제한되어 있습니다.\n고객센터(1588-0000)로 문의해주세요."
-        );
+      if (
+        error.message &&
+        error.message.includes(
+          "해당 계정은 이용이 제한되어 있습니다. 관리자에게 문의해주세요."
+        )
+      ) {
+        alert(error.message);
       } else {
         setError("아이디 또는 비밀번호가 올바르지 않습니다.");
       }
