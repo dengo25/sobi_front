@@ -75,16 +75,15 @@ function Login() {
       // 로그인 후 메인 페이지로 이동
       navigate("/");
     } catch (error) {
-      console.error("로그인 오류:", error);
-      // 블랙리스트 에러 처리 추가
+      const errorMessage =
+        error?.response?.data?.error || error?.message || "오류 발생";
+
       if (
-        error.message &&
-        error.message.includes(
+        errorMessage.includes(
           "해당 계정은 이용이 제한되어 있습니다. 관리자에게 문의해주세요."
         )
       ) {
-        console.log("error.message : " + error.message);
-        alert(error.message);
+        alert(errorMessage);
       } else {
         setError("아이디 또는 비밀번호가 올바르지 않습니다.");
       }
