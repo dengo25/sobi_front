@@ -425,7 +425,7 @@ function DetailComponent({ tno: propTno,moveToList }) {
           </Stack>
         </Box>
 
-        <Box sx={{ textAlign: "center" }}>
+        {/* <Box sx={{ textAlign: "center" }}>
           <Typography
             variant="body1"
             color="primary"
@@ -441,7 +441,7 @@ function DetailComponent({ tno: propTno,moveToList }) {
           >
             목록 보기
           </Typography>
-        </Box>
+        </Box> */}
       </MainContainer>
     </ThemeProvider>
   );

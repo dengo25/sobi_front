@@ -85,7 +85,7 @@ const DeleteProfile = ({ open, onClose, onDelete }) => {
 
           <ErrorOutlineIcon sx={{ fontSize: 48, mb: 1, opacity: 0.9 }} />
           <Typography variant="h5" fontWeight={700} gutterBottom>
-            계정 삭제
+            회원 탈퇴
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             이 작업은 되돌릴 수 없습니다
@@ -110,12 +110,12 @@ const DeleteProfile = ({ open, onClose, onDelete }) => {
 
           {/* 위험 구역 */}
           <DangerZone>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            {/* <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <ShieldIcon sx={{ color: "#d32f2f", mr: 1.5, fontSize: 24 }} />
               <Typography variant="h6" fontWeight={700} color="error.main">
                 위험 구역
               </Typography>
-            </Box>
+            </Box> */}
             <Typography variant="body2" color="error.dark" fontWeight={500}>
               계정을 영구적으로 삭제하려면 현재 비밀번호를 입력하세요.
             </Typography>
