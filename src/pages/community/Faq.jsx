@@ -198,9 +198,9 @@ const Faq = () => {
 
   return (
     <>
-          <ThemeProvider theme={sobiTheme}>
-            <MainContainer maxWidth="lg">
-<HeaderSection>
+      <ThemeProvider theme={sobiTheme}>
+        <MainContainer maxWidth="lg">
+          <HeaderSection>
             <Box
               sx={{
                 mb: 3,
@@ -218,64 +218,62 @@ const Faq = () => {
                 SOBI의 FAQ 입니다.
               </Typography>
             </Box>
-            </HeaderSection>
+          </HeaderSection>
 
-
-      {dataList}
-      {/* 페이징 컴포넌트 */}
-      {pageInfo.totalPages > 1 && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-          <BasicPagination
-            count={pageInfo.totalPages}
-            page={pageInfo.currentPage + 1} // MUI는 1부터 시작하므로 +1
-            onChange={handlePageChange}
-            color="primary"
-            useCustomStyle={true}
-            customColor="primary"
-            showFirstButton={true}
-            showLastButton={true}
-            siblingCount={1}
-            boundaryCount={1}
-          />
-        </Box>
-      )}
-      {member?.role === "ROLE_ADMIN" && (
-        <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
-          <CustomButton
-            type="button"
-            onClick={() => {
-              handleClick("insert");
-            }}
-            size="medium"
-            variant="contained"
-            color="success"
-            text="새글 등록"
-          />
-          <CustomButton
-            type="button"
-            onClick={() => {
-              handleClick("update");
-            }}
-            size="medium"
-            variant="contained"
-            color="default"
-            text="수정"
-          />
-          <CustomButton
-            type="button"
-            onClick={() => {
-              handleClick("delete");
-            }}
-            size="medium"
-            variant="contained"
-            color="danger"
-            text="삭제"
-          />
-        </Stack>
-      )}
-                  </MainContainer>
-          </ThemeProvider>
-
+          {dataList}
+          {/* 페이징 컴포넌트 */}
+          {pageInfo.totalPages > 1 && (
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+              <BasicPagination
+                count={pageInfo.totalPages}
+                page={pageInfo.currentPage + 1} // MUI는 1부터 시작하므로 +1
+                onChange={handlePageChange}
+                color="primary"
+                useCustomStyle={true}
+                customColor="primary"
+                showFirstButton={true}
+                showLastButton={true}
+                siblingCount={1}
+                boundaryCount={1}
+              />
+            </Box>
+          )}
+          {member?.role === "ROLE_ADMIN" && (
+            <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
+              <CustomButton
+                type="button"
+                onClick={() => {
+                  handleClick("insert");
+                }}
+                size="medium"
+                variant="contained"
+                color="success"
+                text="새글 등록"
+              />
+              <CustomButton
+                type="button"
+                onClick={() => {
+                  handleClick("update");
+                }}
+                size="medium"
+                variant="contained"
+                color="default"
+                text="수정"
+              />
+              <CustomButton
+                type="button"
+                onClick={() => {
+                  handleClick("delete");
+                }}
+                size="medium"
+                variant="contained"
+                color="danger"
+                text="삭제"
+              />
+            </Stack>
+          )}
+        </MainContainer>
+      </ThemeProvider>
     </>
   );
 };

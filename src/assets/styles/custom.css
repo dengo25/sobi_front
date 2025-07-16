@@ -25,9 +25,9 @@
 .css-yfrx4k-MuiAccordionSummary-content img{margin:0 5px;}
 .basic-acc.MuiAccordion-root{margin-bottom:20px;border-radius:10px;}
 .basic-acc.MuiAccordion-root::before{content:none;}
-.basic-acc.MuiAccordion-root .MuiAccordionSummary-content{display:flex;}
+.basic-acc.MuiAccordion-root .MuiAccordionSummary-content{display:flex;align-items:center;}
 .basic-acc.MuiAccordion-root .MuiAccordion-heading img{width:24px;height:100%;margin:0 10px 0 0;}
-.basic-acc.MuiAccordion-root .MuiAccordionDetails-root{display:flex;}
+.basic-acc.MuiAccordion-root .MuiAccordionDetails-root{display:flex;align-items:flex-start;}
 .basic-acc.MuiAccordion-root .MuiAccordionDetails-root img{width:24px;height:100%;margin-right:10px;}
 
 /*========================================================
