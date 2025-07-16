@@ -35,159 +35,24 @@ import {
 } from "@mui/icons-material";
 import PageComponent from "./PageComponent.jsx";
 import { useSelector } from "react-redux";
-
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
-const MainContainer = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(4),
-  marginBottom: theme.spacing(4),
-  maxWidth: "1200px !important",
-}));
-
-const HeaderSection = styled(Box)(({ theme }) => ({
-  marginBottom: theme.spacing(4),
-  padding: theme.spacing(2, 0),
-}));
-
-const FilterSection = styled(Card)(({ theme }) => ({
-  marginBottom: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-  border: "1px solid #f0f0f0",
-}));
-
-const BlogCard = styled(Card)(({ theme }) => ({
-  marginBottom: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-  transition: "all 0.3s ease-in-out",
-  cursor: "pointer",
-  border: "1px solid #f0f0f0",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 8px 25px rgba(68,195,170,0.15)",
-    borderColor: theme.palette.primary.light,
-  },
-}));
-
-const AuthorSection = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  marginBottom: theme.spacing(2),
-}));
-
-const AuthorAvatar = styled(Avatar)(({ theme }) => ({
-  width: 48,
-  height: 48,
-  backgroundColor: theme.palette.primary.main,
-  marginRight: theme.spacing(1.5),
-  fontSize: "1.2rem",
-  fontWeight: "bold",
-}));
-
-const AuthorInfo = styled(Box)({
-  flex: 1,
-});
-
-const PostTitle = styled(Typography)(({ theme }) => ({
-  fontWeight: 700,
-  fontSize: "1.25rem",
-  lineHeight: 1.4,
-  marginBottom: theme.spacing(1),
-  color: theme.palette.text.primary,
-  display: "-webkit-box",
-  WebkitLineClamp: 2,
-  WebkitBoxOrient: "vertical",
-  overflow: "hidden",
-}));
-
-const PostContent = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.secondary,
-  lineHeight: 1.6,
-  marginBottom: theme.spacing(2),
-  display: "-webkit-box",
-  WebkitLineClamp: 3,
-  WebkitBoxOrient: "vertical",
-  overflow: "hidden",
-}));
-
-const ThumbnailImage = styled("img")(({ theme }) => ({
-  width: "100%",
-  height: 160,
-  objectFit: "cover",
-  borderRadius: theme.spacing(1.5),
-  backgroundColor: "#f5f5f5",
-}));
-
-const StatsSection = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  paddingTop: theme.spacing(2),
-  borderTop: `1px solid ${theme.palette.divider}`,
-}));
-
-const CategoryChip = styled(Chip)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.light + "20",
-  color: theme.palette.primary.dark,
-  fontWeight: 500,
-  fontSize: "0.75rem",
-  height: 24,
-}));
-
-const WriteButton = styled(Button)(({ theme }) => ({
-  borderRadius: theme.spacing(3),
-  padding: theme.spacing(1, 3),
-  fontWeight: 600,
-  textTransform: "none",
-  boxShadow: `0 4px 12px ${theme.palette.primary.main}30`,
-  "&:hover": {
-    transform: "translateY(-1px)",
-    boxShadow: `0 6px 16px ${theme.palette.primary.main}40`,
-  },
-}));
-
-const FloatingWriteButton = styled(Fab)(({ theme }) => ({
-  position: "fixed",
-  bottom: theme.spacing(3),
-  right: theme.spacing(3),
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  boxShadow: `0 4px 20px ${theme.palette.primary.main}40`,
-  "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
-    transform: "scale(1.1)",
-  },
-  zIndex: 1000,
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    borderRadius: theme.spacing(3),
-    backgroundColor: "#fafafa",
-    "&:hover": {
-      backgroundColor: "#f5f5f5",
-    },
-    "&.Mui-focused": {
-      backgroundColor: "white",
-    },
-  },
-}));
+import {
+  sobiTheme,
+  MainContainer,
+  HeaderSection,
+  FilterSection,
+  BlogCard,
+  AuthorSection,
+  AuthorAvatar,
+  AuthorInfo,
+  PostTitle,
+  PostContent,
+  ThumbnailImage,
+  StatsSection,
+  CategoryChip,
+  WriteButton,
+  FloatingWriteButton,
+  StyledTextField,
+} from "../../assets/styles/sobiThemeReview";
 
 function ListComponent() {
   const {

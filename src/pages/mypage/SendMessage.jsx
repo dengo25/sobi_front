@@ -5,62 +5,20 @@ import {
   Box,
   Typography,
   TextField,
-  Button,
   Alert,
   Grid,
   CircularProgress,
-  Card,
   CardContent,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Container,
   ThemeProvider,
-  createTheme,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import {
-  Send as SendIcon,
-  Refresh as RefreshIcon,
-  Info as InfoIcon,
-} from "@mui/icons-material";
+import { Send as SendIcon, Refresh as RefreshIcon } from "@mui/icons-material";
 import { sendMessage } from "../../service/member/ApiService";
-
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
-const StyledCard = styled(Card)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  marginTop: theme.spacing(2),
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  borderRadius: theme.spacing(1.5),
-}));
-
-const InfoCard = styled(Card)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-  color: theme.palette.primary.contrastText,
-  marginTop: theme.spacing(3),
-  boxShadow: "0 4px 12px rgba(68,195,170,0.3)",
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  minWidth: 120,
-}));
+import {
+  sobiTheme,
+  StyledCard,
+  StyledButton,
+} from "../../assets/styles/sobiTheme";
 
 const SendMessage = ({ onMessageSent }) => {
   const [formData, setFormData] = useState({

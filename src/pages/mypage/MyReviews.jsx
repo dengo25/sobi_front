@@ -7,7 +7,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Paper,
@@ -25,49 +24,15 @@ import {
   Pagination,
   Stack,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import {
+  StyledTableContainer,
+  StyledTableRow,
+  EmptyStateBox,
+  LoadingBox,
+  PaginationContainer,
+} from "../../assets/styles/sobiTheme";
 import { getMyReviews } from "../../service/mypage/ApiService";
-
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-  "& .MuiTable-root": {
-    tableLayout: "fixed",
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  cursor: "pointer",
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-const EmptyStateBox = styled(Box)(({ theme }) => ({
-  textAlign: "center",
-  padding: theme.spacing(4),
-  color: theme.palette.text.secondary,
-}));
-
-const LoadingBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: 200,
-}));
-
-const PaginationContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  padding: theme.spacing(2),
-  borderTop: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.background.paper,
-  position: "sticky",
-  bottom: 0,
-  zIndex: 1,
-  boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
-}));
+import { stripHtml } from "../../utils/common";
 
 const MyReviews = ({ onReviewAction }) => {
   const [reviews, setReviews] = useState([]);
@@ -257,7 +222,7 @@ const MyReviews = ({ onReviewAction }) => {
                           paddingRight: 1, // 우측 여백 추가
                         }}
                       >
-                        {review.title}
+                        {stripHtml(review.title)} {/* HTML 태그 제거 적용 */}
                       </TableCell>
                       <TableCell align="center">
                         {getStatusChip(review.confirmed)}
@@ -319,7 +284,7 @@ const MyReviews = ({ onReviewAction }) => {
           <>
             <DialogTitle>
               <Typography variant="h6" component="div" fontWeight={600}>
-                {selectedReview.title}
+                {stripHtml(selectedReview.title)} {/* HTML 태그 제거 적용 */}
               </Typography>
               <Box sx={{ mt: 1 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -357,7 +322,8 @@ const MyReviews = ({ onReviewAction }) => {
                     lineHeight: 1.6,
                   }}
                 >
-                  {selectedReview.content}
+                  {stripHtml(selectedReview.content)}{" "}
+                  {/* HTML 태그 제거 적용 */}
                 </Typography>
               </Paper>
             </DialogContent>

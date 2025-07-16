@@ -20,7 +20,7 @@ import {
   MenuItem,
   Alert,
   CircularProgress,
-  Modal, // Modal 추가
+  Modal,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import {

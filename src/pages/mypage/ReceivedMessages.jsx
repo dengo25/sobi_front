@@ -26,7 +26,6 @@ import {
   Chip,
   TextField,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import {
   Delete as DeleteIcon,
   Close as CloseIcon,
@@ -36,51 +35,20 @@ import {
   MarkEmailUnread as UnreadIcon,
 } from "@mui/icons-material";
 import {
+  sobiTheme,
+  HeaderBox,
+  StyledTableContainer,
+  StyledTableRow,
+  UnreadTableRow,
+  EmptyStateBox,
+  LoadingBox,
+} from "../../assets/styles/sobiTheme";
+import {
   getReceivedMessages,
   deleteMessageByReceiver,
   markMessageAsRead,
   sendMessage,
 } from "../../service/member/ApiService";
-
-const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  cursor: "pointer",
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-const UnreadTableRow = styled(TableRow)(({ theme }) => ({
-  cursor: "pointer",
-  backgroundColor: theme.palette.primary.light + "20",
-  "&:hover": {
-    backgroundColor: theme.palette.primary.light + "40",
-  },
-}));
-
-const EmptyStateBox = styled(Box)(({ theme }) => ({
-  textAlign: "center",
-  padding: theme.spacing(4),
-  color: theme.palette.text.secondary,
-}));
-
-const LoadingBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: 200,
-}));
-
-const HeaderBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: theme.spacing(2),
-}));
 
 const ReceivedMessages = ({ onMessageAction }) => {
   const [messages, setMessages] = useState([]);

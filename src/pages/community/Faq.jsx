@@ -1,7 +1,43 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Stack, Box } from "@mui/material";
+import {
+  Stack,
+  Box,
+  Typography,
+  ThemeProvider,
+  InputAdornment,
+  TableRow,
+  TableCell,
+  TableSortLabel,
+} from "@mui/material";
+
+import {
+  sobiTheme,
+  MainContainer,
+  HeaderSection,
+  FilterSection,
+  BlogCard,
+  AuthorSection,
+  AuthorAvatar,
+  AuthorInfo,
+  PostTitle,
+  PostContent,
+  ThumbnailImage,
+  StatsSection,
+  CategoryChip,
+  WriteButton,
+  FloatingWriteButton,
+  StyledTextField,
+  StyledTableContainer,
+  StyledTable,
+  StyledTableHead,
+  StyledTableBody,
+  NumberTableCell,
+  ContentTableCell,
+  // ViewCountCell,
+  // DateTableCell,
+} from "../../assets/styles/sobiThemeReview";
 
 import CNTAccordion from "../../components/list/ControlledAccordions";
 import CustomButton from "../../components/input/CustomButton";
@@ -10,7 +46,7 @@ import {
   getFaqList,
   deleteFaq,
   getFaqListWithPaging,
-} from "../../service/community/FaqApiService";
+} from "../../service/community/faqApiService";
 
 const Faq = () => {
   const [selectedFaqs, setSelectedFaqs] = useState([]);
@@ -31,7 +67,7 @@ const Faq = () => {
     sortBy: "faqCreateDate",
     sortDirection: "desc",
   });
-  
+
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
   // const member = useSelector((state) => state.memberSlice);
@@ -162,7 +198,29 @@ const Faq = () => {
 
   return (
     <>
-      <h2>FAQ</h2>
+          <ThemeProvider theme={sobiTheme}>
+            <MainContainer maxWidth="lg">
+<HeaderSection>
+            <Box
+              sx={{
+                mb: 3,
+              }}
+            >
+              <Typography
+                variant="h4"
+                fontWeight={700}
+                color="text.primary"
+                gutterBottom
+              >
+                FAQ
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                SOBI의 FAQ 입니다.
+              </Typography>
+            </Box>
+            </HeaderSection>
+
+
       {dataList}
       {/* 페이징 컴포넌트 */}
       {pageInfo.totalPages > 1 && (
@@ -215,6 +273,9 @@ const Faq = () => {
           />
         </Stack>
       )}
+                  </MainContainer>
+          </ThemeProvider>
+
     </>
   );
 };

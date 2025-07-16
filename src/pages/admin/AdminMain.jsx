@@ -35,7 +35,7 @@ import {
   NavigateNext as NavigateNextIcon,
 } from "@mui/icons-material";
 import { getStatus } from "../../service/admin/ApiService";
-import AdminDashboard from "./AdminDashBoard";
+
 import MemberList from "./MemberList";
 import AdminReviewList from "./AdminReviewList";
 import ReportList from "./ReportList";

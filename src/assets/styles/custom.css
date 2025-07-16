@@ -1,5 +1,13 @@
 @charset "UTF-8";
 
+
+/*========================================================
+ MUI : Layout
+========================================================*/
+.MuiBox-root.main-content{max-width:1440px;margin:0 auto;}
+
+
+
 /*========================================================
  MUI : Input
 ========================================================*/
@@ -15,12 +23,45 @@
 ========================================================*/
 .css-yfrx4k-MuiAccordionSummary-content{align-items:center;}
 .css-yfrx4k-MuiAccordionSummary-content img{margin:0 5px;}
+.basic-acc.MuiAccordion-root{margin-bottom:20px;border-radius:10px;}
+.basic-acc.MuiAccordion-root::before{content:none;}
+.basic-acc.MuiAccordion-root .MuiAccordionSummary-content{display:flex;}
+.basic-acc.MuiAccordion-root .MuiAccordion-heading img{width:24px;height:100%;margin:0 10px 0 0;}
+.basic-acc.MuiAccordion-root .MuiAccordionDetails-root{display:flex;}
+.basic-acc.MuiAccordion-root .MuiAccordionDetails-root img{width:24px;height:100%;margin-right:10px;}
 
+/*========================================================
+ MUI : Card
+========================================================*/
+.css-1i3faf7-MuiPaper-root-MuiCard-root{}
+/* .MuiCardMedia-root{float:left;width:100%;margin-right:1em;}
+.MuiCardContent-root{overflow:hidden;text-align:left;height:240px; } */
+.MuiCardActions-root{}
+.MuiCardActions-root .MuiTypography-root.MuiTypography-h5{}
+.MuiCardActions-root .custom-body{}
+/* card-basic */ 
+.card-basic{margin-top:8px;}
+.card-basic .MuiCardMedia-root{float:left;margin-right:1em;}/*.width:100%; */
+.card-basic .MuiCardContent-root{overflow:hidden;text-align:left;max-height:240px;padding:40px 16px;}
+
+/*========================================================
+ MUI : ImageList
+========================================================*/
+.basic-list .MuiImageListItem-root{position:relative;}
+.basic-list .MuiImageListItem-root img{object-fit:cover;height:250px;width:100%;opacity:.8;}
+.basic-list .MuiImageListItemBar-root{position:absolute;left:0;bottom:0;width:100%;height:65px;padding:15px;background-color:rgba(0, 0, 0, 0.4);text-align:left;color:#fff;font-size:16px;
+	-webkit-transition: all 0.3s ease;
+	transition: all 0.3s ease;}
+.basic-list .MuiImageListItemBar-root:hover{background-color:rgba(0, 0, 0, 0.6); cursor: pointer;
+	-webkit-transform: scale(1.01);
+    -moz-transform: scale(1.01);
+    -ms-transform: scale(1.01);
+    transform: scale(1.01);}
 
 /*========================================================
  Quill : editor-area
 ========================================================*/
 .editor-area{margin-bottom:30px;}
-.editor-area ~ .MuiStack-root{margin-bottom:70px;}
+.editor-area ~ .MuiStack-root{margin-bottom:30px;}
 .editor-area .ql-container{height:350px;display:flex;flex-direction:column;}
 .editor-area .ql-editor{flex:1;overflow-y:auto;}

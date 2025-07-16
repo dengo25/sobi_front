@@ -34,166 +34,20 @@ import {
 import { useSelector } from "react-redux";
 import { getReview } from "../../service/review/ReviewService.js";
 import { deleteReview } from "../../service/review/ReviewService.js";
-
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
-const MainContainer = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(3),
-  marginBottom: theme.spacing(4),
-  maxWidth: "1200px !important",
-}));
-
-const HeaderSection = styled(Box)(({ theme }) => ({
-  marginBottom: theme.spacing(4),
-  padding: theme.spacing(2, 0),
-}));
-
-const DetailCard = styled(Card)(({ theme }) => ({
-  marginBottom: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-  border: "1px solid #f0f0f0",
-  overflow: "hidden",
-}));
-
-const InfoTable = styled(TableContainer)(({ theme }) => ({
-  "& .MuiTableCell-root": {
-    border: "none",
-    padding: theme.spacing(2.5),
-    borderBottom: `1px solid ${theme.palette.divider}`,
-  },
-  "& .MuiTableRow-root:last-child .MuiTableCell-root": {
-    borderBottom: "none",
-  },
-}));
-
-const LabelCell = styled(TableCell)(({ theme }) => ({
-  backgroundColor: `${theme.palette.primary.main}08`,
-  fontWeight: 600,
-  width: "140px",
-  textAlign: "center",
-  color: theme.palette.primary.dark,
-  fontSize: "0.875rem",
-  letterSpacing: "0.5px",
-  borderRadius: `${theme.spacing(1)} 0 0 ${theme.spacing(1)}`,
-}));
-
-const ContentCell = styled(TableCell)(({ theme }) => ({
-  backgroundColor: "white",
-  color: theme.palette.text.primary,
-  fontSize: "0.95rem",
-  lineHeight: 1.6,
-}));
-
-const ContentArea = styled(Box)(({ theme }) => ({
-  minHeight: "200px",
-  padding: theme.spacing(3),
-  fontSize: "1rem",
-  lineHeight: 1.8,
-  color: theme.palette.text.primary,
-  backgroundColor: "#fafafa",
-  borderRadius: theme.spacing(1.5),
-  border: `1px solid ${theme.palette.divider}`,
-  "& img": {
-    maxWidth: "100%",
-    height: "auto",
-    borderRadius: theme.spacing(1),
-    margin: theme.spacing(1, 0),
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  },
-  "& p": {
-    marginBottom: theme.spacing(1.5),
-  },
-}));
-
-const FilesArea = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(3),
-  backgroundColor: "#fafafa",
-  borderRadius: theme.spacing(1.5),
-  border: `1px solid ${theme.palette.divider}`,
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
-
-const BackButton = styled(Button)(({ theme }) => ({
-  borderRadius: theme.spacing(2),
-  padding: theme.spacing(1, 2),
-  fontWeight: 500,
-  textTransform: "none",
-  color: theme.palette.text.secondary,
-  "&:hover": {
-    backgroundColor: theme.palette.action.hover,
-    transform: "translateX(-2px)",
-  },
-  transition: "all 0.3s ease",
-}));
-
-const ActionButton = styled(Button)(({ theme }) => ({
-  borderRadius: theme.spacing(3),
-  padding: theme.spacing(1.5, 3),
-  fontWeight: 600,
-  textTransform: "none",
-  minWidth: 120,
-  boxShadow: "none",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-1px)",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-  },
-}));
-
-const StatusChip = styled(Chip)(({ theme }) => ({
-  fontWeight: 600,
-  fontSize: "0.75rem",
-  height: 28,
-  borderRadius: theme.spacing(1.5),
-}));
-
-const CategoryChip = styled(Chip)(({ theme }) => ({
-  backgroundColor: `${theme.palette.primary.main}15`,
-  color: theme.palette.primary.dark,
-  fontWeight: 500,
-  fontSize: "0.8rem",
-  height: 28,
-  borderRadius: theme.spacing(1.5),
-  border: `1px solid ${theme.palette.primary.main}30`,
-}));
-
-const ImageGallery = styled(Box)(({ theme }) => ({
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-  gap: theme.spacing(2),
-  marginTop: theme.spacing(2),
-}));
-
-const GalleryImage = styled("img")(({ theme }) => ({
-  width: "100%",
-  maxHeight: "200px",
-  objectFit: "cover",
-  borderRadius: theme.spacing(1.5),
-  cursor: "pointer",
-  transition: "all 0.3s ease",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  "&:hover": {
-    transform: "scale(1.02)",
-    boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
-  },
-}));
+import {
+  sobiTheme,
+  MainContainer,
+  HeaderSection,
+  DetailCard,
+  InfoTable,
+  LabelCell,
+  ContentCell,
+  CategoryChip,
+  ContentArea,
+  BackButton,
+  ActionButton,
+  StatusChip,
+} from "../../assets/styles/sobiThemeReview";
 
 function DetailComponent({ tno: propTno }) {
   const { tno: paramTno } = useParams();

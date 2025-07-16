@@ -1,8 +1,49 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Stack } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Container,
+  Button,
+  ThemeProvider,
+  createTheme,
+  Alert,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  Stack,
+  Chip,
+  Card,
+  CardContent,
+  Divider,
+} from "@mui/material";
 
+import {
+  sobiTheme,
+  MainContainer,
+  HeaderSection,
+  DetailCard,
+  InfoTable,
+  LabelCell,
+  ContentCell,
+  CategoryChip,
+  ContentArea,
+  BackButton,
+  ActionButton,
+  StatusChip,
+} from "../../assets/styles/sobiThemeReview";
+import {
+  ArrowBack as ArrowBackIcon,
+  Share as ShareIcon,
+  Edit as EditIcon,
+  Report as ReportIcon, //추가
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import CustomButton from "../../components/input/CustomButton.jsx";
 import {
   getNoticeDetail,
@@ -54,20 +95,83 @@ const NoticeDetail = () => {
   if (!detail) return <div>로딩 중...</div>;
   return (
     <>
-      <h2>공지사항 - 상세</h2>
+      <ThemeProvider theme={sobiTheme}>
+        <MainContainer>
+          <HeaderSection>
+            <BackButton
+              startIcon={<ArrowBackIcon />}
+              onClick={() => {
+                handleClick("list");
+              }}
+            >
+              목록으로
+            </BackButton>
 
-      <div className="content-area">
-        <span>글번호 : {noticeNo}</span>
-        <p>
-          {detail.memberId} <b>관리자</b>
-        </p>
-        <h3>{detail.noticeTitle}</h3>
-        <div className="content">
-          <p dangerouslySetInnerHTML={{ __html: detail.noticeContent }} />
-        </div>
-      </div>
+            <Box sx={{ mt: 2 }}>
+              <Typography
+                variant="h4"
+                fontWeight={700}
+                color="text.primary"
+                gutterBottom
+              >
+                공지사항 상세보기
+              </Typography>
+            </Box>
+          </HeaderSection>
 
-      {member?.role === "ROLE_ADMIN" && (
+          <DetailCard>
+            <InfoTable component={Paper} elevation={0}>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <LabelCell>작성자</LabelCell>
+                    <ContentCell>
+                      <Typography variant="body1" fontWeight={500}>
+                        {detail.memberId} (관리자)
+                      </Typography>
+                    </ContentCell>
+
+                    <LabelCell sx={{ width: "140px" }}>글번호</LabelCell>
+                    <ContentCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {noticeNo}
+                      </Typography>
+                    </ContentCell>
+                  </TableRow>
+                  <TableRow>
+                    <LabelCell>제목</LabelCell>
+                    <ContentCell colSpan={3}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                      >
+                        <Typography variant="body1" fontWeight={500}>
+                          {detail.noticeTitle}
+                        </Typography>
+                      </Box>
+                    </ContentCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </InfoTable>
+
+            <Divider />
+
+            <CardContent sx={{ p: 4 }}>
+              <Typography
+                variant="subtitle1"
+                fontWeight={600}
+                color="primary.dark"
+                sx={{ mb: 2 }}
+              >
+                내용
+              </Typography>
+              <ContentArea
+                dangerouslySetInnerHTML={{ __html: detail.noticeContent }}
+              />
+            </CardContent>
+          </DetailCard>
+
+          {member?.role === "ROLE_ADMIN" && (
         <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
           <CustomButton
             type="button"
@@ -101,6 +205,8 @@ const NoticeDetail = () => {
           />
         </Stack>
       )}
+        </MainContainer>
+      </ThemeProvider>
     </>
   );
 };
