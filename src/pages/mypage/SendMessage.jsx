@@ -5,62 +5,20 @@ import {
   Box,
   Typography,
   TextField,
-  Button,
   Alert,
   Grid,
   CircularProgress,
-  Card,
   CardContent,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Container,
   ThemeProvider,
-  createTheme,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import {
-  Send as SendIcon,
-  Refresh as RefreshIcon,
-  Info as InfoIcon,
-} from "@mui/icons-material";
+import { Send as SendIcon, Refresh as RefreshIcon } from "@mui/icons-material";
 import { sendMessage } from "../../service/member/ApiService";
-
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
-const StyledCard = styled(Card)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  marginTop: theme.spacing(2),
-  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-  borderRadius: theme.spacing(1.5),
-}));
-
-const InfoCard = styled(Card)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-  color: theme.palette.primary.contrastText,
-  marginTop: theme.spacing(3),
-  boxShadow: "0 4px 12px rgba(68,195,170,0.3)",
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  minWidth: 120,
-}));
+import {
+  sobiTheme,
+  StyledCard,
+  StyledButton,
+} from "../../assets/styles/sobiTheme";
 
 const SendMessage = ({ onMessageSent }) => {
   const [formData, setFormData] = useState({
@@ -146,10 +104,25 @@ const SendMessage = ({ onMessageSent }) => {
     } catch (err) {
       console.error("쪽지 전송 오류:", err);
 
-      // 에러 메시지 처리
+      // 에러 메시지 처리 개선
       let errorMessage = "쪽지 전송 중 오류가 발생했습니다.";
+
       if (err.message) {
-        errorMessage = err.message;
+        // 특정 에러 메시지에 대한 사용자 친화적 변환
+        if (
+          err.message.includes("수신자를 찾을 수 없습니다") ||
+          err.message.includes("찾을 수 없습니다") ||
+          err.message.includes("존재하지 않는")
+        ) {
+          errorMessage = `수신자를 찾을 수 없습니다: ${formData.receiverMemberId}`;
+        } else if (err.message.includes("서버 오류")) {
+          errorMessage = "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        } else if (err.message.includes("네트워크")) {
+          errorMessage =
+            "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.";
+        } else {
+          errorMessage = err.message;
+        }
       }
 
       setError(errorMessage);

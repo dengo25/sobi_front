@@ -7,7 +7,6 @@ import { login } from "../../slice/memberSlice"; // login 액션 추가
 import {
   Box,
   Typography,
-  Avatar,
   List,
   ListItem,
   ListItemButton,
@@ -15,26 +14,19 @@ import {
   ListItemText,
   Tabs,
   Tab,
-  Paper,
   Divider,
   Badge,
   Alert,
   Snackbar,
   CircularProgress,
   Button,
-  Container,
   Card,
   CardContent,
   ThemeProvider,
-  createTheme,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import {
   RateReview as ReviewIcon,
   Comment as CommentIcon,
-  Stars as PointIcon,
-  EmojiEvents as BadgeIcon,
-  Science as ExperimentIcon,
   Mail as MailIcon,
   Delete as DeleteIcon,
   Close as CloseIcon,
@@ -51,104 +43,21 @@ import ReceivedMessages from "./ReceivedMessages";
 import SentMessages from "./SentMessages";
 import MyReviews from "./MyReviews";
 import AccountInfo from "./AccountInfo";
-
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
-const MainContainer = styled(Container)(({ theme }) => ({
-  minHeight: "100vh",
-  paddingTop: theme.spacing(3),
-  paddingBottom: theme.spacing(3),
-}));
-
-const MainCard = styled(Paper)(({ theme }) => ({
-  borderRadius: theme.spacing(1),
-  overflow: "hidden",
-  minHeight: 700,
-  display: "flex",
-}));
-
-const Sidebar = styled(Box)(({ theme }) => ({
-  width: 280,
-  backgroundColor: theme.palette.background.paper,
-  borderRight: `1px solid ${theme.palette.divider}`,
-  display: "flex",
-  flexDirection: "column",
-}));
-
-const ProfileSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(3),
-  textAlign: "center",
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  background: `linear-gradient(135deg, ${theme.palette.primary.light}15, ${theme.palette.primary.main}08)`,
-}));
-
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  width: 80,
-  height: 80,
-  margin: "0 auto 12px",
-  backgroundColor: theme.palette.primary.main,
-  fontSize: 32,
-  fontWeight: "bold",
-}));
-
-const MenuSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(2),
-  flex: 1,
-}));
-
-const MenuLabel = styled(Typography)(({ theme }) => ({
-  fontSize: 14,
-  color: theme.palette.text.secondary,
-  fontWeight: 500,
-  marginBottom: theme.spacing(1.5),
-  paddingLeft: theme.spacing(1),
-}));
-
-const MainContent = styled(Box)({
-  flex: 1,
-  display: "flex",
-  flexDirection: "column",
-});
-
-const TabsContainer = styled(Box)(({ theme }) => ({
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-}));
-
-const ContentArea = styled(Box)({
-  flex: 1,
-  minHeight: 0,
-});
-
-const MessageTabsContainer = styled(Box)(({ theme }) => ({
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.background.paper,
-}));
-
-const DefaultContent = styled(Box)(({ theme }) => ({
-  height: "100%",
-  backgroundColor: theme.palette.grey[50],
-  padding: theme.spacing(4),
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
+import {
+  MainContainer,
+  MainCard,
+  Sidebar,
+  ProfileSection,
+  StyledAvatar,
+  MenuSection,
+  MenuLabel,
+  MainContent,
+  TabsContainer,
+  ContentArea,
+  MessageTabsContainer,
+  DefaultContent,
+  sobiTheme,
+} from "../../assets/styles/sobiTheme";
 
 const Mypage = () => {
   const [userInfo, setUserInfo] = useState(null);

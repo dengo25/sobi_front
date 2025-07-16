@@ -2,7 +2,7 @@ import { API_BASE_URL } from "../util/api-config.js";
 import jwtAxios from "../util/JwtUtil.jsx";
 
 //API 호출을 위한 공통 함수 정의
-function call(api, method, request) {
+export function call(api, method, request) {
   //HTTP 요청 헤더 생성 및 Content-Type 설정
   let headers = new Headers({
     "Content-Type": "application/json",
@@ -28,7 +28,7 @@ function call(api, method, request) {
     options.body = JSON.stringify(request);
   }
 
-  console.log("Review API 호출:", {
+  console.log("API 호출:", {
     url: options.url,
     method: options.method,
     headers: Object.fromEntries(headers.entries()),
@@ -38,7 +38,7 @@ function call(api, method, request) {
   //fetch로 API 호출
   return fetch(options.url, options)
     .then((response) => {
-      console.log("Review API 응답 상태:", response.status);
+      console.log("API 응답 상태:", response.status);
 
       if (response.status === 200) {
         return response.json();
@@ -47,24 +47,64 @@ function call(api, method, request) {
         console.error("인증 오류 - 로그인 페이지로 이동");
         return Promise.reject("Authentication failed");
       } else {
-        // 에러 응답도 JSON으로 파싱해서 확인
-        return response.text().then((text) => {
-          console.error("Review API 에러 응답:", text);
-          let errorData;
-          try {
-            errorData = JSON.parse(text);
-          } catch (e) {
-            errorData = { error: text };
-          }
-          throw new Error(
-            errorData.error || `HTTP ${response.status}: ${text}`
-          );
-        });
+        // Content-Type 확인하여 JSON인지 HTML인지 구분
+        const contentType = response.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+          // JSON 응답인 경우
+          return response.json().then((errorData) => {
+            console.error("API JSON 에러 응답:", errorData);
+            throw new Error(
+              errorData.error || errorData.message || `HTTP ${response.status}`
+            );
+          });
+        } else {
+          // HTML 또는 기타 형태의 응답인 경우
+          return response.text().then((text) => {
+            console.error("API 에러 응답 (비JSON):", text);
+
+            // HTML 응답인 경우 사용자 친화적인 에러 메시지 제공
+            if (text.includes("<!doctype") || text.includes("<html")) {
+              // 상태 코드에 따른 적절한 에러 메시지
+              let errorMessage;
+              switch (response.status) {
+                case 400:
+                  errorMessage = "잘못된 요청입니다. 입력 정보를 확인해주세요.";
+                  break;
+                case 404:
+                  errorMessage = "요청한 리소스를 찾을 수 없습니다.";
+                  break;
+                case 500:
+                  errorMessage =
+                    "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+                  break;
+                default:
+                  errorMessage = "요청 처리 중 오류가 발생했습니다.";
+              }
+              throw new Error(errorMessage);
+            }
+
+            // JSON 파싱 시도
+            try {
+              const errorData = JSON.parse(text);
+              throw new Error(
+                errorData.error ||
+                  errorData.message ||
+                  `HTTP ${response.status}: ${text}`
+              );
+            } catch (parseError) {
+              // JSON 파싱 실패 시 원본 텍스트의 일부만 사용
+              const shortText =
+                text.length > 100 ? text.substring(0, 100) + "..." : text;
+              throw new Error(`HTTP ${response.status}: ${shortText}`);
+            }
+          });
+        }
       }
     })
     .catch((error) => {
       //네트워크 오류 또는 처리되지 않은 예외 발생 시 로그 출력
-      console.error("Review API 호출 오류:", error);
+      console.error("API 호출 오류:", error);
       throw error; // 에러를 다시 throw해서 호출한 곳에서 처리할 수 있도록
     });
 }

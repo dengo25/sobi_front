@@ -3,7 +3,7 @@
 /*========================================================
  레이아웃
 ========================================================*/
-header *{font-family:'Noto Sans KR';}
+header *{font-family: 'Roboto', 'Noto Sans KR', sans-serif;}
 main,
 .wrap{max-width:1260px;margin:0 auto;}
 
@@ -421,51 +421,26 @@ table[class*="table"] td .required + [class*="ico-"]{margin-left:5px;}
 
 
 
+/* Main ---------------------------------------- */
+.welcome-ment{margin:50px 0 30px;font-size:2.125rem;color:rgba(0, 0, 0, 0.87);font-weight:bold;}
+.main-title{margin:50px 0 30px;font-size:2.125rem;color:rgba(0, 0, 0, 0.87);}
+/* 스와이퍼 */
+.review-trand .slide-box{position:relative;}
+.review-trand .slide-img img{object-fit:cover;height:450px;width:100%;opacity:.8;}
+.review-trand .text{position:absolute;left:0;bottom:0;width:100%;height:150px;padding:20px;background-color:rgba(0, 0, 0, 0.4);text-align:left;color:#fff;font-size:16px;
+	-webkit-transition: all 0.3s ease;
+	transition: all 0.3s ease;}
+.review-trand .text span{display:block;margin-bottom:5px;font-size:25px;font-weight:bold;}
+.review-trand .text:hover{background-color:rgba(0, 0, 0, 0.6); cursor: pointer;
+	-webkit-transform: scale(1.01);
+    -moz-transform: scale(1.01);
+    -ms-transform: scale(1.01);
+    transform: scale(1.01);}
+.notice-swiper img{object-fit:cover;width:100%;height:415px;cursor:pointer;}
+
 /* Accodian ---------------------------------------- */
-.ui-acc dt { display: flex; justify-content: space-between; align-items: center; min-height: 52px; padding:23px 16px 16px; border-bottom: 1px solid #e5e5e5; cursor: pointer; } 
-.ui-acc dt .tit { display: inline-block; width: calc(100% - 48px); color: #4c4c4c; font-size: 14px; line-height: 20px; } 
-.ui-acc dd { min-height: 106px; overflow: hidden; padding:16px; border-bottom: 1px solid #e5e5e5; background-color: #f8f8f8; } /* max-height: 106px;padding:20px 30px; */
-.ui-acc dl .plusminus{ display: block; position: relative; width: 36px; height: 28px; cursor: pointer; } /*  width: 28px; height: 28px; width: 10px; height: 10px;margin-right: 12px; */
-.ui-acc dl .plusminus:before,
-.ui-acc dl .plusminus:after { content: ""; display: block; background-color: #4c4c4c; position: absolute; top: 50%; left:11px; transition: .35s ease-in-out; width: 14px; height: 2px; } /* width: 50%; height: 1.5px;left: 8px;<< left: 0; */
-.ui-acc dl .plusminus:before { transform: translateY(-50%); } 
-.ui-acc dl .plusminus:after { transform: translateY(-50%) rotate(90deg); } 
-.ui-acc dl.on .plusminus:before { transform: translateY(-50%) rotate(-90deg); opacity: 0; } 
-.ui-acc dl.on .plusminus:after { transform: translateY(-50%) rotate(0); } 
-/* dt > input */
-.ui-acc dt .input-group{width:calc(100% - 36px);}/* width:calc(100% - 36px); */
-/* 유형추가 */
-
-
 /* Accodian : ui-acc(type-faq) ---------------------------------------- */
-.ui-acc.type-faq{margin-bottom:24px;background-color:transparent;border-top:1px solid #4c4c4c;}
-.ui-acc.type-faq dl{overflow:hidden;border-radius:4px;border-bottom:16px solid #f5f6f7;}
-.ui-acc.type-faq dt{position:relative;min-height:56px;padding:16px;border-bottom:none;border-radius:4px;background-color:#fff;}/* min-height:80px;padding:24px; */
-.ui-acc.type-faq dl.on dt::after{content:'';overflow:hidden;display:block;position:absolute;right:16px;left:16px;bottom:0; clear:both;width:calc(100% - 16px);border-bottom:2px dashed #e5e5e5; border-spacing:2px;}
-
-.ui-acc.type-faq dt .tit{display: flex;gap:8px;align-items: center;font-size:16px;line-height:20px;}/*  gap :16px;font-size:16px; line-height: 24px; */
-.ui-acc.type-faq dt .tit .ico-faq-q{flex-basis:24px;}/* flex-basis: 33px; */
-.ui-acc.type-faq dt .tit span{flex-basis: calc(100% - 24px);}/* flex-basis: calc(100% - 32px); */
-.ui-acc.type-faq dd{position:relative;display:flex;flex-direction:column;justify-content:flex-start;gap:16px;min-height: auto; overflow: hidden;padding:16px 16px 16px 48px;background-color:#fff;border-radius:0 0 4px 4px;border-bottom:none;}/* align-items: center;padding:32px 40px;background-color: #f5f6f7; */
-.ui-acc.type-faq dd.over-line{align-items: start;}
-.ui-acc.type-faq dd .ico-faq-a{position:absolute;top:16px;left:16px;}/*  margin-left: 32px; flex-basis: 33px; */
-.ui-acc.type-faq dd .cont-txt{ flex-basis: calc(100% - 72px); font-size: 16px; line-height: 20px; color: #4c4c4c;}/* font-size: 16px;line-height: 24px; */
-.ui-acc.type-faq dl dt .dropdown {display: inline-block;width:16px;height:16px; background:url(/v1/static/images/ico-faq-dropdown.svg);transition: .35s ease-in-out;}/* margin-right: 8px; */
-.ui-acc.type-faq dl.on dt .dropdown{transform: rotate(-180deg);}
-
 /* FAQ */
 [class*="ico-faq-"]{width:24px;height:24px;}
 .ico-faq-q{background:url('/v1/static/images/ico-faq-q.svg') no-repeat center / contain;}/* width:32px;height:32px; */
 .ico-faq-a{background:url('/v1/static/images/ico-faq-a.svg') no-repeat center / contain;}
-
-
-
-/*========================================================
- date-wrap
-========================================================*/
-.info-wrap{display:flex;align-items:center;gap:17px;height:20px;}/* gap:32px;height:29px; */
-.info-wrap span{position:relative;color:#989898;font-size:14px;line-height:20px;}/* color:#4c4c4c;font-size:16px;line-height:24px; */
-.info-wrap .date ~ span:after{content:'';width:1px;height:16px;position:absolute;left:-8px;top:calc(50% + 1px);transform:translateY(-50%);background:#e1e3e5;}/* left:-15px; */
-
-.info-area{margin:80px 0 0;min-height:400px;text-align:center;}
-.info-area p{margin-top: 20px;font-weight: bold;font-size: 25px;}

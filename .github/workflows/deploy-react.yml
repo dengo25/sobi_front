@@ -38,7 +38,7 @@ jobs:
           AWS_REGION: 'ap-northeast-2'
           SOURCE_DIR: 'dist'  # 리액트 빌드 결과 디렉토리
 
-      #5. CloudFront 캐시 무효화 (index.html 등 변경 시 즉시 반영되도록)
+       #5. CloudFront 캐시 무효화 (index.html 등 변경 시 즉시 반영되도록)
       - name: 🚀 Invalidate CloudFront Cache
         uses: chetan/invalidate-cloudfront-action@v2
         env:

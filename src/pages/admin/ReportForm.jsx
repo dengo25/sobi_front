@@ -184,25 +184,7 @@ const ReportForm = () => {
               />
 
               {/* 신고 정보 표시 */}
-              <Box
-                sx={{
-                  p: 2,
-                  backgroundColor: "grey.50",
-                  borderRadius: 1,
-                  mb: 3,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  신고 정보
-                </Typography>
-                <Typography variant="body2">
-                  • 신고자 ID: {reporterId}
-                </Typography>
-                <Typography variant="body2">
-                  • 신고 대상 ID: {writerId}
-                </Typography>
-                <Typography variant="body2">• 대상 번호: {reviewId}</Typography>
-              </Box>
+              <Typography variant="body2">신고 대상 ID: {writerId}</Typography>
 
               {/* 액션 버튼들 */}
               <ActionButtons>

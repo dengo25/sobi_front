@@ -38,7 +38,7 @@ export const getList = async (pageParam) => {
 
   try {
     const params = {
-      page: page, // ✅ +1 제거!
+      page: page,
       size: size,
       sortBy: sortBy,
       sortDir: sortDir,
@@ -160,7 +160,7 @@ export const getReviewList = async (pageParam) => {
     confirmed = null,
   } = pageParam || {};
 
-  // console.log("🔍 리뷰 목록 API 요청 파라미터:", {
+  // console.log("리뷰 목록 API 요청 파라미터:", {
   //   page,
   //   size,
   //   sortBy,
@@ -184,25 +184,25 @@ export const getReviewList = async (pageParam) => {
       confirmed !== undefined
     ) {
       params.confirmed = confirmed;
-      // console.log("📤 confirmed 필터 적용:", confirmed);
+      // console.log("confirmed 필터 적용:", confirmed);
     } else {
-      console.log("📤 confirmed 필터 없음 (전체 조회)");
+      console.log("confirmed 필터 없음 (전체 조회)");
     }
 
-    // console.log("📤 실제 전송 파라미터:", params);
+    // console.log("실제 전송 파라미터:", params);
 
     const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/review/list`, {
       params: params,
     });
 
-    // console.log("📥 리뷰 목록 API 응답:", res.data);
-    // console.log("📊 조회된 리뷰 개수:", res.data?.reviews?.length || 0);
+    // console.log("리뷰 목록 API 응답:", res.data);
+    // console.log("조회된 리뷰 개수:", res.data?.reviews?.length || 0);
 
     return res.data;
   } catch (error) {
-    console.error("❌ 리뷰 목록 조회 API 오류:", error);
-    console.error("❌ 오류 응답:", error.response?.data);
-    console.error("❌ 오류 상태코드:", error.response?.status);
+    console.error("리뷰 목록 조회 API 오류:", error);
+    console.error("오류 응답:", error.response?.data);
+    console.error("오류 상태코드:", error.response?.status);
     throw error;
   }
 };

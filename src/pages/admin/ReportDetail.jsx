@@ -149,7 +149,7 @@ const ReportDetail = ({ data, onBack, onViewReportReview }) => {
   if (!review) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
-        <Typography>리뷰 데이터를 불러오는 중...</Typography>
+        <Typography>삭제된 게시물입니다.</Typography>
       </Box>
     );
   }

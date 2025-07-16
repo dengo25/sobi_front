@@ -1,47 +1,50 @@
-import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 
-import CustomCheckbox from "../input/CustomCheckbox"
+import CustomCheckbox from "../input/CustomCheckbox";
 
 import faqIconQ from "../../assets/icons/ico-faq-q.svg";
 import faqIconA from "../../assets/icons/ico-faq-a.svg";
 
-
 const ControlledAccordions = ({
-  name, 
-  title, 
-  content, 
-  expanded, 
-  handleChange, 
-  faqNo, 
-  isChecked, 
+  name,
+  title,
+  content,
+  expanded,
+  handleChange,
+  faqNo,
+  isChecked,
   onCheckToggle,
-  isAdmin
+  isAdmin,
 }) => {
   return (
-    <div>
-      <Accordion expanded={expanded === name} onChange={handleChange(name)}>
-        <AccordionSummary
-          aria-controls={`${name}bh-content`}
-          id={`${name}bh-header`}
-        >
-          {isAdmin && (
-            <CustomCheckbox
-              checked={isChecked}
-              onChange={() => onCheckToggle(faqNo)}
-              onClick={(e) => e.stopPropagation()} // 아코디언 열림 방지
-              onFocus={(e) => e.stopPropagation()}
-              size="medium"
-              color='success'
-            />
-          )}
-          <img src={faqIconQ}/>{title}
-        </AccordionSummary>
-        <AccordionDetails>
-          <img src={faqIconA}/>{content}
-        </AccordionDetails>
-      </Accordion>
-    </div>
-  )
-}
+    <Accordion
+      expanded={expanded === name}
+      onChange={handleChange(name)}
+      className="basic-acc"
+    >
+      <AccordionSummary
+        aria-controls={`${name}bh-content`}
+        id={`${name}bh-header`}
+      >
+        {isAdmin && (
+          <CustomCheckbox
+            checked={isChecked}
+            onChange={() => onCheckToggle(faqNo)}
+            onClick={(e) => e.stopPropagation()} // 아코디언 열림 방지
+            onFocus={(e) => e.stopPropagation()}
+            size="medium"
+            color="success"
+          />
+        )}
+        <img src={faqIconQ} />
+        {title}
+      </AccordionSummary>
+      <AccordionDetails>
+        <img src={faqIconA} />
+        {content}
+      </AccordionDetails>
+    </Accordion>
+  );
+};
 
 export default ControlledAccordions;

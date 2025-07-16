@@ -3,19 +3,14 @@
 import { useState } from "react";
 import {
   Typography,
-  TextField,
-  Button,
   Box,
-  Card,
   Alert,
   CircularProgress,
   ThemeProvider,
-  createTheme,
   InputAdornment,
   IconButton,
   Link as MuiLink,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Person as PersonIcon,
@@ -29,182 +24,20 @@ import {
 import { signin, socialLogin } from "../../service/member/ApiService.js";
 import { useDispatch } from "react-redux";
 import { login } from "../../slice/memberSlice.jsx";
-
-// 색상 테마
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
-// 스타일드 컴포넌트
-const MainContainer = styled(Box)(({ theme }) => ({
-  minHeight: "100vh",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  padding: theme.spacing(2),
-}));
-
-const LoginCard = styled(Card)(({ theme }) => ({
-  maxWidth: 1000,
-  width: "100%",
-  borderRadius: theme.spacing(2),
-  boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
-  overflow: "hidden",
-  display: "flex",
-  minHeight: 600,
-  [theme.breakpoints.down("md")]: {
-    flexDirection: "column",
-    maxWidth: 400,
-  },
-}));
-
-const LeftSection = styled(Box)(({ theme }) => ({
-  flex: 1,
-  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.dark})`,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(6),
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  textAlign: "center",
-  position: "relative",
-  overflow: "hidden",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: "-50%",
-    right: "-50%",
-    width: "200%",
-    height: "200%",
-    background:
-      "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
-    animation: "float 6s ease-in-out infinite",
-  },
-  "@keyframes float": {
-    "0%, 100%": { transform: "translateY(0px)" },
-    "50%": { transform: "translateY(-20px)" },
-  },
-  [theme.breakpoints.down("md")]: {
-    minHeight: 200,
-    padding: theme.spacing(4),
-  },
-}));
-
-const RightSection = styled(Box)(({ theme }) => ({
-  flex: 1,
-  padding: theme.spacing(6),
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  backgroundColor: "white",
-  [theme.breakpoints.down("md")]: {
-    padding: theme.spacing(4),
-  },
-}));
-
-const BrandLogo = styled(Typography)(({ theme }) => ({
-  fontSize: "3rem",
-  fontWeight: 800,
-  letterSpacing: "3px",
-  marginBottom: theme.spacing(2),
-  textShadow: "0 2px 4px rgba(0,0,0,0.1)",
-  [theme.breakpoints.down("md")]: {
-    fontSize: "2rem",
-  },
-}));
-
-const WelcomeText = styled(Typography)(({ theme }) => ({
-  fontSize: "1.5rem",
-  fontWeight: 300,
-  marginBottom: theme.spacing(1),
-  opacity: 0.9,
-  [theme.breakpoints.down("md")]: {
-    fontSize: "1.2rem",
-  },
-}));
-
-const SubText = styled(Typography)(({ theme }) => ({
-  fontSize: "1rem",
-  fontWeight: 400,
-  opacity: 0.8,
-  lineHeight: 1.6,
-  maxWidth: 300,
-  [theme.breakpoints.down("md")]: {
-    fontSize: "0.9rem",
-  },
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  "& .MuiOutlinedInput-root": {
-    borderRadius: theme.spacing(1),
-    backgroundColor: "#fafafa",
-    transition: "all 0.3s ease",
-    "&:hover": {
-      backgroundColor: "#f5f5f5",
-    },
-    "&.Mui-focused": {
-      backgroundColor: "white",
-      "& .MuiOutlinedInput-notchedOutline": {
-        borderColor: theme.palette.primary.main,
-        borderWidth: "2px",
-      },
-    },
-  },
-}));
-
-const LoginButton = styled(Button)(({ theme }) => ({
-  borderRadius: theme.spacing(1),
-  padding: theme.spacing(1.5),
-  fontSize: "1rem",
-  fontWeight: 600,
-  textTransform: "none",
-  marginTop: theme.spacing(2),
-  marginBottom: theme.spacing(3),
-  boxShadow: `0 4px 14px ${theme.palette.primary.main}40`,
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: `0 6px 20px ${theme.palette.primary.main}60`,
-  },
-}));
-
-const SocialButton = styled(Button)(({ theme }) => ({
-  borderRadius: theme.spacing(1),
-  padding: theme.spacing(1),
-  margin: theme.spacing(0.5),
-  minWidth: 48,
-  width: 48,
-  height: 48,
-  border: "1px solid #e0e0e0",
-  backgroundColor: "white",
-  color: "#666",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    backgroundColor: "#f5f5f5",
-    transform: "translateY(-2px)",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-  },
-}));
-
-const SocialSection = styled(Box)(({ theme }) => ({
-  textAlign: "center",
-  marginTop: theme.spacing(2),
-}));
+import {
+  sobiTheme,
+  MainContainer,
+  LoginCard,
+  LeftSection,
+  BrandLogo,
+  WelcomeText,
+  SubText,
+  RightSection,
+  StyledTextField,
+  LoginButton,
+  SocialButton,
+  SocialSection,
+} from "../../assets/styles/sobiThemeLogin";
 
 function Login() {
   const dispatch = useDispatch();
@@ -241,13 +74,16 @@ function Login() {
 
       // 로그인 후 메인 페이지로 이동
       navigate("/");
-    } catch (err) {
-      console.error("로그인 오류:", err);
-      // 블랙리스트 에러 처리 추가
-      if (err.message && err.message.includes("이용이 제한되어 있습니다")) {
-        alert(
-          "해당 계정은 이용이 제한되어 있습니다.\n고객센터(1588-0000)로 문의해주세요."
-        );
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.error || error?.message || "오류 발생";
+
+      if (
+        errorMessage.includes(
+          "해당 계정은 이용이 제한되어 있습니다. 관리자에게 문의해주세요."
+        )
+      ) {
+        alert(errorMessage);
       } else {
         setError("아이디 또는 비밀번호가 올바르지 않습니다.");
       }

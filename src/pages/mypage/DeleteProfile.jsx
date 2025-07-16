@@ -2,18 +2,14 @@
 
 import { useState, useEffect } from "react";
 import {
-  Dialog,
   TextField,
   Button,
   Typography,
   Alert,
   Box,
-  IconButton,
   CircularProgress,
   ThemeProvider,
-  createTheme,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import {
   Close as CloseIcon,
   Delete as DeleteIcon,
@@ -22,90 +18,16 @@ import {
   Shield as ShieldIcon,
 } from "@mui/icons-material";
 import { deleteMypage, signout } from "../../service/member/ApiService";
-
-const sobiTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#44C3AA",
-      light: "#6FD4BB",
-      dark: "#045242",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#045242",
-      light: "#44C3AA",
-      dark: "#033A30",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialog-paper": {
-    borderRadius: theme.spacing(2),
-    maxWidth: 480,
-    width: "100%",
-    overflow: "hidden",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
-  },
-}));
-
-const HeaderSection = styled(Box)(({ theme }) => ({
-  background: "linear-gradient(135deg, #ff4757, #ff3742)",
-  color: "white",
-  padding: theme.spacing(3, 3, 4, 3),
-  position: "relative",
-  textAlign: "center",
-}));
-
-const CloseButton = styled(IconButton)(({ theme }) => ({
-  position: "absolute",
-  right: theme.spacing(1),
-  top: theme.spacing(1),
-  color: "rgba(255,255,255,0.8)",
-  "&:hover": {
-    backgroundColor: "rgba(255,255,255,0.1)",
-    color: "white",
-  },
-}));
-
-const ContentSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(3),
-}));
-
-const DangerZone = styled(Box)(({ theme }) => ({
-  background: "linear-gradient(135deg, #ffebee, #fce4ec)",
-  border: "2px solid #f48fb1",
-  borderRadius: theme.spacing(1.5),
-  padding: theme.spacing(2.5),
-  marginBottom: theme.spacing(3),
-  position: "relative",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "4px",
-    background: "linear-gradient(90deg, #ff4757, #ff6b7a)",
-    borderRadius: `${theme.spacing(1.5)} ${theme.spacing(1.5)} 0 0`,
-  },
-}));
-
-const InputContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: "#f8f9fa",
-  borderRadius: theme.spacing(1.5),
-  padding: theme.spacing(2.5),
-  border: "1px solid #e9ecef",
-}));
-
-const ActionButtons = styled(Box)(({ theme }) => ({
-  display: "flex",
-  gap: theme.spacing(1.5),
-  marginTop: theme.spacing(3),
-  paddingTop: theme.spacing(2),
-  borderTop: "1px solid #f0f0f0",
-}));
+import {
+  sobiTheme,
+  StyledDialog,
+  HeaderSection,
+  CloseButton,
+  ContentSection,
+  DangerZone,
+  InputContainer,
+  ActionButtons,
+} from "../../assets/styles/sobiTheme";
 
 const DeleteProfile = ({ open, onClose, onDelete }) => {
   const [password, setPassword] = useState("");
@@ -163,7 +85,7 @@ const DeleteProfile = ({ open, onClose, onDelete }) => {
 
           <ErrorOutlineIcon sx={{ fontSize: 48, mb: 1, opacity: 0.9 }} />
           <Typography variant="h5" fontWeight={700} gutterBottom>
-            계정 삭제
+            회원 탈퇴
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             이 작업은 되돌릴 수 없습니다
@@ -188,12 +110,12 @@ const DeleteProfile = ({ open, onClose, onDelete }) => {
 
           {/* 위험 구역 */}
           <DangerZone>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            {/* <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <ShieldIcon sx={{ color: "#d32f2f", mr: 1.5, fontSize: 24 }} />
               <Typography variant="h6" fontWeight={700} color="error.main">
                 위험 구역
               </Typography>
-            </Box>
+            </Box> */}
             <Typography variant="body2" color="error.dark" fontWeight={500}>
               계정을 영구적으로 삭제하려면 현재 비밀번호를 입력하세요.
             </Typography>

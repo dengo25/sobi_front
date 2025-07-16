@@ -148,9 +148,9 @@ const MemberList = ({ onViewDetail }) => {
         sortDir: filters.sortDir,
       };
 
-      // console.log("🔍 회원 목록 API 호출 파라미터:", searchParams);
+      // console.log("회원 목록 API 호출 파라미터:", searchParams);
       const response = await getList(searchParams);
-      // console.log("📥 회원 목록 API 응답:", response);
+      // console.log("회원 목록 API 응답:", response);
 
       if (response) {
         setMemberList(response.content || []);
@@ -161,16 +161,16 @@ const MemberList = ({ onViewDetail }) => {
           pageSize: response.size || 10,
         });
         // console.log(
-        //   "✅ 회원 목록 설정 완료:",
+        //   "회원 목록 설정 완료:",
         //   (response.content || []).length,
         //   "명"
         // );
       } else {
-        console.log("❌ 예상하지 못한 응답 구조:", response);
+        console.log("예상하지 못한 응답 구조:", response);
         setMemberList([]);
       }
     } catch (err) {
-      console.error("❌ 회원 목록 조회 오류:", err);
+      console.error("회원 목록 조회 오류:", err);
       setError("회원 목록을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -203,7 +203,7 @@ const MemberList = ({ onViewDetail }) => {
 
   // 페이지 변경
   const handlePageChange = (event, newPage) => {
-    // console.log("🔥 페이지 클릭:", newPage);
+    // console.log("페이지 클릭:", newPage);
     setCurrentDisplayPage(newPage); // 표시 페이지 즉시 업데이트
     fetchMembers(newPage);
   };
