@@ -36,6 +36,7 @@ import {
   deleteNotice,
 } from "../../service/community/noticeApiService";
 import { extractImageUrls } from "../../utils/extractImages";
+import { isEmptyAndAlert, isEditorEmptyAndAlert } from "../../utils/common.js";
 
 const NoticeForm = () => {
   const { state } = useLocation();
@@ -79,15 +80,8 @@ const NoticeForm = () => {
     e.preventDefault();
 
     // 필수 필드 검증
-    if (!formData.noticeTitle.trim()) {
-      alert("제목을 입력해주세요.");
-      return;
-    }
-
-    if (!formData.noticeContent.trim()) {
-      alert("내용을 입력해주세요.");
-      return;
-    }
+    if(isEmptyAndAlert(formData.noticeTitle,"제목을 입력하세요!")) return;
+    if(isEditorEmptyAndAlert(formData.noticeContent,"내용을 입력하세요!")) return;
 
     // 수정 모드에서 noticeNo 검증
     if (isEdit && !formData.noticeNo) {
