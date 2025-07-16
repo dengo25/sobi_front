@@ -25,6 +25,8 @@ import {
   IconButton,
   Chip,
   TextField,
+  Pagination,
+  Stack,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -33,6 +35,7 @@ import {
   Send as SendIcon,
   MarkEmailRead as ReadIcon,
   MarkEmailUnread as UnreadIcon,
+  DoneAll as BatchReadIcon,
 } from "@mui/icons-material";
 import {
   sobiTheme,
@@ -42,6 +45,7 @@ import {
   UnreadTableRow,
   EmptyStateBox,
   LoadingBox,
+  PaginationContainer,
 } from "../../assets/styles/sobiTheme";
 import {
   getReceivedMessages,
@@ -59,11 +63,16 @@ const ReceivedMessages = ({ onMessageAction }) => {
   const [selectedMessages, setSelectedMessages] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // 삭제 확인 다이얼로그 상태
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [batchDeleteConfirmOpen, setBatchDeleteConfirmOpen] = useState(false);
+
+  // 일괄 읽음 처리 확인 다이얼로그 상태
+  const [batchReadConfirmOpen, setBatchReadConfirmOpen] = useState(false);
 
   // 답장 다이얼로그 상태
   const [replyDialogOpen, setReplyDialogOpen] = useState(false);
@@ -83,6 +92,8 @@ const ReceivedMessages = ({ onMessageAction }) => {
 
       if (Array.isArray(response)) {
         setMessages(response);
+        // 데이터가 새로 로드되면 첫 페이지로 이동
+        setCurrentPage(1);
       } else {
         setMessages([]);
       }
@@ -134,11 +145,27 @@ const ReceivedMessages = ({ onMessageAction }) => {
   };
 
   const handleSelectAll = () => {
-    if (selectedMessages.length === messages.length) {
-      setSelectedMessages([]);
+    const currentPageMessages = currentMessages.map((msg) => msg.id);
+    const isAllCurrentPageSelected = currentPageMessages.every((id) =>
+      selectedMessages.includes(id)
+    );
+
+    if (isAllCurrentPageSelected) {
+      // 현재 페이지의 모든 항목이 선택되어 있으면 선택 해제
+      setSelectedMessages((prev) =>
+        prev.filter((id) => !currentPageMessages.includes(id))
+      );
     } else {
-      setSelectedMessages(messages.map((msg) => msg.id));
+      // 현재 페이지의 모든 항목 선택
+      setSelectedMessages((prev) => [
+        ...prev.filter((id) => !currentPageMessages.includes(id)),
+        ...currentPageMessages,
+      ]);
     }
+  };
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
   };
 
   // 개별 쪽지 삭제 확인 다이얼로그 열기
@@ -155,8 +182,21 @@ const ReceivedMessages = ({ onMessageAction }) => {
       await deleteMessageByReceiver(messageToDelete.id);
 
       // 메시지 목록에서 삭제된 메시지 제거
-      setMessages((prev) =>
-        prev.filter((msg) => msg.id !== messageToDelete.id)
+      setMessages((prev) => {
+        const newMessages = prev.filter((msg) => msg.id !== messageToDelete.id);
+
+        // 현재 페이지에서 삭제 후 페이지 조정
+        const totalPages = Math.ceil(newMessages.length / itemsPerPage);
+        if (currentPage > totalPages && totalPages > 0) {
+          setCurrentPage(totalPages);
+        }
+
+        return newMessages;
+      });
+
+      // 선택된 메시지에서도 제거
+      setSelectedMessages((prev) =>
+        prev.filter((id) => id !== messageToDelete.id)
       );
 
       // 다이얼로그가 열려있고 삭제된 메시지라면 닫기
@@ -196,9 +236,19 @@ const ReceivedMessages = ({ onMessageAction }) => {
       );
 
       // 삭제된 메시지들을 목록에서 제거
-      setMessages((prev) =>
-        prev.filter((msg) => !selectedMessages.includes(msg.id))
-      );
+      setMessages((prev) => {
+        const newMessages = prev.filter(
+          (msg) => !selectedMessages.includes(msg.id)
+        );
+
+        // 현재 페이지에서 삭제 후 페이지 조정
+        const totalPages = Math.ceil(newMessages.length / itemsPerPage);
+        if (currentPage > totalPages && totalPages > 0) {
+          setCurrentPage(totalPages);
+        }
+
+        return newMessages;
+      });
 
       // 선택 상태 초기화
       setSelectedMessages([]);
@@ -218,6 +268,62 @@ const ReceivedMessages = ({ onMessageAction }) => {
       setError("쪽지 삭제 중 오류가 발생했습니다.");
     } finally {
       setBatchDeleteConfirmOpen(false);
+    }
+  };
+
+  // 선택된 쪽지들 일괄 읽음 처리 확인
+  const handleBatchReadConfirm = () => {
+    setBatchReadConfirmOpen(true);
+  };
+
+  // 선택된 쪽지들 일괄 읽음 처리 실행
+  const handleBatchReadExecute = async () => {
+    try {
+      // 선택된 메시지 중 읽지 않은 메시지만 필터링
+      const unreadSelectedMessages = selectedMessages.filter((messageId) => {
+        const message = messages.find((msg) => msg.id === messageId);
+        return message && message.isRead === "N";
+      });
+
+      if (unreadSelectedMessages.length === 0) {
+        setSuccessMessage("선택된 쪽지는 모두 이미 읽음 처리되었습니다.");
+        setShowSuccessAlert(true);
+        setBatchReadConfirmOpen(false);
+        return;
+      }
+
+      // 읽지 않은 메시지들을 읽음 처리
+      await Promise.all(
+        unreadSelectedMessages.map((messageId) => markMessageAsRead(messageId))
+      );
+
+      // 메시지 목록에서 읽음 상태 업데이트
+      setMessages((prev) =>
+        prev.map((msg) =>
+          unreadSelectedMessages.includes(msg.id)
+            ? { ...msg, isRead: "Y" }
+            : msg
+        )
+      );
+
+      // 선택 상태 초기화
+      setSelectedMessages([]);
+
+      // 부모 컴포넌트에 읽음 처리 알림
+      if (onMessageAction) {
+        onMessageAction();
+      }
+
+      // 성공 메시지 표시
+      setSuccessMessage(
+        `${unreadSelectedMessages.length}개의 쪽지가 읽음 처리되었습니다.`
+      );
+      setShowSuccessAlert(true);
+    } catch (err) {
+      console.error("선택 쪽지 읽음 처리 오류:", err);
+      setError("쪽지 읽음 처리 중 오류가 발생했습니다.");
+    } finally {
+      setBatchReadConfirmOpen(false);
     }
   };
 
@@ -308,6 +414,27 @@ const ReceivedMessages = ({ onMessageAction }) => {
 
   const unreadCount = messages.filter((msg) => msg.isRead === "N").length;
 
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(messages.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentMessages = messages.slice(startIndex, endIndex);
+
+  // 현재 페이지의 체크박스 상태 계산
+  const currentPageMessageIds = currentMessages.map((msg) => msg.id);
+  const isAllCurrentPageSelected =
+    currentPageMessageIds.length > 0 &&
+    currentPageMessageIds.every((id) => selectedMessages.includes(id));
+  const isIndeterminate =
+    currentPageMessageIds.some((id) => selectedMessages.includes(id)) &&
+    !isAllCurrentPageSelected;
+
+  // 선택된 메시지 중 읽지 않은 메시지 개수 계산
+  const selectedUnreadCount = selectedMessages.filter((messageId) => {
+    const message = messages.find((msg) => msg.id === messageId);
+    return message && message.isRead === "N";
+  }).length;
+
   if (loading) {
     return (
       <LoadingBox>
@@ -334,7 +461,16 @@ const ReceivedMessages = ({ onMessageAction }) => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ p: 2 }}>
+    <Container
+      maxWidth="lg"
+      sx={{
+        p: 2,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "calc(100vh - 200px)",
+      }}
+    >
       {/* 헤더 영역 */}
       <HeaderBox>
         <Box>
@@ -346,18 +482,36 @@ const ReceivedMessages = ({ onMessageAction }) => {
               읽지 않은 쪽지 {unreadCount}개
             </Typography>
           )}
+          {messages.length > 0 && (
+            <Typography variant="body2" color="text.secondary">
+              페이지 {currentPage} / {totalPages}
+            </Typography>
+          )}
         </Box>
 
         {selectedMessages.length > 0 && (
-          <Button
-            onClick={handleBatchDeleteConfirm}
-            variant="outlined"
-            color="error"
-            size="small"
-            startIcon={<DeleteIcon />}
-          >
-            선택 삭제 ({selectedMessages.length})
-          </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {selectedUnreadCount > 0 && (
+              <Button
+                onClick={handleBatchReadConfirm}
+                variant="outlined"
+                color="primary"
+                size="small"
+                startIcon={<BatchReadIcon />}
+              >
+                읽음 처리 ({selectedUnreadCount})
+              </Button>
+            )}
+            <Button
+              onClick={handleBatchDeleteConfirm}
+              variant="outlined"
+              color="error"
+              size="small"
+              startIcon={<DeleteIcon />}
+            >
+              선택 삭제 ({selectedMessages.length})
+            </Button>
+          </Box>
         )}
       </HeaderBox>
 
@@ -375,103 +529,128 @@ const ReceivedMessages = ({ onMessageAction }) => {
           </CardContent>
         </Card>
       ) : (
-        <StyledTableContainer component={Paper}>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "grey.50" }}>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={
-                      selectedMessages.length === messages.length &&
-                      messages.length > 0
-                    }
-                    onChange={handleSelectAll}
-                    indeterminate={
-                      selectedMessages.length > 0 &&
-                      selectedMessages.length < messages.length
-                    }
-                  />
-                </TableCell>
-                <TableCell align="center">상태</TableCell>
-                <TableCell>보낸사람</TableCell>
-                <TableCell>제목</TableCell>
-                <TableCell align="center">받은시간</TableCell>
-                <TableCell align="center">삭제</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {messages.map((message) => {
-                const RowComponent =
-                  message.isRead === "N" ? UnreadTableRow : StyledTableRow;
-                return (
-                  <RowComponent key={message.id}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedMessages.includes(message.id)}
-                        onChange={() => handleSelectMessage(message.id)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      onClick={() => handleMessageClick(message)}
-                    >
-                      {getStatusIcon(message.isRead)}
-                    </TableCell>
-                    <TableCell
-                      onClick={() => handleMessageClick(message)}
-                      sx={{
-                        fontWeight: message.isRead === "N" ? 600 : 400,
-                        color:
-                          message.isRead === "N"
-                            ? "text.primary"
-                            : "text.secondary",
-                      }}
-                    >
-                      {message.senderName}
-                    </TableCell>
-                    <TableCell
-                      onClick={() => handleMessageClick(message)}
-                      sx={{
-                        maxWidth: 300,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        fontWeight: message.isRead === "N" ? 600 : 400,
-                        color:
-                          message.isRead === "N"
-                            ? "text.primary"
-                            : "text.secondary",
-                      }}
-                    >
-                      {message.title}
-                    </TableCell>
-                    <TableCell
-                      align="center"
-                      onClick={() => handleMessageClick(message)}
-                    >
-                      <Typography variant="body2" color="text.secondary">
-                        {formatDate(message.sendDate)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteMessageConfirm(message);
-                        }}
-                        color="error"
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <StyledTableContainer component={Paper} sx={{ flex: 1 }}>
+            <Table size="small">
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "grey.50" }}>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={isAllCurrentPageSelected}
+                      onChange={handleSelectAll}
+                      indeterminate={isIndeterminate}
+                    />
+                  </TableCell>
+                  <TableCell align="center">상태</TableCell>
+                  <TableCell>보낸사람</TableCell>
+                  <TableCell>제목</TableCell>
+                  <TableCell align="center">받은시간</TableCell>
+                  <TableCell align="center">삭제</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {currentMessages.map((message) => {
+                  const RowComponent =
+                    message.isRead === "N" ? UnreadTableRow : StyledTableRow;
+                  return (
+                    <RowComponent key={message.id}>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedMessages.includes(message.id)}
+                          onChange={() => handleSelectMessage(message.id)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        onClick={() => handleMessageClick(message)}
                       >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  </RowComponent>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </StyledTableContainer>
+                        {getStatusIcon(message.isRead)}
+                      </TableCell>
+                      <TableCell
+                        onClick={() => handleMessageClick(message)}
+                        sx={{
+                          fontWeight: message.isRead === "N" ? 600 : 400,
+                          color:
+                            message.isRead === "N"
+                              ? "text.primary"
+                              : "text.secondary",
+                        }}
+                      >
+                        {message.senderName}
+                      </TableCell>
+                      <TableCell
+                        onClick={() => handleMessageClick(message)}
+                        sx={{
+                          maxWidth: 300,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          fontWeight: message.isRead === "N" ? 600 : 400,
+                          color:
+                            message.isRead === "N"
+                              ? "text.primary"
+                              : "text.secondary",
+                        }}
+                      >
+                        {message.title}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        onClick={() => handleMessageClick(message)}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDate(message.sendDate)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteMessageConfirm(message);
+                          }}
+                          color="error"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </TableCell>
+                    </RowComponent>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+
+          {/* 페이지네이션 */}
+          <PaginationContainer>
+            {totalPages > 1 ? (
+              <Stack spacing={2} alignItems="center">
+                <Pagination
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="medium"
+                  showFirstButton
+                  showLastButton
+                  siblingCount={1}
+                  boundaryCount={1}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {startIndex + 1}-{Math.min(endIndex, messages.length)} /{" "}
+                  {messages.length}개 표시
+                </Typography>
+              </Stack>
+            ) : (
+              messages.length > 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  총 {messages.length}개
+                </Typography>
+              )
+            )}
+          </PaginationContainer>
+        </Box>
       )}
 
       {/* 쪽지 상세 다이얼로그 */}
@@ -701,6 +880,42 @@ const ReceivedMessages = ({ onMessageAction }) => {
             color="error"
           >
             모두 삭제하기
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 일괄 읽음 처리 확인 다이얼로그 */}
+      <Dialog
+        open={batchReadConfirmOpen}
+        onClose={() => setBatchReadConfirmOpen(false)}
+        maxWidth="sm"
+      >
+        <DialogTitle>선택된 쪽지 읽음 처리 확인</DialogTitle>
+        <DialogContent>
+          <Typography gutterBottom>
+            선택된 쪽지 중 읽지 않은 {selectedUnreadCount}개의 쪽지를 모두 읽음
+            처리하시겠습니까?
+          </Typography>
+          {selectedUnreadCount === 0 && (
+            <Typography variant="body2" color="text.secondary">
+              선택된 쪽지는 모두 이미 읽음 처리되었습니다.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setBatchReadConfirmOpen(false)}
+            variant="outlined"
+          >
+            취소
+          </Button>
+          <Button
+            onClick={handleBatchReadExecute}
+            variant="contained"
+            color="primary"
+            disabled={selectedUnreadCount === 0}
+          >
+            읽음 처리하기
           </Button>
         </DialogActions>
       </Dialog>
