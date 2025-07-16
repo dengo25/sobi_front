@@ -37,6 +37,7 @@ import {
   BackButton,
   EditorContainer,
 } from "../../assets/styles/sobiThemeReviewWrite";
+import ReviewEditor from "../editor/ReviewEditor.jsx";
 
 const InsertComponent = () => {
   const { state } = useLocation();
@@ -280,11 +281,12 @@ const InsertComponent = () => {
                   도움이 되는 정보를 포함해주시면 좋습니다.
                 </Typography>
                 <EditorContainer elevation={0}>
-                  <BasicEditor
+                  <ReviewEditor
                     value={formData.content}
                     onChange={handleEditorChange}
                     s3Folder="review"
                     onImageUpload={(imageInfo) => {
+
                       setImages((prev) => {
                         const newImage = { ...imageInfo };
                         if (prev.length === 0) {
