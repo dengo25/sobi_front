@@ -224,7 +224,7 @@ const AdminDashboard = ({
         </Grid>
       </StatsGrid>
 
-      {/* 최근 차단된 사용자 목록 */}
+      {/* 차단된 사용자 목록 */}
       <Card>
         <CardContent>
           <SectionTitle variant="h6">
@@ -232,7 +232,12 @@ const AdminDashboard = ({
             차단된 사용자 ({blockedCount}명)
           </SectionTitle>
 
-          <TableContainer>
+          <TableContainer
+            sx={{
+              maxHeight: 200,
+              overflow: "auto",
+            }}
+          >
             <Table size="small">
               <TableHead>
                 <TableRow sx={{ backgroundColor: "grey.50" }}>
@@ -265,8 +270,6 @@ const AdminDashboard = ({
                         <Chip label="차단됨" color="error" size="small" />
                       </TableCell>
                       <TableCell align="center">
-                        {" "}
-                        {/* 추가 */}
                         <Button
                           size="small"
                           onClick={(e) => handleUnblockClick(user, e)}
@@ -303,8 +306,8 @@ const AdminDashboard = ({
                   {selectedUser && (
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" color="text.secondary">
-                        사용자: {selectedUser.memberName} (
-                        {selectedUser.memberId})
+                        사용자: {selectedUser.memberId} (
+                        {selectedUser.memberName})
                       </Typography>
                     </Box>
                   )}

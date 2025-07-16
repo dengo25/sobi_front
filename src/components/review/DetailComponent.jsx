@@ -49,7 +49,7 @@ import {
   StatusChip,
 } from "../../assets/styles/sobiThemeReview";
 
-function DetailComponent({ tno: propTno }) {
+function DetailComponent({ tno: propTno,moveToList }) {
   const { tno: paramTno } = useParams();
   const tno = propTno || paramTno;
   const navigate = useNavigate();
@@ -112,8 +112,13 @@ function DetailComponent({ tno: propTno }) {
   };
 
   const handleBack = () => {
-    navigate("/review/list");
+    if (moveToList) {
+      moveToList(); // 쿼리 파라미터 유지하며 이동
+    } else {
+      navigate("/review/list"); // fallback
+    }
   };
+
 
   const handleShare = () => {
     if (navigator.share) {
@@ -420,7 +425,7 @@ function DetailComponent({ tno: propTno }) {
           </Stack>
         </Box>
 
-        <Box sx={{ textAlign: "center" }}>
+        {/* <Box sx={{ textAlign: "center" }}>
           <Typography
             variant="body1"
             color="primary"
@@ -436,7 +441,7 @@ function DetailComponent({ tno: propTno }) {
           >
             목록 보기
           </Typography>
-        </Box>
+        </Box> */}
       </MainContainer>
     </ThemeProvider>
   );

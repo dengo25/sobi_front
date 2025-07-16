@@ -13,6 +13,8 @@ import {
   DialogActions,
   TableContainer,
   TableRow,
+  TextField,
+  CardContent,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
@@ -132,19 +134,9 @@ export const DangerZone = styled(Box)(({ theme }) => ({
   background: "linear-gradient(135deg, #ffebee, #fce4ec)",
   border: "2px solid #f48fb1",
   borderRadius: theme.spacing(1.5),
-  padding: theme.spacing(2.5),
+  padding: theme.spacing(1.5),
   marginBottom: theme.spacing(3),
   position: "relative",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "4px",
-    background: "linear-gradient(90deg, #ff4757, #ff6b7a)",
-    borderRadius: `${theme.spacing(1.5)} ${theme.spacing(1.5)} 0 0`,
-  },
 }));
 
 export const InputContainer = styled(Box)(({ theme }) => ({
@@ -269,4 +261,123 @@ export const ReadTableRow = styled(TableRow)(({ theme }) => ({
   "&:hover": {
     backgroundColor: theme.palette.action.focus,
   },
+}));
+
+// Message Components - New styled components for consistent design
+export const MessageContainer = styled(Container)(({ theme }) => ({
+  maxWidth: "lg",
+  padding: theme.spacing(2),
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
+  minHeight: "calc(100vh - 200px)",
+}));
+
+export const MessageHeaderBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center", // 세로 중앙 정렬 추가
+  marginBottom: theme.spacing(2),
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.spacing(1),
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  minHeight: 80, // 최소 높이 설정으로 중앙 정렬이 더 명확하게 보이도록
+}));
+
+export const MessageCard = styled(Card)(({ theme }) => ({
+  marginBottom: theme.spacing(3),
+  borderRadius: theme.spacing(2),
+  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}15, ${theme.palette.primary.light}08)`,
+}));
+
+export const MessageCardContent = styled(CardContent)(({ theme }) => ({
+  padding: theme.spacing(3),
+}));
+
+export const MessageTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: 700,
+  color: theme.palette.secondary.main,
+  marginBottom: theme.spacing(2),
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+}));
+
+export const StyledTextField = styled(TextField)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  "& .MuiOutlinedInput-root": {
+    borderRadius: theme.spacing(1),
+    backgroundColor: "#fafafa",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      backgroundColor: "#f5f5f5",
+    },
+    "&.Mui-focused": {
+      backgroundColor: "white",
+      "& .MuiOutlinedInput-notchedOutline": {
+        borderColor: theme.palette.primary.main,
+        borderWidth: "2px",
+      },
+    },
+  },
+}));
+
+export const ActionButton = styled(Button)(({ theme }) => ({
+  borderRadius: theme.spacing(1),
+  padding: theme.spacing(1.5),
+  fontSize: "1rem",
+  fontWeight: 500,
+  textTransform: "none",
+  height: 48,
+  boxShadow: `0 4px 14px ${theme.palette.primary.main}40`,
+  transition: "all 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-2px)",
+    boxShadow: `0 6px 20px ${theme.palette.primary.main}60`,
+  },
+}));
+
+export const MessageFormContainer = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.spacing(2),
+  padding: theme.spacing(3),
+  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+  marginBottom: theme.spacing(2),
+}));
+
+export const MessageButtonGroup = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "flex-end",
+  gap: theme.spacing(2),
+  paddingTop: theme.spacing(3),
+  borderTop: `1px solid ${theme.palette.divider}`,
+  marginTop: theme.spacing(2),
+}));
+
+export const MessageTableCard = styled(Card)(({ theme }) => ({
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+  borderRadius: theme.spacing(1),
+}));
+
+export const MessageEmptyState = styled(Box)(({ theme }) => ({
+  textAlign: "center",
+  padding: theme.spacing(6),
+  color: theme.palette.text.secondary,
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.spacing(2),
+  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+}));
+
+export const MessageStatusChip = styled(Box)(({ theme }) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  padding: theme.spacing(0.5, 1),
+  borderRadius: theme.spacing(3),
+  fontSize: "0.75rem",
+  fontWeight: 500,
 }));

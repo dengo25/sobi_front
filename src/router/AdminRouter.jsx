@@ -2,12 +2,12 @@ import { Suspense } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import AdminMain from "../pages/admin/AdminMain.jsx";
 import ReportList from "../pages/admin/ReportList.jsx";
-import AdminMemberRouter from "./AdminMemberRouter.jsx";
 import AdminRoute from "../components/common/AdminRoute.jsx";
 import ReportDetail from "../pages/admin/ReportDetail.jsx";
 import AdminReviewDetail from "../pages/admin/AdminReviewDetail.jsx";
 import AdminReviewList from "../pages/admin/AdminReviewList.jsx";
-import ReportReviewDetail from "../pages/admin/ReportReviewDetail.jsx";
+import MemberList from "../pages/admin/MemberList";
+import MemberDetail from "../pages/admin/MemberDetail";
 const AdminRouter = () => {
   return {
     path: "admin",
@@ -23,21 +23,27 @@ const AdminRouter = () => {
         ),
       },
       {
+        path: "member",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <MemberList />
+          </Suspense>
+        ),
+      },
+      {
+        path: "member:memberId",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <MemberDetail />
+          </Suspense>
+        ),
+      },
+      {
         path: "report",
         element: (
           <AdminRoute>
             <Suspense fallback={<LoadingSpinner />}>
               <ReportList />
-            </Suspense>
-          </AdminRoute>
-        ),
-      },
-      {
-        path: "report/review/:tno/:reportId",
-        element: (
-          <AdminRoute>
-            <Suspense fallback={<LoadingSpinner />}>
-              <ReportReviewDetail />
             </Suspense>
           </AdminRoute>
         ),
@@ -72,8 +78,6 @@ const AdminRouter = () => {
           </AdminRoute>
         ),
       },
-
-      AdminMemberRouter,
     ],
   };
 };

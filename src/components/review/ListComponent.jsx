@@ -490,7 +490,7 @@ function ListComponent() {
                       </PostContent>
                     </Grid>
 
-                    {/* 썸네일 이미지 */}
+                    {/* 썸네일 이미지
                     {hasImage && (
                       <Grid item xs={4}>
                         <ThumbnailImage
@@ -501,7 +501,7 @@ function ListComponent() {
                           }}
                         />
                       </Grid>
-                    )}
+                    )} */}
                   </Grid>
 
                   {/* 통계 정보 */}

@@ -1,102 +1,45 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
+  getReview,
+  rejectReport,
+  approveReport,
+} from "../../service/admin/ApiService.js";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Alert,
+  Button,
   Box,
   Typography,
-  Card,
-  CardContent,
-  Grid,
-  CircularProgress,
-  Alert,
-  Chip,
-  Button,
-  TextField,
-  Avatar,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import Stack from "@mui/material/Stack";
+import { Card, CardContent, Paper, Divider, Chip } from "@mui/material";
 import {
+  RateReview as ReviewIcon,
   Report as ReportIcon,
   Person as PersonIcon,
-  AccountCircle as AccountIcon,
-  Category as CategoryIcon,
-  Description as DescriptionIcon,
+  CheckCircle as ApprovedIcon,
+  Cancel as RejectIcon,
   CalendarToday as CalendarIcon,
-  Flag as FlagIcon,
-  CheckCircle as CheckIcon,
-  Cancel as CancelIcon,
   Block as BlockIcon,
-  Assignment as AssignmentIcon,
-  ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
-const ReportHeaderSection = styled(Card)(({ theme }) => ({
-  marginBottom: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-  background: `linear-gradient(135deg, ${theme.palette.error.main}15, ${theme.palette.warning.light}08)`,
-}));
-
-const DetailSection = styled(Card)(({ theme }) => ({
-  marginBottom: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-}));
-
-const ActionSection = styled(Card)(({ theme }) => ({
-  borderRadius: theme.spacing(2),
-  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-  border: `2px solid ${theme.palette.primary.light}`,
-}));
-
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  width: 80,
-  height: 80,
-  fontSize: 32,
-  fontWeight: "bold",
-  backgroundColor: theme.palette.error.main,
-  margin: "0 auto",
-}));
-
-const SectionTitle = styled(Typography)(({ theme }) => ({
-  fontWeight: 700,
-  color: theme.palette.secondary.main,
-  marginBottom: theme.spacing(3),
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing(1),
-}));
-
-const InfoRow = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(2, 0),
-  minHeight: 60,
-}));
-
-const InfoLabel = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing(1),
-  minWidth: 140,
-  marginRight: theme.spacing(2),
-}));
-
-const InfoValue = styled(Box)({
-  flex: 1,
-});
 
 const ReportDetail = ({ data, onBack, onViewReportReview }) => {
   const [report, setReport] = useState(data || null);
   const [loading, setLoading] = useState(true);
-  const [reason, setReason] = useState("");
   const [error, setError] = useState("");
+  const [review, setReview] = useState(null);
+  const [openBlockModal, setOpenBlockModal] = useState(false);
+  const [blockReason, setBlockReason] = useState("");
   const navigate = useNavigate();
 
   const handleReportReviewClick = (report, event) => {
     event.preventDefault();
     event.stopPropagation(); // 부모 클릭 이벤트 방지
-    console.log("asdasdasd", report.reportId);
-    console.log("asdasdasd", report.targetId);
     if (onViewReportReview) {
       onViewReportReview(report);
     } else {
@@ -104,11 +47,13 @@ const ReportDetail = ({ data, onBack, onViewReportReview }) => {
     }
   };
   useEffect(() => {
-    if (data) {
+    if (data && data.targetId) {
       setReport(data);
-      setReason(
-        `[${data.reportType}] ${data.detail || data.description || ""}`
-      );
+      // console.log("report", report);
+      const id = parseInt(data.targetId);
+      getReview(id).then((reviewData) => {
+        setReview(reviewData);
+      });
       setLoading(false);
     } else {
       setError("신고 데이터가 없습니다.");
@@ -116,51 +61,82 @@ const ReportDetail = ({ data, onBack, onViewReportReview }) => {
     }
   }, [data]);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "PENDING":
-        return "warning";
-      case "PROCESSED":
-        return "success";
-      case "REJECTED":
-        return "error";
-      default:
-        return "default";
+  const handleReject = async () => {
+    if (!window.confirm("이 신고를 반려하시겠습니까?")) return;
+    try {
+      await rejectReport(report.reportId);
+      alert("신고가 반려 처리되었습니다.");
+      if (onBack) onBack();
+    } catch (err) {
+      console.error("반려 실패:", err);
+      alert("반려 중 오류가 발생했습니다.");
     }
   };
 
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case "PENDING":
-        return "처리 대기";
-      case "PROCESSED":
-        return "처리 완료";
-      case "REJECTED":
-        return "반려";
-      default:
-        return status;
+  const handleOpenBlockModal = () => {
+    setOpenBlockModal(true);
+    setBlockReason("");
+    setError("");
+  };
+
+  const handleCloseModal = () => {
+    setOpenBlockModal(false);
+    setBlockReason("");
+    setError("");
+    setLoading(false);
+  };
+
+  const handleConfirmBlock = async () => {
+    if (!blockReason.trim()) {
+      setError("차단 사유를 입력해주세요.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await approveReport(report.reportId, report.targetId, blockReason);
+      alert("리뷰가 차단되고 블랙리스트에 등록되었습니다.");
+      setReview({ ...review, confirmed: "B", isDeleted: "Y" });
+      handleCloseModal();
+      if (onBack) onBack();
+    } catch (err) {
+      console.error("차단 실패:", err);
+      setError("차단 중 오류가 발생했습니다.");
+      setLoading(false);
     }
   };
 
-  const getReportTypeColor = (type) => {
-    switch (type) {
-      case "가짜/조작된 리뷰":
-        return "error";
-      case "부적절한 표현 및 혐오 콘텐츠":
-        return "warning";
-      case "스팸 및 상업적 광고":
-        return "info";
-      case "민감한 주제의 표현":
-        return "secondary";
+  const getStatusChip = (confirmed) => {
+    switch (confirmed) {
+      case "Y":
+        return <Chip icon={<ApprovedIcon />} label="승인" color="success" />;
+      case "R":
+        return (
+          <Chip
+            icon={<RejectIcon />}
+            label="반려"
+            color="error"
+            variant="outlined"
+          />
+        );
+      case "B":
+        return <Chip icon={<BlockIcon />} label="차단됨" color="error" />;
       default:
-        return "default";
+        return <Chip label="대기중" color="warning" variant="outlined" />;
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleString("ko-KR");
   };
 
   if (!data) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
-        <Alert severity="error">신고 정보를 찾을 수 없습니다.</Alert>
+        <Alert severity="error">신고 데이터를 찾을 수 없습니다.</Alert>
         {onBack && (
           <Button onClick={onBack} sx={{ mt: 2 }}>
             목록으로 돌아가기
@@ -170,196 +146,179 @@ const ReportDetail = ({ data, onBack, onViewReportReview }) => {
     );
   }
 
-  if (error) {
+  if (!review) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
-        <Alert severity="error">{error}</Alert>
-        {onBack && (
-          <Button onClick={onBack} sx={{ mt: 2 }}>
-            목록으로 돌아가기
-          </Button>
-        )}
+        <Typography>삭제된 게시물입니다.</Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: "md", margin: "0 auto" }}>
-      {/* 신고 헤더 섹션 */}
-      <ReportHeaderSection>
-        <CardContent sx={{ textAlign: "center", p: 4 }}>
-          <StyledAvatar sx={{ mb: 3 }}>
-            <ReportIcon fontSize="large" />
-          </StyledAvatar>
-
-          <Typography variant="h5" fontWeight={700} gutterBottom>
-            신고 #{report.reportId}
+    <Box sx={{ p: 3, maxWidth: "lg", margin: "0 auto" }}>
+      {/* 신고 정보 섹션 */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <ReportIcon />
+            신고 정보 #{report.reportId}
           </Typography>
 
-          <Typography variant="body1" color="text.secondary" gutterBottom>
-            {report.createdAt
-              ? new Date(report.createdAt).toLocaleString("ko-KR")
-              : ""}
-          </Typography>
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+            <Chip
+              icon={<PersonIcon />}
+              label={`신고자: ${report.reporterId}`}
+              variant="outlined"
+            />
+            <Chip label={report.reportType} color="warning" variant="filled" />
+            <Chip label={formatDate(report.createdAt)} variant="outlined" />
+          </Box>
+          {(report.detail || report.description) && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                신고 사유:
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  whiteSpace: "pre-wrap", // 줄바꿈 허용
+                  wordBreak: "break-word", // 긴 단어 줄바꿈
+                  maxWidth: "100%", // 최대 너비 설정
+                  overflow: "visible", // 잘림 방지
+                }}
+              >
+                {report.detail || report.description}
+              </Typography>
+            </Box>
+          )}
+        </CardContent>
+        <Divider sx={{ my: 2 }} />
+        {/* 신고된 리뷰 헤더 섹션 */}
 
-          <Chip
-            label={getStatusLabel(report.status)}
-            color={getStatusColor(report.status)}
-            size="large"
-            sx={{ mt: 2, fontWeight: 600 }}
+        <CardContent>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 2,
+            }}
+          >
+            <Typography variant="h5" fontWeight={600}>
+              제목: {review?.title || "제목 없음"}
+            </Typography>
+            <Box>{getStatusChip(review?.confirmed)}</Box>
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 3, mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <PersonIcon color="action" />
+              <Typography variant="body2" color="text.secondary">
+                작성자: {review?.memberId || "N/A"}
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <CalendarIcon color="action" />
+              <Typography variant="body2" color="text.secondary">
+                작성일: {formatDate(review?.createdAt)}
+              </Typography>
+            </Box>
+          </Box>
+        </CardContent>
+
+        {/* 리뷰 내용 섹션 */}
+
+        <CardContent>
+          <Divider sx={{ mb: 2 }} />
+          <Paper
+            sx={{ p: 2, backgroundColor: "grey.50", minHeight: 200 }}
+            dangerouslySetInnerHTML={{
+              __html: review?.content || "내용이 없습니다.",
+            }}
           />
         </CardContent>
-      </ReportHeaderSection>
-
-      {/* 신고 상세 정보 섹션 */}
-      <DetailSection>
-        <CardContent sx={{ p: 4 }}>
-          <SectionTitle variant="h6">
-            <AssignmentIcon />
-            신고 상세 정보
-          </SectionTitle>
-
-          <Grid container spacing={4}>
-            {/* 신고자 정보 */}
-            <Grid item xs={12} md={6}>
-              <InfoRow>
-                <InfoLabel>
-                  <PersonIcon color="primary" />
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    color="text.secondary"
-                  >
-                    신고자
-                  </Typography>
-                </InfoLabel>
-                <InfoValue>
-                  <Typography variant="body2" fontWeight={500}>
-                    {report.reporterId || "알 수 없음"}
-                  </Typography>
-                </InfoValue>
-              </InfoRow>
-            </Grid>
-
-            {/* 피신고자 정보 */}
-            <Grid item xs={12} md={6}>
-              <InfoRow>
-                <InfoLabel>
-                  <AccountIcon color="error" />
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    color="text.secondary"
-                  >
-                    피신고자
-                  </Typography>
-                </InfoLabel>
-                <InfoValue>
-                  <Typography variant="body2" fontWeight={500}>
-                    {report.reportedId || "알 수 없음"}
-                  </Typography>
-                </InfoValue>
-              </InfoRow>
-            </Grid>
-
-            {/* 신고 유형 */}
-            <Grid item xs={12} md={6}>
-              <InfoRow>
-                <InfoLabel>
-                  <CategoryIcon color="primary" />
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    color="text.secondary"
-                  >
-                    신고 유형
-                  </Typography>
-                </InfoLabel>
-                <InfoValue>
-                  <Chip
-                    label={report.reportType || "미분류"}
-                    color={getReportTypeColor(report.reportType)}
-                    size="small"
-                    variant="filled"
-                  />
-                </InfoValue>
-              </InfoRow>
-            </Grid>
-
-            {/* 타겟 번호 */}
-            <Grid item xs={12} md={6}>
-              <InfoRow>
-                <InfoLabel>
-                  <FlagIcon color="primary" />
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    color="text.secondary"
-                  >
-                    후기 번호
-                  </Typography>
-                </InfoLabel>
-                <InfoValue>
-                  <Chip
-                    label={`#${report.targetId || "N/A"}`}
-                    color="primary"
-                    size="small"
-                    variant="outlined"
-                    onClick={(event) => handleReportReviewClick(report, event)}
-                  />
-                </InfoValue>
-              </InfoRow>
-            </Grid>
-
-            {/* 신고일자 */}
-            <Grid item xs={12}>
-              <InfoRow>
-                <InfoLabel>
-                  <CalendarIcon color="primary" />
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    color="text.secondary"
-                  >
-                    신고일자
-                  </Typography>
-                </InfoLabel>
-                <InfoValue>
-                  <Typography variant="body2" fontWeight={500}>
-                    {report.createdAt
-                      ? new Date(report.createdAt).toLocaleDateString("ko-KR")
-                      : "정보 없음"}
-                  </Typography>
-                </InfoValue>
-              </InfoRow>
-            </Grid>
-          </Grid>
+        <CardContent>
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ justifyContent: "center", mt: 2 }}
+          >
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<ApprovedIcon />}
+              onClick={handleOpenBlockModal}
+              disabled={loading}
+            >
+              승인 (차단)
+            </Button>
+            <Button
+              variant="outlined"
+              color="warning"
+              startIcon={<RejectIcon />}
+              onClick={handleReject}
+              disabled={loading}
+            >
+              반려
+            </Button>
+          </Stack>
         </CardContent>
-      </DetailSection>
+      </Card>
 
-      {/* 신고 내용*/}
-      <DetailSection>
-        <CardContent sx={{ p: 4 }}>
-          <SectionTitle variant="h6">
-            <BlockIcon />
-            신고 내용
-          </SectionTitle>
+      {/* 차단 승인 모달 */}
+      <Dialog
+        open={openBlockModal}
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>신고 승인</DialogTitle>
+        <DialogContent>
+          {review && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                리뷰: {review.title}
+              </Typography>
+            </Box>
+          )}
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
           <TextField
             fullWidth
             multiline
-            rows={2}
-            label="신고 내용"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="블랙리스트 등록 사유를 입력해주세요..."
+            rows={3}
+            label="차단 사유"
+            value={blockReason}
+            onChange={(e) => setBlockReason(e.target.value)}
+            placeholder="차단 사유를 입력해주세요..."
             variant="outlined"
-            disabled
           />
-        </CardContent>
-      </DetailSection>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} disabled={loading}>
+            취소
+          </Button>
+          <Button
+            onClick={handleConfirmBlock}
+            variant="contained"
+            color="error"
+            disabled={loading}
+          >
+            {loading ? "처리 중..." : "승인"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
-
 export default ReportDetail;
