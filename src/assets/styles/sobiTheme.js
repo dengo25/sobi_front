@@ -132,19 +132,19 @@ export const DangerZone = styled(Box)(({ theme }) => ({
   background: "linear-gradient(135deg, #ffebee, #fce4ec)",
   border: "2px solid #f48fb1",
   borderRadius: theme.spacing(1.5),
-  padding: theme.spacing(2.5),
+  padding: theme.spacing(1.5),
   marginBottom: theme.spacing(3),
   position: "relative",
-  "&::before": {
-    content: '""',
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "4px",
-    background: "linear-gradient(90deg, #ff4757, #ff6b7a)",
-    borderRadius: `${theme.spacing(1.5)} ${theme.spacing(1.5)} 0 0`,
-  },
+  // "&::before": {
+  //   content: '""',
+  //   position: "absolute",
+  //   top: 0,
+  //   left: 0,
+  //   right: 0,
+  //   height: "4px",
+  //   background: "linear-gradient(90deg, #ff4757, #ff6b7a)",
+  //   borderRadius: `${theme.spacing(1.5)} ${theme.spacing(1.5)} 0 0`,
+  // },
 }));
 
 export const InputContainer = styled(Box)(({ theme }) => ({
