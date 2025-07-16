@@ -26,13 +26,13 @@ import {
   ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
 
-import BasicEditor from "../../components/editor/BasicEditor";
 import {
   getCategoryList,
   insertReview,
   updateReview,
 } from "../../service/review/ReviewService.js";
 import { useSelector } from "react-redux";
+import ReviewEditor from "../editor/ReviewEditor.jsx";
 
 const sobiTheme = createTheme({
   palette: {
@@ -383,7 +383,7 @@ const InsertComponent = () => {
                   도움이 되는 정보를 포함해주시면 좋습니다.
                 </Typography>
                 <EditorContainer elevation={0}>
-                  <BasicEditor
+                  <ReviewEditor
                     value={formData.content}
                     onChange={handleEditorChange}
                     s3Folder="review"
