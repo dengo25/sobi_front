@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { getNoticeList } from "../service/community/NoticeApiService";
+import { getNoticeList } from "../service/community/noticeApiService";
 import { noticeLimit3List, reviewLimit5List, reviewLimit5ListfromCateogry1, reviewLimit5ListfromCateogry2 } from "../service/main/MainApiService";
 
 import SwiperCarousel from "../components/swiper/SwiperCarousel";
