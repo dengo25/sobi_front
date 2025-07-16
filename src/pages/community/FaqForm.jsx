@@ -36,12 +36,14 @@ import {
   insertFaqList,
   updateFaqList,
 } from "../../service/community/faqApiService.js";
+import { isEmptyAndAlert, isEditorEmptyAndAlert } from "../../utils/common.js";
 
 const FaqForm = () => {
   const location = useLocation();
   const faqDataFromState = location.state?.faqData;
   const [faqQuestion, setFaqQuestion] = useState("");
   const [value, setValue] = useState("");
+  // const [faqAnswer, setFaqAnswer] = useState("");
   const { faqNo } = useParams();
   const navigate = useNavigate();
   console.log("faqNo: ", faqNo);
@@ -72,6 +74,11 @@ const FaqForm = () => {
 
   const submitEditor = async (e) => {
     e.preventDefault();
+
+    // 필수 필드 검증
+    if(isEmptyAndAlert(faqQuestion,"제목을 입력하세요!")) return;
+    if(isEditorEmptyAndAlert(value,"내용을 입력하세요!")) return;
+
     const dto = {
       faqQuestion,
       faqAnswer: value,

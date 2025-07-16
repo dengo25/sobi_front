@@ -47,6 +47,7 @@ import {
   deleteFaq,
   getFaqListWithPaging,
 } from "../../service/community/faqApiService";
+import { CollectionsBookmarkRounded } from "@mui/icons-material";
 
 const Faq = () => {
   const [selectedFaqs, setSelectedFaqs] = useState([]);
@@ -148,6 +149,7 @@ const Faq = () => {
         return;
       }
       if (selectedFaqs.length > 1) {
+        // console.log("선택 항목 : ",selectedFaqs.length);
         alert("하나의 항목만 선택해 주세요.");
         return;
       }
