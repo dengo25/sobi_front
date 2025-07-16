@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
+import noImg from "../../assets/images/img-noimg.png" // 경로 이슈로 임포트 처리
 
 const ImageWithTitleList = ({
   items,
@@ -27,12 +28,12 @@ const ImageWithTitleList = ({
               src={
                 item.img
                   ? `${item.img}?w=248&fit=crop&auto=format`
-                  : `src/assets/images/img-noimg.png`
+                  : noImg
               }
               srcSet={
                 item.img
                   ? `${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`
-                  : `src/assets/images/img-noimg.png`
+                  : noImg
               }
               alt={item.title + ` 게시글 타이틀 이미지`}
               loading="lazy"

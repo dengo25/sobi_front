@@ -5,6 +5,8 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import CustomButton from "../input/CustomButton";
 import { stripHtml } from "../../utils/common";
+import noImg from "../../assets/images/img-noimg.png" // 경로 이슈로 임포트 처리
+
 
 const ImageCard = ({
   items,
@@ -28,7 +30,7 @@ const ImageCard = ({
             image={
               item.img
                 ? `${item.img}?w=248&fit=crop&auto=format`
-                : "src/assets/images/img-noimg.png"
+                : noImg
             }
             title={item.title}
           />
@@ -37,8 +39,6 @@ const ImageCard = ({
               {item.title}
             </Typography>
             <div
-              // variant="body2"
-              // sx={{ color: "text.secondary" }}
               dangerouslySetInnerHTML={{ __html: stripHtml(item.content) }}
               className="custom-body"
             ></div>
