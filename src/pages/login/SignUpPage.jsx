@@ -197,6 +197,7 @@ export default function SignUpPage() {
       alert("회원가입 완료");
       window.location.href = "/login";
     } catch (error) {
+      console.log("전체 error 객체:", error);
       if (
         error.message &&
         error.message.includes(

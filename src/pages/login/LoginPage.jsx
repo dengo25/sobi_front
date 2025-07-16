@@ -74,8 +74,8 @@ function Login() {
 
       // 로그인 후 메인 페이지로 이동
       navigate("/");
-    } catch (err) {
-      console.error("로그인 오류:", err);
+    } catch (error) {
+      console.error("로그인 오류:", error);
       // 블랙리스트 에러 처리 추가
       if (
         error.message &&
