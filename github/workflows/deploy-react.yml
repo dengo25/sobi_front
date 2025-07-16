@@ -1,0 +1,49 @@
+name: Deploy React App to S3 + CloudFront(예정)
+
+on:
+  push:
+    branches:
+      - main-dev
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 레포지토리 코드 체크아웃
+      - name: 📁 Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. 의존성 설치
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      # 3. 빌드 실행
+      - name: 🛠️ Build React App
+        run: npm run build
+
+      # 4. S3 버킷에 업로드 (기존 파일은 삭제하고 새로 덮어씀)
+      - name: ☁️ Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'ap-northeast-2'
+          SOURCE_DIR: 'dist'  # 리액트 빌드 결과 디렉토리
+
+      #5. CloudFront 캐시 무효화 (index.html 등 변경 시 즉시 반영되도록)
+      - name: 🚀 Invalidate CloudFront Cache
+        uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          DISTRIBUTION: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}  # CloudFront 배포 ID
+          PATHS: '/*'  # 전체 경로 무효화 (필요시 특정 경로만 지정 가능)
+          AWS_REGION: 'ap-northeast-2'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
