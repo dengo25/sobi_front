@@ -114,7 +114,6 @@ const AdminReviewList = ({ onViewDetail }) => {
     { value: "createdAt", label: "작성일" },
     { value: "title", label: "제목" },
     { value: "confirmed", label: "승인상태" },
-    // { value: "rno", label: "글번호" },
   ];
   const confirmedOptions = [
     { value: "all", label: "전체" },
@@ -140,7 +139,7 @@ const AdminReviewList = ({ onViewDetail }) => {
         confirmed: filters.confirmed,
       };
 
-      //      console.log("🔍 리뷰 목록 API 호출 파라미터:", searchParams);
+      //console.log("🔍 리뷰 목록 API 호출 파라미터:", searchParams);
       const response = await getReviewList(searchParams);
       // console.log("📥 리뷰 목록 API 응답:", response);
       // console.log(
@@ -166,8 +165,8 @@ const AdminReviewList = ({ onViewDetail }) => {
           pageSize: response.pageSize || response.size || 10,
         });
 
-        // console.log("✅ 리뷰 목록 설정 완료:", reviewContent.length, "개");
-        // console.log("📊 페이지 정보:", {
+        // console.log("리뷰 목록 설정 완료:", reviewContent.length, "개");
+        // console.log("페이지 정보:", {
         //   totalElements: response.totalElements,
         //   totalPages: response.totalPages,
         //   currentPage: response.currentPage,
@@ -394,9 +393,6 @@ const AdminReviewList = ({ onViewDetail }) => {
                 <TableCell align="center" sx={{ fontWeight: 600 }}>
                   승인상태
                 </TableCell>
-                {/* <TableCell align="center" sx={{ fontWeight: 600 }}>
-                    글번호
-                  </TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
