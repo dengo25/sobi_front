@@ -44,7 +44,6 @@ import ReportList from "./ReportList";
 import MemberDetail from "./MemberDetail";
 import AdminReviewDetail from "./AdminReviewDetail";
 import ReportDetail from "./ReportDetail";
-// import ReportReviewDetail from "./ReportReviewDetail";
 
 import { unblockUser } from "../../service/admin/ApiService";
 
@@ -150,7 +149,7 @@ const AdminMain = () => {
   // 상세 페이지 상태 관리 추가
   const [currentView, setCurrentView] = useState("list"); // 'list' 또는 'detail'
   const [detailData, setDetailData] = useState(null);
-  const [detailType, setDetailType] = useState(""); // 'member', 'review', 'report', 'reportReview'
+  const [detailType, setDetailType] = useState(""); // 'member', 'review', 'report'
 
   // 통계 데이터
   const [memberNotBlockedCount, setMemberNotBlockedCount] = useState(0);
@@ -278,8 +277,6 @@ const AdminMain = () => {
           return `리뷰 상세 (${detailData?.reviewId || detailData?.id})`;
         case "report":
           return `신고 상세 (${detailData?.reportId || detailData?.id})`;
-        case "reportReview":
-          return `신고된 리뷰 상세 (${detailData?.targetId || detailData?.id})`;
         default:
           return "상세 정보";
       }
@@ -334,10 +331,6 @@ const AdminMain = () => {
               }
             />
           );
-        // case "reportReview":
-        //   return (
-        //     <ReportReviewDetail data={detailData} onBack={handleBackToList} />
-        //   );
         default:
           return (
             <Box sx={{ p: 3, textAlign: "center" }}>

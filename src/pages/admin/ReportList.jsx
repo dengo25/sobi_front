@@ -86,18 +86,6 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
       navigate(`/admin/report/${report.reportId}`);
     }
   };
-  const handleReportReviewClick = (report, event) => {
-    event.preventDefault();
-    event.stopPropagation(); // 부모 클릭 이벤트 방지
-
-    if (onViewReportReview) {
-      // console.log("신고된 리뷰 보기:", report);
-      onViewReportReview(report);
-    } else {
-      `/admin/report/review/${report.targetId}/${report.reportId}`;
-    }
-  };
-
   // 신고 목록과 페이징 상태
   const [reportList, setReportList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -178,13 +166,13 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
           hasNext: response.hasNext || false,
           hasPrevious: response.hasPrevious || false,
         });
-        // console.log("✅ 신고 목록 설정 완료:", response.reports.length, "건");
+        // console.log("신고 목록 설정 완료:", response.reports.length, "건");
       } else {
-        console.log("❌ 예상하지 못한 응답 구조:", response);
+        console.log("예상하지 못한 응답 구조:", response);
         setReportList([]);
       }
     } catch (err) {
-      console.error("❌ 신고 목록 조회 오류:", err);
+      console.error("신고 목록 조회 오류:", err);
       setError("신고 목록을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -478,9 +466,6 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
                         color="primary"
                         size="small"
                         variant="outlined"
-                        onClick={(event) =>
-                          handleReportReviewClick(report, event)
-                        }
                         sx={{ cursor: "pointer" }}
                       />
                     </TableCell>
