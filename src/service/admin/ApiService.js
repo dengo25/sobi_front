@@ -34,7 +34,7 @@ export const getList = async (pageParam) => {
     sortDir = "desc",
   } = pageParam || {};
 
-  console.log("API 요청 파라미터:", { page, size, sortBy, sortDir });
+  // console.log("API 요청 파라미터:", { page, size, sortBy, sortDir });
 
   try {
     const params = {
@@ -48,7 +48,7 @@ export const getList = async (pageParam) => {
       params: params,
     });
 
-    console.log("API 응답:", res.data);
+    // console.log("API 응답:", res.data);
     return res.data;
   } catch (error) {
     console.error("회원 목록 조회 API 오류:", error);
@@ -73,7 +73,7 @@ export const getReportList = async (searchParams) => {
     reportType = null,
   } = searchParams || {};
 
-  console.log("신고 목록 API 요청 파라미터:", searchParams);
+  // console.log("신고 목록 API 요청 파라미터:", searchParams);
 
   try {
     const params = {};
@@ -92,7 +92,7 @@ export const getReportList = async (searchParams) => {
       params: params,
     });
 
-    console.log("신고 목록 API 응답:", res.data);
+    // console.log("신고 목록 API 응답:", res.data);
     return res.data;
   } catch (error) {
     console.error("신고 목록 조회 API 오류:", error);
@@ -153,13 +153,20 @@ export async function getReview(tno) {
 //관리자 Review List
 export const getReviewList = async (pageParam) => {
   const {
-    page = 0,
+    page = 1,
     size = 10,
-    sortBy = "memberReg",
+    sortBy = "createdAt",
     sortDir = "desc",
+    confirmed = null,
   } = pageParam || {};
 
-  console.log("리뷰 목록 API 요청 파라미터:", { page, size, sortBy, sortDir });
+  // console.log("🔍 리뷰 목록 API 요청 파라미터:", {
+  //   page,
+  //   size,
+  //   sortBy,
+  //   sortDir,
+  //   confirmed,
+  // });
 
   try {
     const params = {
@@ -169,14 +176,33 @@ export const getReviewList = async (pageParam) => {
       sortDir: sortDir,
     };
 
+    // confirmed가 유효한 값일 때만 추가 ("all", null, undefined는 제외)
+    if (
+      confirmed &&
+      confirmed !== "all" &&
+      confirmed !== null &&
+      confirmed !== undefined
+    ) {
+      params.confirmed = confirmed;
+      // console.log("📤 confirmed 필터 적용:", confirmed);
+    } else {
+      console.log("📤 confirmed 필터 없음 (전체 조회)");
+    }
+
+    // console.log("📤 실제 전송 파라미터:", params);
+
     const res = await jwtAxios.get(`${API_BASE_URL}/api/admin/review/list`, {
       params: params,
     });
 
-    console.log("리뷰 목록 API 응답:", res.data);
+    // console.log("📥 리뷰 목록 API 응답:", res.data);
+    // console.log("📊 조회된 리뷰 개수:", res.data?.reviews?.length || 0);
+
     return res.data;
   } catch (error) {
-    console.error("리뷰 목록 조회 API 오류:", error);
+    console.error("❌ 리뷰 목록 조회 API 오류:", error);
+    console.error("❌ 오류 응답:", error.response?.data);
+    console.error("❌ 오류 상태코드:", error.response?.status);
     throw error;
   }
 };

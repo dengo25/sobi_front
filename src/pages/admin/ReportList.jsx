@@ -79,7 +79,7 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
     event.preventDefault();
     // onViewDetail prop이 있으면 상세 페이지로, 없으면 기존 방식으로
     if (onViewDetail) {
-      console.log("신고 상세 페이지로 이동:", report);
+      // console.log("신고 상세 페이지로 이동:", report);
       onViewDetail(report);
     } else {
       // AdminMain 밖에서 사용될 때는 기존 방식 유지
@@ -91,7 +91,7 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
     event.stopPropagation(); // 부모 클릭 이벤트 방지
 
     if (onViewReportReview) {
-      console.log("신고된 리뷰 보기:", report);
+      // console.log("신고된 리뷰 보기:", report);
       onViewReportReview(report);
     } else {
       `/admin/report/review/${report.targetId}/${report.reportId}`;
@@ -166,9 +166,7 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
         reportType: filters.reportType || null,
       };
 
-      console.log("🔍 API 호출 파라미터:", searchParams);
       const response = await getReportList(searchParams);
-      console.log("📥 API 응답:", response);
 
       if (response?.reports && Array.isArray(response.reports)) {
         setReportList(response.reports);
@@ -180,7 +178,7 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
           hasNext: response.hasNext || false,
           hasPrevious: response.hasPrevious || false,
         });
-        console.log("✅ 신고 목록 설정 완료:", response.reports.length, "건");
+        // console.log("✅ 신고 목록 설정 완료:", response.reports.length, "건");
       } else {
         console.log("❌ 예상하지 못한 응답 구조:", response);
         setReportList([]);

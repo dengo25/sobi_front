@@ -44,7 +44,7 @@ import ReportList from "./ReportList";
 import MemberDetail from "./MemberDetail";
 import AdminReviewDetail from "./AdminReviewDetail";
 import ReportDetail from "./ReportDetail";
-import ReportReviewDetail from "./ReportReviewDetail";
+// import ReportReviewDetail from "./ReportReviewDetail";
 
 import { unblockUser } from "../../service/admin/ApiService";
 
@@ -334,10 +334,10 @@ const AdminMain = () => {
               }
             />
           );
-        case "reportReview":
-          return (
-            <ReportReviewDetail data={detailData} onBack={handleBackToList} />
-          );
+        // case "reportReview":
+        //   return (
+        //     <ReportReviewDetail data={detailData} onBack={handleBackToList} />
+        //   );
         default:
           return (
             <Box sx={{ p: 3, textAlign: "center" }}>
