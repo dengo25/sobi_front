@@ -149,7 +149,7 @@ const ReportDetail = ({ data, onBack, onViewReportReview }) => {
   if (!review) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
-        <Typography>이미 처리된 신고 내역입니다.</Typography>
+        <Typography>삭제된 게시물입니다.</Typography>
       </Box>
     );
   }
