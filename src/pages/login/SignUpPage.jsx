@@ -203,6 +203,7 @@ export default function SignUpPage() {
           "해당 계정은 이용이 제한되어 있습니다. 관리자에게 문의해주세요."
         )
       ) {
+        console.log("error.message : " + error.message);
         alert(error.message);
       } else {
         console.error("회원가입 실패:", error);

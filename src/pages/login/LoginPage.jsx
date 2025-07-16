@@ -83,6 +83,7 @@ function Login() {
           "해당 계정은 이용이 제한되어 있습니다. 관리자에게 문의해주세요."
         )
       ) {
+        console.log("error.message : " + error.message);
         alert(error.message);
       } else {
         setError("아이디 또는 비밀번호가 올바르지 않습니다.");
