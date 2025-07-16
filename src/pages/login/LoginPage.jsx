@@ -74,10 +74,10 @@ function Login() {
 
       // 로그인 후 메인 페이지로 이동
       navigate("/");
-    } catch (err) {
-      console.error("로그인 오류:", err);
+    } catch (error) {
+      console.error("로그인 오류:", error);
       // 블랙리스트 에러 처리 추가
-      if (err.message && err.message.includes("이용이 제한되어 있습니다")) {
+      if (error.message && error.message.includes("이용이 제한되어 있습니다")) {
         alert(
           "해당 계정은 이용이 제한되어 있습니다.\n고객센터(1588-0000)로 문의해주세요."
         );
