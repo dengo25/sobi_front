@@ -4,7 +4,7 @@ import { Stack } from '@mui/material';
 
 import CustomButton from '../../components/input/CustomButton';
 import BasicEditor from '../../components/editor/BasicEditor';
-import { getFaqDetail, updateFaqList, insertFaqList } from '../../service/community/FaqApiService';
+import { getFaqDetail, updateFaqList, insertFaqList } from '../../service/community/faqApiService';
 
 const FaqForm = () => {
     const location = useLocation();
