@@ -19,9 +19,16 @@ export async function getReview(tno) {
   return response.data;
 }
 
-export function getCategoryList() {
-  return call("/api/category", "GET", null);
+
+export async function getCategoryList() {
+  const response = await axios.get(`${API_BASE_URL}/api/category`);
+  return response.data;
 }
+
+
+// export function getCategoryList() {
+//   return call("/api/category", "GET", null);
+// }
 
 //프론트에서 const { tno, ...updateData } = reviewData 코드를 사용하면 tno가 body에서 빠지므로, 백엔드 DTO에 tno가 null로 들어가게 된다.
 //그래서 reviewData.tno 이렇게 보내줘야 tno가 넣어짐
