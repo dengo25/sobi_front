@@ -21,7 +21,6 @@ import {
   GitHub as GitHubIcon,
   Google as GoogleIcon,
 } from "@mui/icons-material";
-import { signin, socialLogin } from "../../service/member/ApiService.js";
 import { useDispatch } from "react-redux";
 import { login } from "../../slice/memberSlice.jsx";
 import {
@@ -46,7 +45,11 @@ function Login() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // 일반 로그인 시 실행되는 함수
+  const validAccounts = [
+    { memberId: "admin", password: "admin", role: "admin" },
+    { memberId: "user", password: "user", role: "user" },
+  ];
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -56,7 +59,6 @@ function Login() {
     const memberId = data.get("memberId");
     const password = data.get("password");
 
-    // 입력 검증
     if (!memberId || !password) {
       setError("아이디와 비밀번호를 모두 입력해주세요.");
       setLoading(false);
@@ -64,35 +66,38 @@ function Login() {
     }
 
     try {
-      const response = await signin({ memberId, password });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const account = validAccounts.find(
+        (acc) => acc.memberId === memberId && acc.password === password
+      );
 
-      // 토큰 저장
-      localStorage.setItem("ACCESS_TOKEN", response.token);
+      if (!account) {
+        setError("아이디 또는 비밀번호가 올바르지 않습니다.");
+        setLoading(false);
+        return;
+      }
 
-      // Redux에 로그인 정보 저장
-      dispatch(login(response));
+      const fakeToken = `fake-jwt-token-${account.memberId}-${Date.now()}`;
 
-      // 로그인 후 메인 페이지로 이동
+      localStorage.setItem("ACCESS_TOKEN", fakeToken);
+
+      const userInfo = {
+        memberId: account.memberId,
+        role: account.role,
+        token: fakeToken,
+        loginTime: new Date().toISOString(),
+      };
+
+      dispatch(login(userInfo));
+
       navigate("/");
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.error || error?.message || "오류 발생";
-
-      if (
-        errorMessage.includes(
-          "해당 계정은 이용이 제한되어 있습니다. 관리자에게 문의해주세요."
-        )
-      ) {
-        alert(errorMessage);
-      } else {
-        setError("아이디 또는 비밀번호가 올바르지 않습니다.");
-      }
+      setError("로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
-  // 소셜 로그인 버튼 클릭 시 실행되는 함수
   const handleSocialLogin = (provider) => {
     socialLogin(provider);
   };
@@ -128,9 +133,17 @@ function Login() {
               >
                 로그인
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                 계정에 로그인하여 서비스를 이용하세요.
               </Typography>
+
+              <Alert severity="info" sx={{ mb: 3, borderRadius: 1 }}>
+                <Typography variant="body2">
+                  <strong> 관리자: admin / admin</strong>
+                  <br></br>
+                  <strong> 사용자: user / user</strong>
+                </Typography>
+              </Alert>
 
               {/* 에러 알림 */}
               {error && (
@@ -193,18 +206,6 @@ function Login() {
                     ),
                   }}
                 />
-
-                {/* 비밀번호 찾기 링크
-                <Box sx={{ textAlign: "right", mb: 2 }}>
-                  <MuiLink
-                    component="button"
-                    variant="body2"
-                    color="primary"
-                    sx={{ textDecoration: "none", cursor: "pointer" }}
-                  >
-                    비밀번호를 잊으셨나요?
-                  </MuiLink>
-                </Box> */}
 
                 {/* 로그인 버튼 */}
                 <LoginButton

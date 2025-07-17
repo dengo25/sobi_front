@@ -105,16 +105,6 @@ const FooterPP = ({ open, onClose }) => {
             기술적·관리적 보호조치를 시행합니다.
           </Typography>
 
-          <HighlightBox>
-            <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              <ShieldIcon
-                sx={{ verticalAlign: "middle", mr: 1, fontSize: 20 }}
-              />
-              개인정보 관련 문의사항이 있으시면 언제든지 고객센터로 연락주시기
-              바랍니다.
-            </Typography>
-          </HighlightBox>
-
           <SectionDivider />
         </ContentSection>
       </StyledDialog>

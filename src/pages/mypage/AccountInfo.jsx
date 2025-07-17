@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react"; // useEffect 추가
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -36,10 +36,9 @@ import {
   VisibilityOff as VisibilityOffIcon,
   Security as SecurityIcon,
   Save as SaveIcon,
-  Close as CloseIcon, // CloseIcon 추가
+  Close as CloseIcon,
 } from "@mui/icons-material";
-import DaumPostcode from "react-daum-postcode"; // DaumPostcode 추가
-import { updateMypage } from "../../service/member/ApiService"; // 경로 확인
+import DaumPostcode from "react-daum-postcode";
 
 // SOBI 테마 설정 (기존과 동일)
 const sobiTheme = createTheme({
@@ -121,11 +120,11 @@ const ActionButtons = styled(Box)(({ theme }) => ({
 
 // SignUpPage.jsx에서 가져온 StyledTextField
 const StyledTextField = styled(TextField)(({ theme }) => ({
-  marginBottom: theme.spacing(2), // 기존 InfoRow 내부에서는 mb를 0으로 설정할 수 있음
+  marginBottom: theme.spacing(2),
   "& .MuiOutlinedInput-root": {
     borderRadius: theme.spacing(1),
     backgroundColor: "#fafafa",
-    height: 56, // 높이 고정
+    height: 56,
     transition: "all 0.3s ease",
     "&:hover": {
       backgroundColor: "#f5f5f5",
@@ -163,7 +162,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false); // 주소 검색 모달 상태
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     memberName: userInfo?.memberName || "",
@@ -172,7 +171,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
     memberBirth: userInfo?.memberBirth || "",
     memberAddr: userInfo?.memberAddr || "",
     memberZip: userInfo?.memberZip || "",
-    detailAddress: "", // 상세 주소 필드 추가
+    detailAddress: "",
     password: "",
     confirmPassword: "",
   });
@@ -186,7 +185,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
       memberBirth: userInfo?.memberBirth || "",
       memberAddr: userInfo?.memberAddr || "",
       memberZip: userInfo?.memberZip || "",
-      detailAddress: "", // 상세 주소는 수정 모드 진입 시 초기화
+      detailAddress: "",
       password: "",
       confirmPassword: "",
     });
@@ -271,34 +270,33 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
     setError("");
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const finalAddress =
         `${formData.memberAddr} ${formData.detailAddress}`.trim();
 
       const updateData = {
+        ...userInfo,
         memberName: formData.memberName,
         memberEmail: formData.memberEmail,
         memberGender: formData.memberGender,
         memberBirth: formData.memberBirth,
-        memberAddr: finalAddress, // 상세 주소 포함하여 전송
+        memberAddr: finalAddress,
         memberZip: formData.memberZip,
       };
 
       if (formData.password.trim()) {
-        updateData.password = formData.password;
+        console.log("비밀번호 변경 요청:", formData.password);
       }
 
-      const response = await updateMypage(updateData);
-
-      if (response) {
-        onUpdate(response, "회원정보가 성공적으로 수정되었습니다!");
-        setEditMode(false);
-        setFormData((prev) => ({
-          ...prev,
-          password: "",
-          confirmPassword: "",
-          detailAddress: "", // 저장 후 상세 주소 초기화
-        }));
-      }
+      onUpdate(updateData, "회원정보가 성공적으로 수정되었습니다!");
+      setEditMode(false);
+      setFormData((prev) => ({
+        ...prev,
+        password: "",
+        confirmPassword: "",
+        detailAddress: "",
+      }));
     } catch (err) {
       console.error("회원정보 수정 오류:", err);
       setError("회원정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -321,7 +319,6 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
     return `${year}년 ${month}월 ${day}일`;
   };
 
-  // Daum 주소 검색 처리
   const handleAddressSelect = (data) => {
     const fullAddress = data.address;
     const zonecode = data.zonecode;
@@ -337,7 +334,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
   return (
     <ThemeProvider theme={sobiTheme}>
       <Container maxWidth="md" sx={{ py: 3 }}>
-        {/* 프로필 섹션 (기존과 동일) */}
+        {/* 프로필 섹션 */}
         <ProfileSection>
           <CardContent sx={{ textAlign: "center", p: 4 }}>
             <StyledAvatar sx={{ mb: 3 }}>
@@ -372,7 +369,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
             </Typography>
 
             <Typography variant="body2" color="primary.main" fontWeight={600}>
-              {userInfo?.role === "ROLE_USER" ? "일반 회원" : "관리자"}
+              {userInfo?.role === "ROLE_ADMIN" ? "관리자" : "일반 회원"}
             </Typography>
           </CardContent>
         </ProfileSection>
@@ -405,7 +402,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                 variant={editMode ? "outlined" : "contained"}
                 color={editMode ? "inherit" : "primary"}
                 disabled={loading}
-                sx={{ height: 40, mt: 0, mb: 0 }} // 버튼 높이 조정
+                sx={{ height: 40, mt: 0, mb: 0 }}
               >
                 {editMode ? "취소" : "수정"}
               </ActionButton>
@@ -434,7 +431,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
                         value={formData.memberEmail}
                         onChange={handleChange}
                         size="small"
-                        sx={{ mb: 0 }} // InfoRow 내부이므로 margin 조정
+                        sx={{ mb: 0 }}
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
@@ -538,7 +535,7 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
 
             {/* 두 번째 행: 우편번호, 주소, 상세주소 */}
             <Grid container spacing={4}>
-              {editMode && ( // editMode일 때만 우편번호 필드 표시
+              {editMode && (
                 <Grid item xs={12} md={4}>
                   <InfoRow>
                     <InfoLabel>
@@ -581,8 +578,6 @@ const AccountInfo = ({ userInfo, onUpdate, onDeleteAccount }) => {
               )}
 
               <Grid item xs={12} md={editMode ? 8 : 12}>
-                {" "}
-                {/* editMode에 따라 Grid 크기 조정 */}
                 <InfoRow>
                   <InfoLabel>
                     <HomeIcon color="primary" />

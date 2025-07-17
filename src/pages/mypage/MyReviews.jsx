@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   Box,
   Typography,
@@ -31,7 +32,6 @@ import {
   LoadingBox,
   PaginationContainer,
 } from "../../assets/styles/sobiTheme";
-import { getMyReviews } from "../../service/mypage/ApiService";
 import { stripHtml } from "../../utils/common";
 
 const MyReviews = ({ onReviewAction }) => {
@@ -43,21 +43,72 @@ const MyReviews = ({ onReviewAction }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 14;
 
+  const reduxUserInfo = useSelector((state) => state.member);
+
+  const generateReviewsData = (memberId) => {
+    const baseDate = new Date();
+
+    if (memberId === "admin") {
+      return Array.from({ length: 15 }, (_, index) => {
+        const reviewDate = new Date(baseDate);
+        reviewDate.setDate(reviewDate.getDate() - index * 2);
+
+        return {
+          tno: 1000 + index,
+          title: `[관리자] 서비스 ${
+            index + 1
+          }번째 후기 - 매우 만족스러운 경험이었습니다`,
+          content: `안녕하세요, 관리자입니다.\n\n이번에 서비스를 이용해보았는데 정말 만족스러운 경험이었습니다.\n\n특히 다음과 같은 점들이 좋았습니다:\n1. 사용자 인터페이스가 매우 직관적입니다\n2. 응답 속도가 빠릅니다\n3. 고객 지원이 훌륭합니다\n\n앞으로도 계속 이용할 예정입니다. 추천드립니다!`,
+          confirmed: index % 3 === 0 ? "N" : "Y",
+          createdAt: reviewDate.toISOString(),
+          memberId: "admin",
+        };
+      });
+    } else {
+      return Array.from({ length: 3 }, (_, index) => {
+        const reviewDate = new Date(baseDate);
+        reviewDate.setDate(reviewDate.getDate() - index * 5);
+
+        return {
+          tno: 2000 + index,
+          title: `일반 사용자 후기 ${index + 1} - 좋은 서비스네요`,
+          content: `안녕하세요!\n\n처음 이용해봤는데 생각보다 정말 좋네요.\n\n${
+            index === 0
+              ? "처음에는 좀 어려울 줄 알았는데 생각보다 쉽게 사용할 수 있었어요."
+              : index === 1
+              ? "친구 추천으로 사용하게 되었는데 만족스럽습니다."
+              : "이미 몇 번째 이용인데 매번 만족스러워요."
+          }\n\n다만 아쉬운 점이 있다면 더 다양한 기능이 있으면 좋겠어요.\n\n그래도 전반적으로 만족합니다! 👍`,
+          confirmed: index === 0 ? "N" : "Y",
+          createdAt: reviewDate.toISOString(),
+          memberId: "user",
+        };
+      });
+    }
+  };
+
   useEffect(() => {
     fetchMyReviews();
-  }, []);
+  }, [reduxUserInfo]);
 
   const fetchMyReviews = async () => {
     try {
       setLoading(true);
       setError("");
-      const response = await getMyReviews();
-      console.log("내가 쓴 후기 응답:", response);
 
-      if (response && response.rnoList) {
-        setReviews(response.rnoList);
-        // 데이터가 새로 로드되면 첫 페이지로 이동
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      if (reduxUserInfo && reduxUserInfo.memberId) {
+        const mockReviews = generateReviewsData(reduxUserInfo.memberId);
+
+        const sortedReviews = mockReviews.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setReviews(sortedReviews);
         setCurrentPage(1);
+
+        console.log("생성된 후기 데이터:", sortedReviews);
       } else {
         setReviews([]);
       }
@@ -118,7 +169,14 @@ const MyReviews = ({ onReviewAction }) => {
     }
   };
 
-  // 페이지네이션 계산
+  const safeStripHtml = (html) => {
+    if (!html) return "";
+    if (typeof stripHtml === "function") {
+      return stripHtml(html);
+    }
+    return html.replace(/<[^>]*>/g, "");
+  };
+
   const totalPages = Math.ceil(reviews.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -203,7 +261,6 @@ const MyReviews = ({ onReviewAction }) => {
               </TableHead>
               <TableBody>
                 {currentReviews.map((review, index) => {
-                  // 전체 목록에서의 실제 번호 계산 (최신순)
                   const actualIndex = startIndex + index;
                   const displayNumber = reviews.length - actualIndex;
 
@@ -219,10 +276,10 @@ const MyReviews = ({ onReviewAction }) => {
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
                           fontWeight: 500,
-                          paddingRight: 1, // 우측 여백 추가
+                          paddingRight: 1,
                         }}
                       >
-                        {stripHtml(review.title)} {/* HTML 태그 제거 적용 */}
+                        {safeStripHtml(review.title)}
                       </TableCell>
                       <TableCell align="center">
                         {getStatusChip(review.confirmed)}
@@ -284,7 +341,7 @@ const MyReviews = ({ onReviewAction }) => {
           <>
             <DialogTitle>
               <Typography variant="h6" component="div" fontWeight={600}>
-                {stripHtml(selectedReview.title)} {/* HTML 태그 제거 적용 */}
+                {safeStripHtml(selectedReview.title)}
               </Typography>
               <Box sx={{ mt: 1 }}>
                 <Typography variant="body2" color="text.secondary">
@@ -322,8 +379,7 @@ const MyReviews = ({ onReviewAction }) => {
                     lineHeight: 1.6,
                   }}
                 >
-                  {stripHtml(selectedReview.content)}{" "}
-                  {/* HTML 태그 제거 적용 */}
+                  {safeStripHtml(selectedReview.content)}
                 </Typography>
               </Paper>
             </DialogContent>

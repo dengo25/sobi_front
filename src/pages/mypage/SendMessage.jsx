@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import {
   Box,
   Typography,
@@ -13,7 +14,6 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { Send as SendIcon, Refresh as RefreshIcon } from "@mui/icons-material";
-import { sendMessage } from "../../service/member/ApiService";
 import {
   sobiTheme,
   StyledCard,
@@ -30,6 +30,8 @@ const SendMessage = ({ onMessageSent }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const reduxUserInfo = useSelector((state) => state.member);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -37,7 +39,6 @@ const SendMessage = ({ onMessageSent }) => {
       [name]: value,
     }));
 
-    // 에러 메시지 초기화
     if (error) setError("");
     if (success) setSuccess("");
   };
@@ -63,6 +64,13 @@ const SendMessage = ({ onMessageSent }) => {
       return false;
     }
 
+    // 유효한 사용자 아이디 체크 (admin, user만 허용)
+    const validUsers = ["admin", "user"];
+    if (!validUsers.includes(formData.receiverMemberId.trim())) {
+      setError("존재하지 않는 사용자입니다. (admin 또는 user만 가능)");
+      return false;
+    }
+
     return true;
   };
 
@@ -78,39 +86,38 @@ const SendMessage = ({ onMessageSent }) => {
     setSuccess("");
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       const messageDTO = {
+        id: Date.now(),
+        senderMemberId: reduxUserInfo.memberId,
+        senderName: reduxUserInfo.memberName,
         receiverMemberId: formData.receiverMemberId.trim(),
+        receiverName:
+          formData.receiverMemberId.trim() === "admin" ? "관리자" : "사용자",
         title: formData.title.trim(),
         content: formData.content.trim(),
+        sendDate: new Date().toISOString(),
+        isRead: "N",
       };
+      setSuccess("쪽지가 성공적으로 전송되었습니다!");
 
-      console.log("쪽지 전송 시도:", messageDTO);
-      const response = await sendMessage(messageDTO);
-      console.log("쪽지 전송 응답:", response);
+      setFormData({
+        receiverMemberId: "",
+        title: "",
+        content: "",
+      });
 
-      if (response) {
-        setSuccess("쪽지가 성공적으로 전송되었습니다!");
-        setFormData({
-          receiverMemberId: "",
-          title: "",
-          content: "",
-        });
-
-        // 부모 컴포넌트에 전송 완료 알림
-        if (onMessageSent) {
-          onMessageSent(response);
-        }
+      if (onMessageSent) {
+        onMessageSent(messageDTO);
       }
+
+      setTimeout(() => {
+        setSuccess("");
+      }, 3000);
     } catch (err) {
       console.error("쪽지 전송 오류:", err);
-
-      // 에러 메시지 처리
-      let errorMessage = "쪽지 전송 중 오류가 발생했습니다.";
-      if (err.message) {
-        errorMessage = err.message;
-      }
-
-      setError(errorMessage);
+      setError("쪽지 전송 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -151,12 +158,12 @@ const SendMessage = ({ onMessageSent }) => {
                 </Alert>
               )}
 
-              {/* 성공 알림
+              {/* 성공 알림 */}
               {success && (
                 <Alert severity="success" sx={{ mb: 2 }}>
                   {success}
                 </Alert>
-              )} */}
+              )}
 
               {/* 받는 사람과 제목 */}
               <Grid container spacing={2} sx={{ mb: 2 }}>
@@ -240,56 +247,6 @@ const SendMessage = ({ onMessageSent }) => {
             </Box>
           </CardContent>
         </StyledCard>
-
-        {/* 안내 메시지
-        <InfoCard>
-          <CardContent>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-              <InfoIcon sx={{ mr: 1, fontSize: 20 }} />
-              <Typography variant="subtitle2" fontWeight={600}>
-                쪽지 전송 안내
-              </Typography>
-            </Box>
-            <List dense>
-              <ListItem sx={{ py: 0.5 }}>
-                <ListItemIcon sx={{ minWidth: 20 }}>
-                  <Typography variant="body2">•</Typography>
-                </ListItemIcon>
-                <ListItemText
-                  primary="받는 사람의 아이디를 정확히 입력해주세요."
-                  primaryTypographyProps={{ variant: "body2" }}
-                />
-              </ListItem>
-              <ListItem sx={{ py: 0.5 }}>
-                <ListItemIcon sx={{ minWidth: 20 }}>
-                  <Typography variant="body2">•</Typography>
-                </ListItemIcon>
-                <ListItemText
-                  primary="자기 자신에게도 쪽지를 보낼 수 있습니다. (메모 기능)"
-                  primaryTypographyProps={{ variant: "body2" }}
-                />
-              </ListItem>
-              <ListItem sx={{ py: 0.5 }}>
-                <ListItemIcon sx={{ minWidth: 20 }}>
-                  <Typography variant="body2">•</Typography>
-                </ListItemIcon>
-                <ListItemText
-                  primary="제목은 최대 100자까지 입력 가능합니다."
-                  primaryTypographyProps={{ variant: "body2" }}
-                />
-              </ListItem>
-              <ListItem sx={{ py: 0.5 }}>
-                <ListItemIcon sx={{ minWidth: 20 }}>
-                  <Typography variant="body2">•</Typography>
-                </ListItemIcon>
-                <ListItemText
-                  primary="전송된 쪽지는 수정할 수 없으니 신중히 작성해주세요."
-                  primaryTypographyProps={{ variant: "body2" }}
-                />
-              </ListItem>
-            </List>
-          </CardContent>
-        </InfoCard> */}
       </Container>
     </ThemeProvider>
   );

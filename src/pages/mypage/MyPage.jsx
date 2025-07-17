@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux"; // Redux 훅 추가
-import { login } from "../../slice/memberSlice"; // login 액션 추가
+import { useSelector, useDispatch } from "react-redux";
+import { login } from "../../slice/memberSlice";
 import {
   Box,
   Typography,
@@ -31,12 +31,6 @@ import {
   Delete as DeleteIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
-import {
-  getMypage,
-  isLoggedIn,
-  getReceivedMessages,
-} from "../../service/member/ApiService";
-import { getMyReviews } from "../../service/mypage/ApiService"; // 후기 API 추가
 import DeleteProfile from "./DeleteProfile";
 import SendMessage from "./SendMessage";
 import ReceivedMessages from "./ReceivedMessages";
@@ -73,19 +67,31 @@ const Mypage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Redux에서 사용자 정보 가져오기
   const reduxUserInfo = useSelector((state) => state.member);
 
-  // URL 파라미터에서 탭 정보 가져오기
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // 메뉴 아이템 데이터 - 동적으로 후기 수 반영
+  const generateUserInfo = (memberId) => {
+    const baseInfo = {
+      id: memberId === "admin" ? 1 : 2,
+      memberId: memberId,
+      role: memberId === "admin" ? "ROLE_ADMIN" : "ROLE_USER",
+      memberName: memberId === "admin" ? "관리자" : "사용자",
+      memberEmail: memberId === "admin" ? "admin@sobi.com" : "user@sobi.com",
+      memberGender: memberId === "admin" ? "M" : "F",
+      memberBirth: memberId === "admin" ? "900101" : "950615",
+      memberAddr:
+        memberId === "admin"
+          ? "서울특별시 강남구 테헤란로 123"
+          : "서울특별시 마포구 홍익로 456",
+      memberZip: memberId === "admin" ? "12345" : "54321",
+    };
+    return baseInfo;
+  };
+
   const menuItems = [
     { text: "계정 정보", count: "", icon: <CommentIcon /> },
     { text: "내가 쓴 후기", count: `${reviewCount}건`, icon: <ReviewIcon /> },
-    // { text: "포인트", count: "0P", icon: <PointIcon /> },
-    // { text: "뱃지", count: "0개", icon: <BadgeIcon /> },
-    // { text: "체험단", count: "0건?", icon: <ExperimentIcon /> },
     {
       text: "쪽지",
       count:
@@ -96,15 +102,13 @@ const Mypage = () => {
     },
   ];
 
-  const tabLabels = [
-    "계정 정보",
-    "내가 쓴 후기",
-    // "포인트",
-    // "뱃지",
-    // "체험단",
-    "쪽지",
-  ];
+  const tabLabels = ["계정 정보", "내가 쓴 후기", "쪽지"];
   const messageTabLabels = ["받은쪽지", "보낸쪽지", "쪽지보내기"];
+
+  const isLoggedIn = () => {
+    const token = localStorage.getItem("ACCESS_TOKEN");
+    return token !== null;
+  };
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -112,47 +116,32 @@ const Mypage = () => {
       return;
     }
 
-    // URL 파라미터에서 탭 정보 확인
     const tabParam = searchParams.get("tab");
     if (tabParam !== null) {
       const tabIndex = Number.parseInt(tabParam, 10);
       if (tabIndex >= 0 && tabIndex < tabLabels.length) {
         setSelectedTab(tabIndex);
       }
-      // URL 파라미터 제거 (깔끔한 URL 유지)
       setSearchParams({});
     }
 
     fetchUserInfo();
   }, [navigate, searchParams, setSearchParams]);
 
-  // 읽지 않은 쪽지 수를 가져오는 함수
   const fetchUnreadMessageCount = async () => {
     try {
-      const messages = await getReceivedMessages();
-      if (Array.isArray(messages)) {
-        const unreadCount = messages.filter(
-          (message) => message.isRead === "N"
-        ).length;
-        setUnreadMessageCount(unreadCount);
-      }
+      const count = reduxUserInfo.memberId === "admin" ? 3 : 1;
+      setUnreadMessageCount(count);
     } catch (err) {
       console.error("읽지 않은 쪽지 수 조회 오류:", err);
       setUnreadMessageCount(0);
     }
   };
 
-  // 후기 수를 가져오는 함수
   const fetchReviewCount = async () => {
     try {
-      const response = await getMyReviews();
-      console.log("후기 수 조회 응답:", response);
-
-      if (response && response.rnoList && Array.isArray(response.rnoList)) {
-        setReviewCount(response.rnoList.length);
-      } else {
-        setReviewCount(0);
-      }
+      const count = reduxUserInfo.memberId === "admin" ? 15 : 3;
+      setReviewCount(count);
     } catch (err) {
       console.error("후기 수 조회 오류:", err);
       setReviewCount(0);
@@ -164,32 +153,21 @@ const Mypage = () => {
       setLoading(true);
       setError(null);
 
-      console.log("Redux 사용자 정보:", reduxUserInfo);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const response = await getMypage();
-      console.log("API 응답 사용자 정보:", response);
-
-      if (response) {
-        // API에서 가져온 정보를 상태에 저장
-        setUserInfo(response);
+      if (reduxUserInfo && reduxUserInfo.memberId) {
+        const mockUserInfo = generateUserInfo(reduxUserInfo.memberId);
+        setUserInfo(mockUserInfo);
 
         dispatch(
           login({
-            // 기존 토큰과 중요 정보는 반드시 유지
             token: reduxUserInfo.token,
             memberId: reduxUserInfo.memberId,
             role: reduxUserInfo.role,
-            // API에서 가져온 최신 정보로 업데이트 (token 제외)
-            memberName: response.memberName,
-            memberEmail: response.memberEmail,
-            memberGender: response.memberGender,
-            memberBirth: response.memberBirth,
-            memberAddr: response.memberAddr,
-            memberZip: response.memberZip,
+            ...mockUserInfo,
           })
         );
 
-        // 쪽지 수와 후기 수를 병렬로 가져오기
         await Promise.all([fetchUnreadMessageCount(), fetchReviewCount()]);
       } else {
         setError("사용자 정보를 불러올 수 없습니다.");
@@ -204,16 +182,14 @@ const Mypage = () => {
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
-    if (newValue !== 5) {
+    if (newValue !== 2) {
       setSelectedMessageTab(0);
     }
 
-    // 쪽지 탭을 선택했을 때 읽지 않은 쪽지 수를 다시 가져옴
-    if (newValue === 5) {
+    if (newValue === 2) {
       fetchUnreadMessageCount();
     }
 
-    // 내가 쓴 후기 탭을 선택했을 때 후기 수를 다시 가져옴
     if (newValue === 1) {
       fetchReviewCount();
     }
@@ -222,7 +198,6 @@ const Mypage = () => {
   const handleMessageTabChange = (event, newValue) => {
     setSelectedMessageTab(newValue);
 
-    // 받은쪽지 탭을 선택했을 때 읽지 않은 쪽지 수를 다시 가져옴
     if (newValue === 0) {
       fetchUnreadMessageCount();
     }
@@ -230,7 +205,7 @@ const Mypage = () => {
 
   const handleSidebarItemClick = (index) => {
     setSelectedTab(index);
-    if (index === 5) {
+    if (index === 2) {
       fetchUnreadMessageCount();
     }
     if (index === 1) {
@@ -248,27 +223,18 @@ const Mypage = () => {
 
   const handleDeleteSuccess = () => {
     setDeleteDialogOpen(false);
+    localStorage.removeItem("ACCESS_TOKEN");
     navigate("/login");
   };
 
   const handleProfileUpdate = (updatedUserInfo, message) => {
-    // 로컬 상태 업데이트
     setUserInfo(updatedUserInfo);
 
     dispatch(
       login({
-        // 기존 토큰과 역할은 반드시 유지
         token: reduxUserInfo.token,
         role: reduxUserInfo.role,
-        // 업데이트된 정보 반영 (아이디 포함)
-        id: updatedUserInfo.id,
-        // memberId: updatedUserInfo.memberId, // ← 아이디도 업데이트
-        memberName: updatedUserInfo.memberName,
-        memberEmail: updatedUserInfo.memberEmail,
-        memberGender: updatedUserInfo.memberGender,
-        memberBirth: updatedUserInfo.memberBirth,
-        memberAddr: updatedUserInfo.memberAddr,
-        memberZip: updatedUserInfo.memberZip,
+        ...updatedUserInfo,
       })
     );
 
@@ -288,18 +254,15 @@ const Mypage = () => {
     setShowSuccessAlert(true);
   };
 
-  // 쪽지 관련 작업 후 읽지 않은 쪽지 수를 업데이트하는 함수
   const handleMessageAction = () => {
     fetchUnreadMessageCount();
   };
 
-  // 후기 관련 작업 후 후기 수를 업데이트하는 함수
   const handleReviewAction = () => {
     fetchReviewCount();
   };
 
   const renderTabContent = () => {
-    // 계정 정보 탭
     if (selectedTab === 0) {
       return (
         <Box sx={{ height: "100%", backgroundColor: "grey.50", p: 3 }}>
@@ -359,37 +322,6 @@ const Mypage = () => {
         </Box>
       );
     }
-
-    return (
-      <DefaultContent>
-        <Box sx={{ maxWidth: 500, textAlign: "center" }}>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
-            콘텐츠 영역
-          </Typography>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                선택된 탭별 리스트/테이블 출력
-              </Typography>
-              <Box sx={{ textAlign: "left", color: "text.secondary" }}>
-                <Typography variant="body2" gutterBottom>
-                  - 포인트: 히스토리 테이블
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  - 뱃지: 획득 조건 안내 카드
-                </Typography>
-                <Typography variant="body2" gutterBottom>
-                  - 체험단: ?
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 3 }}>
-                이 영역에 실제 탭별 콘텐츠가 표시됩니다.
-              </Typography>
-            </CardContent>
-          </Card>
-        </Box>
-      </DefaultContent>
-    );
   };
 
   if (loading) {
@@ -450,7 +382,7 @@ const Mypage = () => {
                 {userInfo?.memberName?.charAt(0).toUpperCase() || "U"}
               </StyledAvatar>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                {userInfo?.role === "ROLE_USER" ? "일반 회원" : "관리자"}
+                {userInfo?.role === "ROLE_ADMIN" ? "관리자" : "일반 회원"}
               </Typography>
               <Typography variant="h6" fontWeight={600}>
                 {userInfo?.memberName || "사용자"}#{userInfo?.id || "0"}
@@ -490,7 +422,7 @@ const Mypage = () => {
                           color: selectedTab === index ? "inherit" : "inherit",
                         }}
                       >
-                        {index === 5 && unreadMessageCount > 0 ? (
+                        {index === 2 && unreadMessageCount > 0 ? (
                           <Badge
                             badgeContent={unreadMessageCount}
                             color="error"

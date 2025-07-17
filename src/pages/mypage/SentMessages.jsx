@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   Box,
   Typography,
@@ -43,10 +44,6 @@ import {
   PaginationContainer,
   ActionButton,
 } from "../../assets/styles/sobiTheme";
-import {
-  getSentMessages,
-  deleteMessageBySender,
-} from "../../service/member/ApiService";
 
 const SentMessages = () => {
   const [messages, setMessages] = useState([]);
@@ -64,19 +61,109 @@ const SentMessages = () => {
   const [messageToDelete, setMessageToDelete] = useState(null);
   const [batchDeleteConfirmOpen, setBatchDeleteConfirmOpen] = useState(false);
 
+  const reduxUserInfo = useSelector((state) => state.member);
+
+  const generateSentMessagesData = (memberId) => {
+    const baseDate = new Date();
+
+    if (memberId === "admin") {
+      return [
+        {
+          id: 5001,
+          senderMemberId: "admin",
+          senderName: "관리자",
+          receiverMemberId: "user",
+          receiverName: "사용자",
+          title: "Re: 서비스 이용 문의드립니다",
+          content:
+            "안녕하세요! 문의해주신 내용에 대해 답변드립니다.\n\n1. 계정 정보 수정: 마이페이지 > 계정 정보에서 수정 가능합니다.\n2. 비밀번호 변경: 계정 정보 수정 시 함께 변경할 수 있습니다.\n3. 후기 작성: 허위 내용이나 부적절한 내용은 승인되지 않을 수 있습니다.\n\n추가 궁금한 점이 있으시면 언제든 문의해주세요!\n감사합니다.",
+          sendDate: new Date(baseDate.getTime() - 1000 * 60 * 20).toISOString(), // 20분 전
+          isRead: "Y",
+        },
+        {
+          id: 5002,
+          senderMemberId: "admin",
+          senderName: "관리자",
+          receiverMemberId: "user",
+          receiverName: "사용자",
+          title: "후기 승인 완료 안내",
+          content:
+            "안녕하세요!\n\n작성해주신 후기가 승인되었습니다.\n후기 작성해주셔서 감사합니다.\n\n앞으로도 좋은 의견 부탁드립니다! 😊",
+          sendDate: new Date(
+            baseDate.getTime() - 1000 * 60 * 60 * 3
+          ).toISOString(), // 3시간 전
+          isRead: "Y",
+        },
+        {
+          id: 5003,
+          senderMemberId: "admin",
+          senderName: "관리자",
+          receiverMemberId: "user",
+          receiverName: "사용자",
+          title: "서비스 이용 안내",
+          content:
+            "회원가입을 환영합니다!\n\n저희 서비스를 이용해주셔서 감사합니다.\n궁금한 점이 있으시면 언제든 문의해주세요.\n\n좋은 하루 되세요!",
+          sendDate: new Date(
+            baseDate.getTime() - 1000 * 60 * 60 * 24 * 2
+          ).toISOString(), // 2일 전
+          isRead: "Y",
+        },
+      ];
+    } else {
+      return [
+        {
+          id: 6001,
+          senderMemberId: "user",
+          senderName: "사용자",
+          receiverMemberId: "admin",
+          receiverName: "관리자",
+          title: "서비스 이용 문의드립니다",
+          content:
+            "안녕하세요 관리자님!\n\n서비스를 이용하면서 몇 가지 궁금한 점이 있어서 문의드립니다.\n\n1. 계정 정보 수정은 어떻게 하나요?\n2. 비밀번호 변경이 가능한가요?\n3. 후기 작성 시 주의사항이 있나요?\n\n바쁘시겠지만 답변 부탁드립니다.\n감사합니다!",
+          sendDate: new Date(baseDate.getTime() - 1000 * 60 * 35).toISOString(), // 35분 전
+          isRead: "Y",
+        },
+        {
+          id: 6002,
+          senderMemberId: "user",
+          senderName: "사용자",
+          receiverMemberId: "admin",
+          receiverName: "관리자",
+          title: "후기 승인 관련 문의",
+          content:
+            "관리자님 안녕하세요.\n\n제가 어제 작성한 후기가 아직 승인 대기 상태인데, 보통 승인까지 얼마나 걸리나요?\n\n급하지는 않지만 궁금해서 문의드립니다.\n\n좋은 하루 되세요!",
+          sendDate: new Date(
+            baseDate.getTime() - 1000 * 60 * 60 * 2.5
+          ).toISOString(), // 2.5시간 전
+          isRead: "Y",
+        },
+      ];
+    }
+  };
+
   useEffect(() => {
     fetchMessages();
-  }, []);
+  }, [reduxUserInfo]);
 
   const fetchMessages = async () => {
     try {
       setLoading(true);
       setError("");
-      const response = await getSentMessages();
 
-      if (Array.isArray(response)) {
-        setMessages(response);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      if (reduxUserInfo && reduxUserInfo.memberId) {
+        const mockMessages = generateSentMessagesData(reduxUserInfo.memberId);
+
+        // 최신순으로 정렬
+        const sortedMessages = mockMessages.sort(
+          (a, b) => new Date(b.sendDate) - new Date(a.sendDate)
+        );
+
+        setMessages(sortedMessages);
         setCurrentPage(1);
+
+        console.log("생성된 보낸 쪽지 데이터:", sortedMessages);
       } else {
         setMessages([]);
       }
@@ -134,7 +221,8 @@ const SentMessages = () => {
     if (!messageToDelete) return;
 
     try {
-      await deleteMessageBySender(messageToDelete.id);
+      // 삭제
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       setMessages((prev) => {
         const newMessages = prev.filter((msg) => msg.id !== messageToDelete.id);
@@ -171,9 +259,8 @@ const SentMessages = () => {
 
   const handleBatchDeleteExecute = async () => {
     try {
-      await Promise.all(
-        selectedMessages.map((messageId) => deleteMessageBySender(messageId))
-      );
+      // 배치 삭제
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setMessages((prev) => {
         const newMessages = prev.filter(
@@ -337,9 +424,6 @@ const SentMessages = () => {
                           indeterminate={isIndeterminate}
                         />
                       </TableCell>
-                      <TableCell align="center">상태</TableCell>
-                      <TableCell>받는사람</TableCell>
-                      <TableCell>제목</TableCell>
                       <TableCell align="center">보낸시간</TableCell>
                       <TableCell align="center">삭제</TableCell>
                     </TableRow>
@@ -449,7 +533,6 @@ const SentMessages = () => {
           </Box>
         )}
 
-        {/* Message Detail Dialog */}
         <Dialog
           open={dialogOpen}
           onClose={handleCloseDialog}
@@ -545,7 +628,6 @@ const SentMessages = () => {
           )}
         </Dialog>
 
-        {/* Delete Confirmation Dialogs */}
         <Dialog
           open={deleteConfirmOpen}
           onClose={() => setDeleteConfirmOpen(false)}

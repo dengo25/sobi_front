@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   TextField,
   Button,
@@ -17,7 +18,6 @@ import {
   ErrorOutline as ErrorOutlineIcon,
   Shield as ShieldIcon,
 } from "@mui/icons-material";
-import { deleteMypage, signout } from "../../service/member/ApiService";
 import {
   sobiTheme,
   StyledDialog,
@@ -33,6 +33,16 @@ const DeleteProfile = ({ open, onClose, onDelete }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Redux에서 사용자 정보 가져오기
+  const reduxUserInfo = useSelector((state) => state.member);
+
+  // 하드코딩된 비밀번호 (admin: admin, user: user)
+  const getCorrectPassword = (memberId) => {
+    if (memberId === "admin") return "admin";
+    if (memberId === "user") return "user";
+    return null;
+  };
 
   useEffect(() => {
     if (!open) {
@@ -58,17 +68,29 @@ const DeleteProfile = ({ open, onClose, onDelete }) => {
     setError("");
 
     try {
-      const response = await deleteMypage(password);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      if (response && !response.error) {
-        signout();
-        onDelete();
-      } else {
-        setError(response.error || "회원 탈퇴 처리 중 오류가 발생했습니다.");
+      // 비밀번호 확인
+      const correctPassword = getCorrectPassword(reduxUserInfo?.memberId);
+
+      if (!correctPassword) {
+        setError("사용자 정보를 찾을 수 없습니다.");
+        setLoading(false);
+        return;
       }
+
+      if (password !== correctPassword) {
+        setError("비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
+        setLoading(false);
+        return;
+      }
+
+      localStorage.removeItem("ACCESS_TOKEN");
+
+      onDelete();
     } catch (err) {
       console.error("회원 탈퇴 오류:", err);
-      setError("비밀번호가 일치하지 않거나 탈퇴 처리 중 오류가 발생했습니다.");
+      setError("회원 탈퇴 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -92,7 +114,6 @@ const DeleteProfile = ({ open, onClose, onDelete }) => {
           </Typography>
         </HeaderSection>
 
-        {/* 컨텐츠 */}
         <ContentSection>
           {/* 에러 알림 */}
           {error && (
@@ -108,14 +129,7 @@ const DeleteProfile = ({ open, onClose, onDelete }) => {
             </Alert>
           )}
 
-          {/* 위험 구역 */}
           <DangerZone>
-            {/* <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <ShieldIcon sx={{ color: "#d32f2f", mr: 1.5, fontSize: 24 }} />
-              <Typography variant="h6" fontWeight={700} color="error.main">
-                위험 구역
-              </Typography>
-            </Box> */}
             <Typography variant="body2" color="error.dark" fontWeight={500}>
               계정을 영구적으로 삭제하려면 현재 비밀번호를 입력하세요.
             </Typography>

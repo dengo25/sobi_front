@@ -34,10 +34,6 @@ import {
   StyledTextField,
   ActionButton,
 } from "../../assets/styles/sobiThemeSignUp";
-import {
-  signup,
-  checkEmailDuplicate,
-} from "../../service/member/ApiService.js";
 
 export default function SignUpPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -62,6 +58,8 @@ export default function SignUpPage() {
   });
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const existingEmails = ["admin@sobi.com", "user@sobi.com"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -104,13 +102,25 @@ export default function SignUpPage() {
     setEmailCheck((prev) => ({ ...prev, loading: true }));
 
     try {
-      const result = await checkEmailDuplicate(email);
-      setEmailCheck({
-        checked: true,
-        available: result.available,
-        message: result.message,
-        loading: false,
-      });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const isEmailExists = existingEmails.includes(email.toLowerCase());
+
+      if (isEmailExists) {
+        setEmailCheck({
+          checked: true,
+          available: false,
+          message: "이미 사용 중인 이메일입니다.",
+          loading: false,
+        });
+      } else {
+        setEmailCheck({
+          checked: true,
+          available: true,
+          message: "사용 가능한 이메일입니다.",
+          loading: false,
+        });
+      }
     } catch (error) {
       console.error("이메일 중복 확인 오류:", error);
       setEmailCheck({
@@ -193,7 +203,8 @@ export default function SignUpPage() {
     console.log("제출 데이터:", sendData);
 
     try {
-      const res = await signup(sendData);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       alert("회원가입 완료");
       window.location.href = "/login";
     } catch (error) {
@@ -507,7 +518,7 @@ export default function SignUpPage() {
                       label="상세주소"
                       name="detailAddress"
                       value={formData.detailAddress}
-                      onChange={handleChange} // <-- BUG FIX: use handleChange to update formData
+                      onChange={handleChange}
                       placeholder="상세 주소를 입력하세요"
                       disabled={loading}
                     />

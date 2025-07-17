@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   Box,
   Typography,
@@ -47,12 +48,6 @@ import {
   PaginationContainer,
   ActionButton,
 } from "../../assets/styles/sobiTheme";
-import {
-  getReceivedMessages,
-  deleteMessageByReceiver,
-  markMessageAsRead,
-  sendMessage,
-} from "../../service/member/ApiService";
 
 const ReceivedMessages = ({ onMessageAction }) => {
   const [messages, setMessages] = useState([]);
@@ -74,19 +69,96 @@ const ReceivedMessages = ({ onMessageAction }) => {
   const [replyContent, setReplyContent] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
 
+  const reduxUserInfo = useSelector((state) => state.member);
+
+  const generateReceivedMessagesData = (memberId) => {
+    const baseDate = new Date();
+
+    if (memberId === "admin") {
+      return [
+        {
+          id: 3001,
+          senderMemberId: "user",
+          senderName: "사용자",
+          receiverMemberId: "admin",
+          receiverName: "관리자",
+          title: "서비스 이용 문의드립니다",
+          content:
+            "안녕하세요 관리자님!\n\n서비스를 이용하면서 몇 가지 궁금한 점이 있어서 문의드립니다.\n\n1. 계정 정보 수정은 어떻게 하나요?\n2. 비밀번호 변경이 가능한가요?\n3. 후기 작성 시 주의사항이 있나요?\n\n바쁘시겠지만 답변 부탁드립니다.\n감사합니다!",
+          sendDate: new Date(baseDate.getTime() - 1000 * 60 * 30).toISOString(), // 30분 전
+          isRead: "N",
+        },
+        {
+          id: 3002,
+          senderMemberId: "user",
+          senderName: "사용자",
+          receiverMemberId: "admin",
+          receiverName: "관리자",
+          title: "후기 승인 관련 문의",
+          content:
+            "관리자님 안녕하세요.\n\n제가 어제 작성한 후기가 아직 승인 대기 상태인데, 보통 승인까지 얼마나 걸리나요?\n\n급하지는 않지만 궁금해서 문의드립니다.\n\n좋은 하루 되세요!",
+          sendDate: new Date(
+            baseDate.getTime() - 1000 * 60 * 60 * 2
+          ).toISOString(), // 2시간 전
+          isRead: "Y",
+        },
+        {
+          id: 3003,
+          senderMemberId: "user",
+          senderName: "사용자",
+          receiverMemberId: "admin",
+          receiverName: "관리자",
+          title: "감사 인사",
+          content:
+            "관리자님께\n\n항상 좋은 서비스 제공해주셔서 감사합니다.\n덕분에 편리하게 이용하고 있어요.\n\n앞으로도 잘 부탁드립니다! 😊",
+          sendDate: new Date(
+            baseDate.getTime() - 1000 * 60 * 60 * 24
+          ).toISOString(), // 1일 전
+          isRead: "Y",
+        },
+      ];
+    } else {
+      return [
+        {
+          id: 4001,
+          senderMemberId: "admin",
+          senderName: "관리자",
+          receiverMemberId: "user",
+          receiverName: "사용자",
+          title: "Re: 서비스 이용 문의드립니다",
+          content:
+            "안녕하세요! 문의해주신 내용에 대해 답변드립니다.\n\n1. 계정 정보 수정: 마이페이지 > 계정 정보에서 수정 가능합니다.\n2. 비밀번호 변경: 계정 정보 수정 시 함께 변경할 수 있습니다.\n3. 후기 작성: 허위 내용이나 부적절한 내용은 승인되지 않을 수 있습니다.\n\n추가 궁금한 점이 있으시면 언제든 문의해주세요!\n감사합니다.",
+          sendDate: new Date(baseDate.getTime() - 1000 * 60 * 15).toISOString(), // 15분 전
+          isRead: "N",
+        },
+      ];
+    }
+  };
+
   useEffect(() => {
     fetchMessages();
-  }, []);
+  }, [reduxUserInfo]);
 
   const fetchMessages = async () => {
     try {
       setLoading(true);
       setError("");
-      const response = await getReceivedMessages();
 
-      if (Array.isArray(response)) {
-        setMessages(response);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      if (reduxUserInfo && reduxUserInfo.memberId) {
+        const mockMessages = generateReceivedMessagesData(
+          reduxUserInfo.memberId
+        );
+
+        const sortedMessages = mockMessages.sort(
+          (a, b) => new Date(b.sendDate) - new Date(a.sendDate)
+        );
+
+        setMessages(sortedMessages);
         setCurrentPage(1);
+
+        console.log("생성된 받은 쪽지 데이터:", sortedMessages);
       } else {
         setMessages([]);
       }
@@ -103,19 +175,16 @@ const ReceivedMessages = ({ onMessageAction }) => {
     setDialogOpen(true);
 
     if (message.isRead === "N") {
-      try {
-        await markMessageAsRead(message.id);
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === message.id ? { ...msg, isRead: "Y" } : msg
-          )
-        );
-        setSelectedMessage((prev) => ({ ...prev, isRead: "Y" }));
-        if (onMessageAction) {
-          onMessageAction();
-        }
-      } catch (err) {
-        console.error("메시지 읽음 처리 오류:", err);
+      // 읽음 처리
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === message.id ? { ...msg, isRead: "Y" } : msg
+        )
+      );
+      setSelectedMessage((prev) => ({ ...prev, isRead: "Y" }));
+
+      if (onMessageAction) {
+        onMessageAction();
       }
     }
   };
@@ -161,7 +230,8 @@ const ReceivedMessages = ({ onMessageAction }) => {
     if (!messageToDelete) return;
 
     try {
-      await deleteMessageByReceiver(messageToDelete.id);
+      // 삭제
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       setMessages((prev) => {
         const newMessages = prev.filter((msg) => msg.id !== messageToDelete.id);
@@ -202,9 +272,8 @@ const ReceivedMessages = ({ onMessageAction }) => {
 
   const handleBatchDeleteExecute = async () => {
     try {
-      await Promise.all(
-        selectedMessages.map((messageId) => deleteMessageByReceiver(messageId))
-      );
+      // 배치 삭제
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setMessages((prev) => {
         const newMessages = prev.filter(
@@ -253,9 +322,8 @@ const ReceivedMessages = ({ onMessageAction }) => {
         return;
       }
 
-      await Promise.all(
-        unreadSelectedMessages.map((messageId) => markMessageAsRead(messageId))
-      );
+      // 배치 읽음 처리
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setMessages((prev) =>
         prev.map((msg) =>
@@ -293,13 +361,20 @@ const ReceivedMessages = ({ onMessageAction }) => {
 
     setReplyLoading(true);
     try {
+      // 답장 전송
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       const replyData = {
+        id: Date.now(),
+        senderMemberId: reduxUserInfo.memberId,
+        senderName: reduxUserInfo.memberName,
         receiverMemberId: selectedMessage.senderMemberId,
+        receiverName: selectedMessage.senderName,
         title: `Re: ${selectedMessage.title}`,
         content: replyContent.trim(),
+        sendDate: new Date().toISOString(),
+        isRead: "N",
       };
-
-      await sendMessage(replyData);
 
       setReplyDialogOpen(false);
       setReplyContent("");
@@ -615,7 +690,6 @@ const ReceivedMessages = ({ onMessageAction }) => {
           </Box>
         )}
 
-        {/* Dialogs remain the same but with updated styling */}
         <Dialog
           open={dialogOpen}
           onClose={handleCloseDialog}
@@ -720,7 +794,6 @@ const ReceivedMessages = ({ onMessageAction }) => {
           )}
         </Dialog>
 
-        {/* Reply Dialog */}
         <Dialog
           open={replyDialogOpen}
           onClose={() => setReplyDialogOpen(false)}
@@ -771,7 +844,6 @@ const ReceivedMessages = ({ onMessageAction }) => {
           </DialogActions>
         </Dialog>
 
-        {/* Delete Confirmation Dialogs */}
         <Dialog
           open={deleteConfirmOpen}
           onClose={() => setDeleteConfirmOpen(false)}
