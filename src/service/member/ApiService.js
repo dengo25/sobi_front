@@ -120,16 +120,16 @@ export function socialLogin(provider) {
 // }
 
 export function socialLogin(provider) {
-  const frontendUrl = window.location.protocol + "//" + window.location.host + "/mypage";
+  const frontendUrl =
+    window.location.protocol + "//" + window.location.host + "/mypage";
 
   window.location.href =
-      API_BASE_URL +
-      "/oauth2/authorization/" +
-      provider +
-      "?redirect_url=" +
-      encodeURIComponent(frontendUrl); // ← 꼭 인코딩!
+    API_BASE_URL +
+    "/oauth2/authorization/" +
+    provider +
+    "?redirect_url=" +
+    encodeURIComponent(frontendUrl); // ← 꼭 인코딩!
 }
-
 
 //로그인 후 헤더에서 로그인 삭제 함수
 export function isLoggedIn() {

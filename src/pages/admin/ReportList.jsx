@@ -72,7 +72,7 @@ const PaginationContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
 }));
 
-const ReportList = ({ onViewDetail, onViewReportReview }) => {
+const ReportList = ({ onViewDetail }) => {
   const navigate = useNavigate();
 
   const handleReportClick = (report, event) => {
