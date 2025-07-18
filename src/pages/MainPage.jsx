@@ -278,7 +278,7 @@ const MainPage = () => {
                   )}
                 </Item>
                 <Item>
-                  <h3 className="main-title">📝 SOBI 카테고리별 1</h3>
+                  <h3 className="main-title">📝 SOBI '가구' 최신 리뷰</h3>
                   <ImageCard
                     items={reviewCT1Content}
                     type="review"
@@ -286,7 +286,7 @@ const MainPage = () => {
                   />
                 </Item>
                 <Item>
-                  <h3 className="main-title">📝 SOBI 카테고리별 2</h3>
+                  <h3 className="main-title">📝 SOBI '가전' 최신 리뷰</h3>
                   <ImageCard
                     items={reviewCT2Content}
                     type="review"

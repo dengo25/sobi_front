@@ -104,10 +104,25 @@ const SendMessage = ({ onMessageSent }) => {
     } catch (err) {
       console.error("쪽지 전송 오류:", err);
 
-      // 에러 메시지 처리
+      // 에러 메시지 처리 개선
       let errorMessage = "쪽지 전송 중 오류가 발생했습니다.";
+
       if (err.message) {
-        errorMessage = err.message;
+        // 특정 에러 메시지에 대한 사용자 친화적 변환
+        if (
+          err.message.includes("수신자를 찾을 수 없습니다") ||
+          err.message.includes("찾을 수 없습니다") ||
+          err.message.includes("존재하지 않는")
+        ) {
+          errorMessage = `수신자를 찾을 수 없습니다: ${formData.receiverMemberId}`;
+        } else if (err.message.includes("서버 오류")) {
+          errorMessage = "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        } else if (err.message.includes("네트워크")) {
+          errorMessage =
+            "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.";
+        } else {
+          errorMessage = err.message;
+        }
       }
 
       setError(errorMessage);
