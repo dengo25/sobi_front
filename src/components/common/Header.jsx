@@ -178,7 +178,7 @@ const Header = () => {
 
   const member = useSelector((state) => state.member);
   const role = member?.role;
-
+  console.log("role", role);
   const handleLogout = () => {
     signout();
     setUserMenuAnchor(null);

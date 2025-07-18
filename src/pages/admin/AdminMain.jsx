@@ -227,24 +227,27 @@ const AdminMain = () => {
     fetchAdminStatus();
   }, [searchParams, setSearchParams]);
 
-  const fetchAdminStatus = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const res = await getStatus();
-
-      setMemberNotBlockedCount(res.memberNotBlockedCount || 0);
-      setBlockedCount(res.blockedCount || 0);
-      setReviewCount(res.reviewCount || 0);
-      setUnresolvedReports(res.unSolvedReportCount || 0);
-      setBlacklist(res.blacklistDto || []);
-    } catch (err) {
-      console.error("admin main fetch error", err);
-      setError("데이터를 불러오는데 실패했습니다.");
-    } finally {
-      setLoading(false);
-    }
+  const fetchAdminStatus = () => {
+    setMemberNotBlockedCount(3);
+    setBlockedCount(3);
+    setReviewCount(3);
+    setUnresolvedReports(2);
+    setBlacklist([
+      {
+        blackListNo: 1,
+        memberId: "user1",
+        memberName: "사용자1",
+        updateAt: "2024-07-01T12:34:56",
+      },
+      {
+        blackListNo: 2,
+        memberId: "user2",
+        memberName: "사용자2",
+        updateAt: "2024-07-12T08:00:00",
+      },
+    ]);
+    setLoading(false);
+    setError(null);
   };
 
   const handleTabChange = (event, newValue) => {

@@ -128,7 +128,35 @@ const AdminReviewList = ({ onViewDetail }) => {
   const fetchReviews = async (currentPage = pageInfo.currentPage) => {
     try {
       setLoading(true);
-
+      const response = {
+        reviews: [
+          {
+            tno: 101,
+            title: "이 제품 너무 좋아요!",
+            memberId: "user1",
+            createdAt: "2024-01-01T12:00:00",
+            confirmed: "Y",
+          },
+          {
+            tno: 102,
+            title: "별로였어요.. 다시는 안살 듯",
+            memberId: "user2",
+            createdAt: "2024-02-10T15:20:00",
+            confirmed: "N",
+          },
+          {
+            tno: 103,
+            title: "중간정도 만족입니다",
+            memberId: "user3",
+            createdAt: "2024-03-05T08:30:00",
+            confirmed: "R",
+          },
+        ],
+        totalElements: 3,
+        totalPages: 1,
+        currentPage: 0,
+        pageSize: 10,
+      };
       // 백엔드 API에 맞는 파라미터 구조
       const searchParams = {
         page: currentPage, // MUI에서 온 페이지 번호를 그대로 전달 (1부터 시작)
@@ -140,7 +168,7 @@ const AdminReviewList = ({ onViewDetail }) => {
       };
 
       //console.log("🔍 리뷰 목록 API 호출 파라미터:", searchParams);
-      const response = await getReviewList(searchParams);
+      //const response = await getReviewList(searchParams);
       // console.log("📥 리뷰 목록 API 응답:", response);
       // console.log(
       //   "🔍 confirmed 값:",

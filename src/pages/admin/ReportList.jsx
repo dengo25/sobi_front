@@ -144,6 +144,43 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
   const fetchReports = async (page = pageInfo.currentPage) => {
     try {
       setLoading(true);
+      const response = {
+        reports: [
+          {
+            reportId: 1,
+            reporterId: "user1",
+            reportedId: "user2",
+            reportType: "가짜/조작된 리뷰",
+            createdAt: "2024-01-01T09:00:00",
+            targetId: 101,
+            status: "PENDING",
+          },
+          {
+            reportId: 2,
+            reporterId: "user3",
+            reportedId: "user4",
+            reportType: "부적절한 표현 및 혐오 콘텐츠",
+            createdAt: "2024-02-01T10:00:00",
+            targetId: 102,
+            status: "APPROVE",
+          },
+          {
+            reportId: 3,
+            reporterId: "user5",
+            reportedId: "user6",
+            reportType: "스팸 및 상업적 광고",
+            createdAt: "2024-03-01T11:00:00",
+            targetId: 103,
+            status: "REJECT",
+          },
+        ],
+        totalElements: 3,
+        totalPages: 1,
+        currentPage: 0,
+        pageSize: 10,
+        hasNext: false,
+        hasPrevious: false,
+      };
 
       const searchParams = {
         page: page,
@@ -154,7 +191,7 @@ const ReportList = ({ onViewDetail, onViewReportReview }) => {
         reportType: filters.reportType || null,
       };
 
-      const response = await getReportList(searchParams);
+      //const response = await getReportList(searchParams);
 
       if (response?.reports && Array.isArray(response.reports)) {
         setReportList(response.reports);

@@ -139,7 +139,35 @@ const MemberList = ({ onViewDetail }) => {
   const fetchMembers = async (currentPage = pageInfo.currentPage) => {
     try {
       setLoading(true);
-
+      const response = {
+        content: [
+          {
+            memberId: "user1",
+            memberName: "사용자1",
+            memberReg: "2024-01-01T12:00:00",
+            memberReviewCount: 5,
+            memberReportCount: 0,
+          },
+          {
+            memberId: "user2",
+            memberName: "사용자2",
+            memberReg: "2024-02-15T10:30:00",
+            memberReviewCount: 2,
+            memberReportCount: 1,
+          },
+          {
+            memberId: "user3",
+            memberName: "사용자3",
+            memberReg: "2024-03-20T09:00:00",
+            memberReviewCount: 8,
+            memberReportCount: 3,
+          },
+        ],
+        totalElements: 3,
+        totalPages: 1,
+        number: 0,
+        size: 10,
+      };
       // 백엔드 API에 맞는 파라미터 구조
       const searchParams = {
         page: currentPage, // MUI에서 온 페이지 번호를 그대로 전달 (1부터 시작)
@@ -149,9 +177,9 @@ const MemberList = ({ onViewDetail }) => {
       };
 
       // console.log("회원 목록 API 호출 파라미터:", searchParams);
-      const response = await getList(searchParams);
-      // console.log("회원 목록 API 응답:", response);
 
+      // console.log("회원 목록 API 응답:", response);
+      //const response = await getList(searchParams); //실제 데이터
       if (response) {
         setMemberList(response.content || []);
         setPageInfo({
