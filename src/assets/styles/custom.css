@@ -15,6 +15,11 @@
 .MuiInputBase-formControl,
 .MuiOutlinedInput-root,
 .css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root{border-radius:22px !important;}
+.card-basic .MuiCardContent-root .custom-body{ overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient:vertical;}
 .MuiInputBase-input{border-radius:0 !important;}
 
 
