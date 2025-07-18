@@ -7,7 +7,7 @@ const hostname = window && window.location && window.location.hostname;
 if (hostname === "localhost") {
   backendHost = "http://localhost:8080";
 } else {
-  backendHost = "http://3.38.15.140:8080";
+  backendHost = "https://api.thekosta.com";
 }
 
 // 최종적으로 사용할 API 기본 URL을 export
