@@ -431,6 +431,7 @@ table[class*="table"] td .required + [class*="ico-"]{margin-left:5px;}
 	-webkit-transition: all 0.3s ease;
 	transition: all 0.3s ease;}
 .review-trand .text span{display:block;margin-bottom:5px;font-size:25px;font-weight:bold;}
+.review-trand .text a{overflow:hidden;display:block;height:112px;}
 .review-trand .text:hover{background-color:rgba(0, 0, 0, 0.6); cursor: pointer;
 	-webkit-transform: scale(1.01);
     -moz-transform: scale(1.01);
