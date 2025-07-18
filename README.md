@@ -76,6 +76,41 @@ sobi_front/
 ```
 ---
 
+## ⚙️ 설치 및 실행 방법
+- ✅ 환경 요구사항
+- Node.js 18.x 이상
+- npm 또는 yarn
+
+## ⬇️ 프로젝트 설치
+
+``` bash
+# 저장소 클론
+git clone https://github.com/dengo25/sobi_front.git
+cd sobi_front
+# 의존성 설치
+npm install
+```
+## ▶️ 개발 서버 실행
+```bash
+npm run dev
+```
+- 기본 접속 URL: http://localhost:5173
+- 배포 주소: https://sobi.thekosta.com
+
+## 📦 빌드
+```
+npm run build
+```
+## 🔐 주요 의존성 버전
+```json
+"react": "^19.1.0",
+"react-router-dom": "^7.6.2",
+"@mui/material": "^7.1.2",
+"@emotion/react": "^11.14.0",
+"tailwindcss": "^4.1.11",
+"vite": "^6.3.5"
+```
+---
 ## 주요 화면
 
 ### 로그인
@@ -122,4 +157,11 @@ sobi_front/
 - 차단된 사용자 목록
 - 회원/리뷰/신고 관리  
 ---
+## 오류 보고서
+### Mixed Content 오류(HTTPS + HTTP 혼용)
+<img width="777" height="53" alt="image" src="https://github.com/user-attachments/assets/864f62c5-9fa0-4392-acfb-005a36e02717" />
+<img width="681" height="228" alt="image" src="https://github.com/user-attachments/assets/36cbacb6-8c47-46b4-9e3b-b3a16abbe93e" />
 
+- 문제 상황: 클라이언트가 CloudFront를 통해 HTTPS로 HTML을 로딩했으나, 내부 API 요청은 HTTP 프로토콜을 사용하여 브라우저 보안 정책에 의해 차단
+- 원인: 페이지 로딩 주소는 HTTPS(https://sobi.thekosta.com), 내부호출 주소는 HTTP(http://3.38.15.140:8080/api/review/list)
+- 해결: 내부 호출 주소를 HTTPS로 변환 (기존 EC2 공인 IP -> Application Load Balancer DNS)
