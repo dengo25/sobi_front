@@ -274,7 +274,7 @@ const AdminMain = () => {
             detailData?.memberName || detailData?.memberId || detailData?.id
           })`;
         case "review":
-          return `리뷰 상세 (${detailData?.reviewId || detailData?.id})`;
+          return `리뷰 상세 (${detailData?.tno || detailData?.id})`;
         case "report":
           return `신고 상세 (${detailData?.reportId || detailData?.id})`;
         default:
