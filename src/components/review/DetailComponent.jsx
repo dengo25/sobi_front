@@ -59,7 +59,7 @@ function DetailComponent({ tno: propTno,moveToList }) {
 
   const currentUser = useSelector((state) => state.member);
 
-  // 실제 API를 통한 데이터 조회
+  //더미데이터
   useEffect(() => {
     const fetchReviewDetail = async () => {
       if (!tno) {
@@ -67,17 +67,35 @@ function DetailComponent({ tno: propTno,moveToList }) {
         setLoading(false);
         return;
       }
-
+      const dummyCategories = [
+        {id: 1, name: "전자기기"},
+        {id: 2, name: "가구"},
+        {id: 3, name: "생활용품"},
+        {id: 4, name: "의류"},
+        {id: 5, name: "기타"},
+      ];
       try {
         setLoading(true);
         setError("");
 
-        console.log("후기 상세 조회 시작:", tno);
-        const data = await getReview(tno);
-        console.log("후기 상세 조회 결과:", data);
+        console.log("더미 후기 상세 조회 시작:", tno);
 
-        setReviewData(data);
-        setLoading(false);
+        const dummyReview = {
+          tno: Number(tno),
+          title: "맥북 프로 M2 사용기",
+          content: "<p>성능은 물론 디자인까지 완벽합니다.</p>",
+          memberId: "user",
+          createdAt: "2025-07-20T12:00:00",
+          confirmed: "Y",
+          category: { id: 1, name: "전자기기" },
+          images: [{ isThumbnail: "Y", fileUrl: "https://via.placeholder.com/150" }],
+        };
+
+        // 0.5초 지연 후 데이터 반영
+        setTimeout(() => {
+          setReviewData(dummyReview);
+          setLoading(false);
+        }, 500);
       } catch (err) {
         console.error("후기 상세 조회 실패:", err);
         setError("후기를 불러오는 중 오류가 발생했습니다.");
@@ -87,6 +105,7 @@ function DetailComponent({ tno: propTno,moveToList }) {
 
     fetchReviewDetail();
   }, [tno]);
+
 
   const handleReport = () => {
     // 로그인 체크

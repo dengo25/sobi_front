@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getListWithoutToken } from "../../service/member/ApiService.js";
 import useCustomMove from "../../hooks/review/UseCustomMove.jsx";
 import { useNavigate } from "react-router-dom";
-import { getCategoryList } from "../../service/review/ReviewService.js";
+import {getCategoryList, getReviewListDummy} from "../../service/review/ReviewService.js";
 
 import {
   Box,
@@ -81,39 +81,30 @@ function ListComponent() {
 
   useEffect(() => {
     getCategoryList()
-      .then((data) => {
-        console.log("카테고리 목록:", data);
-        setCategories(data);
-      })
-      .catch((err) => {
-        console.error("카테고리 목록 조회 실패:", err);
-      });
+        .then((data) => {
+          console.log("카테고리 목록 (더미):", data);
+          setCategories(data);
+        })
+        .catch((err) => {
+          console.error("카테고리 로드 실패:", err);
+        });
   }, []);
+
 
   useEffect(() => {
     setLoading(true);
-    const params = {
-      page,
-      size,
-      ...(category && category > 0 && { category }),
-      ...(keyword && keyword.trim() && { keyword: keyword.trim() }),
-      ...(sort && sort !== "latest" && { sort }),
-    };
 
-    console.log("API 요청 파라미터:", params);
+    getReviewListDummy()
+        .then((data) => {
+          setServerData(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("더미 후기 목록 불러오기 실패:", err);
+          setLoading(false);
+        });
+  }, []);
 
-    getListWithoutToken(params)
-      .then((data) => {
-        console.log("서버 응답 데이터:", data);
-        setServerData(data);
-      })
-      .catch((error) => {
-        console.error("데이터 조회 실패:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [page, size, category, keyword, sort]);
 
   useEffect(() => {
     console.log(
