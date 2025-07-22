@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
-import { createBrowserRouter } from "react-router-dom";
+// import { createBrowserRouter } from "react-router-dom";
+import { createHashRouter } from 'react-router-dom';
 import BasicLayout from "../layout/BasicLayout";
 import ReviewRouter from "./ReviewRouter";
 import AdminRouter from "./AdminRouter.jsx";
@@ -17,7 +18,8 @@ const Loading = () => LoadingSpinner();
 
 const Main = lazy(() => import("../pages/MainPage"));
 
-const router = createBrowserRouter([
+// const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     Component: BasicLayout, //컴포넌트는 레이아웃을 의미한다. 대문자로 시작하는 건 아직은 표준으로 통합이 되지 않았다.

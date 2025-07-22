@@ -220,7 +220,7 @@ const Header = () => {
               to="/"
               sx={{ flexGrow: { xs: 1, md: 0 } }}
             >
-              <LogoImage src="/images/logo-color.png" alt="SOBI" />
+              <LogoImage src="final/images/logo-color.png" alt="SOBI" />
             </LogoContainer>
 
             {/* 데스크톱 네비게이션 메뉴 */}
