@@ -16,11 +16,12 @@ import {
   reviewLimit5ListfromCateogry1,
   reviewLimit5ListfromCateogry2,
 } from "../service/main/MainApiService";
-import { incrementNoticeViewCount } from "../service/community/noticeApiService";
+// import { incrementNoticeViewCount } from "../service/community/noticeApiService";
 import SwiperCarousel from "../components/swiper/SwiperCarousel";
 import ImageWithTitleList from "../components/list/ImageWithTitleList";
 import ImageCard from "../components/list/ImageCard";
 import { stripHtml } from "../utils/common";
+import { getContent } from "../utils/dataCommunity";
 
 const MainPage = () => {
   const Item = styled(Paper)(({ theme }) => ({
@@ -35,11 +36,21 @@ const MainPage = () => {
   }));
 
   const member = useSelector((state) => state.member);
-  const [notice3List, setNotice3List] = useState([]);
-  const [reviewList, setReviewList] = useState([]);
-  const [reviewTrandList, setReviewTrandList] = useState([]);
-  const [reviewCT1List, setReviewCT1List] = useState([]);
-  const [reviewCT2List, setReviewCT2List] = useState([]);
+  const [notice3List, setNotice3List] = useState(
+    getContent("notice").slice(0, 3)
+  );
+  const [reviewList, setReviewList] = useState(
+    getContent("notice").slice(0, 3)
+  );
+  const [reviewTrandList, setReviewTrandList] = useState(
+    getContent("notice").slice(0, 10)
+  );
+  const [reviewCT1List, setReviewCT1List] = useState(
+    getContent("notice").slice(0, 5)
+  );
+  const [reviewCT2List, setReviewCT2List] = useState(
+    getContent("notice").slice(0, 5)
+  );
 
   const navigate = useNavigate();
 
@@ -48,34 +59,34 @@ const MainPage = () => {
 
     noticeLimit3List().then((res) => {
       // console.log(res)
-      setNotice3List(res || []);
+      // setNotice3List(res || []);
     });
 
     reviewLimit5List().then((res) => {
       // console.log("5건 res !! ", res.rnoList);
-      setReviewTrandList(res.rnoList || []);
+      // setReviewTrandList(res.rnoList || []);
     });
 
     reviewLimit10List().then((res) => {
       // console.log(res.rnoList);
-      setReviewList(res.rnoList || []);
+      // setReviewList(res.rnoList || []);
     });
 
     reviewLimit5ListfromCateogry1().then((res) => {
       // console.log(res.rnoList);
-      setReviewCT1List(res.rnoList || []);
+      // setReviewCT1List(res.rnoList || []);
     });
 
     reviewLimit5ListfromCateogry2().then((res) => {
       // console.log(res.rnoList);
-      setReviewCT2List(res.rnoList || []);
+      // setReviewCT2List(res.rnoList || []);
     });
   }, [member]);
 
   // 페이지 이동
   const handleClickMove = async (type, no) => {
     if (type == "notice") {
-      await incrementNoticeViewCount(no);
+      // await incrementNoticeViewCount(no);
       navigate(`/notice/${no}`);
     } else if (type == "review") {
       navigate(`/review/detail/${no}?page=1&size=10`);
@@ -259,23 +270,23 @@ const MainPage = () => {
               <Stack spacing={2}>
                 <Item>
                   <h3 className="main-title">📝 SOBI 최신 리뷰</h3>
-                  {reviewTrandContent.length > 0 ? (
-                    <SwiperCarousel
-                      slides={reviewTrandContent}
-                      renderSlide={renderSlide}
-                      // navigation
-                      // pagination={{ clickable: true }}
-                      scrollbar={{ draggable: true }}
-                      autoplay={{ delay: 5000, disableOnInteraction: false }}
-                      loop={true}
-                      enableLazyLoading={true}
-                      slidesPerView={1}
-                      slidesPerGroup={1}
-                      className="review-trand"
-                    />
-                  ) : (
+                  {/* {reviewTrandContent.length > 0 ? ( */}
+                  <SwiperCarousel
+                    slides={reviewTrandContent}
+                    renderSlide={renderSlide}
+                    // navigation
+                    // pagination={{ clickable: true }}
+                    scrollbar={{ draggable: true }}
+                    autoplay={{ delay: 5000, disableOnInteraction: false }}
+                    loop={true}
+                    enableLazyLoading={true}
+                    slidesPerView={1}
+                    slidesPerGroup={1}
+                    className="review-trand"
+                  />
+                  {/* ) : (
                     <p>리뷰가 없습니다....</p>
-                  )}
+                  )} */}
                 </Item>
                 <Item>
                   <h3 className="main-title">📝 SOBI 카테고리별 1</h3>
@@ -296,22 +307,22 @@ const MainPage = () => {
 
                 <Item>
                   <h3 className="main-title">📢 SOBI 공지사항</h3>
-                  {noticeSwiperContent.length > 0 ? (
-                    <SwiperCarousel
-                      slides={noticeSwiperContent}
-                      renderSlide={renderSlideNotice}
-                      scrollbar={{ draggable: true }}
-                      autoplay={{ delay: 8000, disableOnInteraction: false }}
-                      loop={true}
-                      enableLazyLoading={true}
-                      slidesPerView={2}
-                      spaceBetween={15}
-                      slidesPerGroup={1}
-                      className="notice-swiper"
-                    />
-                  ) : (
+                  {/* {noticeSwiperContent.length > 0 ? ( */}
+                  <SwiperCarousel
+                    slides={noticeSwiperContent}
+                    renderSlide={renderSlideNotice}
+                    scrollbar={{ draggable: true }}
+                    autoplay={{ delay: 8000, disableOnInteraction: false }}
+                    loop={true}
+                    enableLazyLoading={true}
+                    slidesPerView={2}
+                    spaceBetween={15}
+                    slidesPerGroup={1}
+                    className="notice-swiper"
+                  />
+                  {/* ) : (
                     <p>리뷰가 없습니다....</p>
-                  )}
+                  )} */}
                 </Item>
 
                 <Item>
@@ -333,17 +344,17 @@ const MainPage = () => {
             <Grid size={4}>
               <Item>
                 <h3 className="main-title">📝 SOBI 리뷰</h3>
-                {reviewAllContent.length > 0 ? (
-                  <ImageWithTitleList
-                    items={reviewAllContent}
-                    cols={1}
-                    gap={10}
-                    type="review"
-                    onItemClick={handleClickMove}
-                  />
-                ) : (
+                {/* {reviewAllContent.length > 0 ? ( */}
+                <ImageWithTitleList
+                  items={reviewAllContent}
+                  cols={1}
+                  gap={10}
+                  type="review"
+                  onItemClick={handleClickMove}
+                />
+                {/* ) : (
                   <p>리뷰가 없습니다.</p>
-                )}
+                )} */}
               </Item>
             </Grid>
           </Grid>

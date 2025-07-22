@@ -4,21 +4,12 @@ import { useSelector } from "react-redux";
 import {
   Box,
   Typography,
-  Container,
-  Button,
   ThemeProvider,
-  createTheme,
-  Alert,
-  CircularProgress,
   Table,
   TableBody,
-  TableCell,
-  TableContainer,
   TableRow,
   Paper,
   Stack,
-  Chip,
-  Card,
   CardContent,
   Divider,
 } from "@mui/material";
@@ -31,11 +22,8 @@ import {
   InfoTable,
   LabelCell,
   ContentCell,
-  CategoryChip,
   ContentArea,
   BackButton,
-  ActionButton,
-  StatusChip,
 } from "../../assets/styles/sobiThemeReview";
 import {
   ArrowBack as ArrowBackIcon,
@@ -49,25 +37,31 @@ import {
   getNoticeDetail,
   deleteNotice,
 } from "../../service/community/noticeApiService";
+import { getContent } from "../../utils/dataCommunity"; // 인라인 데이터용
 
 const NoticeDetail = () => {
   const { noticeNo } = useParams();
   const navigate = useNavigate();
+  const [noticeList] = useState(getContent("notice"));
+
   const [detail, setDetail] = useState(null);
   const member = useSelector((state) => state.member);
   console.log("[slice] 현재 유저 정보 :", member);
 
   useEffect(() => {
     if (!noticeNo) return;
-    getNoticeDetail(noticeNo)
-      .then((res) => {
-        setDetail(res);
-        console.log("[상세호출] res : ", res);
-      })
-      .catch((err) => {
-        console.error("공지 사항 상세 조회 실패 : ", err);
-      });
-  }, [noticeNo]);
+
+    const foundNotice = noticeList.find(
+      (notice) => notice.noticeNo === parseInt(noticeNo)
+    );
+
+    if (foundNotice) {
+      setDetail(foundNotice);
+      console.log("상세조회 >>> 인라인 데이터 사용 : ", foundNotice);
+    } else {
+      console.log("해당 공지사항을 찾을 수 없습니다 : ", noticeNo);
+    }
+  }, [noticeNo, noticeList]);
 
   const handleClick = async (e) => {
     if (e === "update") {
@@ -92,7 +86,24 @@ const NoticeDetail = () => {
     }
   };
 
-  if (!detail) return <div>로딩 중...</div>;
+  if (!detail) {
+    return (
+      <ThemeProvider theme={sobiTheme}>
+        <MainContainer>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "200px",
+            }}
+          >
+            <Typography sx={{ ml: 2 }}>로딩 중...</Typography>
+          </Box>
+        </MainContainer>
+      </ThemeProvider>
+    );
+  }
   return (
     <>
       <ThemeProvider theme={sobiTheme}>
@@ -134,7 +145,7 @@ const NoticeDetail = () => {
                     <LabelCell sx={{ width: "140px" }}>글번호</LabelCell>
                     <ContentCell>
                       <Typography variant="body2" color="text.secondary">
-                        {noticeNo}
+                        {detail.noticeNo}
                       </Typography>
                     </ContentCell>
                   </TableRow>
@@ -171,40 +182,40 @@ const NoticeDetail = () => {
             </CardContent>
           </DetailCard>
 
-          {member?.role === "ROLE_ADMIN" && (
-        <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
-          <CustomButton
-            type="button"
-            onClick={() => {
-              handleClick("list");
-            }}
-            size="medium"
-            variant="contained"
-            color="success"
-            text="목록"
-          />
-          <CustomButton
-            type="button"
-            onClick={() => {
-              handleClick("update");
-            }}
-            size="medium"
-            variant="contained"
-            color="default"
-            text="수정"
-          />
-          <CustomButton
-            type="button"
-            onClick={() => {
-              handleClick("delete");
-            }}
-            size="medium"
-            variant="contained"
-            color="danger"
-            text="삭제"
-          />
-        </Stack>
-      )}
+          {/* {member?.role === "ROLE_ADMIN" && ( */}
+          <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
+            <CustomButton
+              type="button"
+              onClick={() => {
+                handleClick("list");
+              }}
+              size="medium"
+              variant="contained"
+              color="success"
+              text="목록"
+            />
+            <CustomButton
+              type="button"
+              onClick={() => {
+                handleClick("update");
+              }}
+              size="medium"
+              variant="contained"
+              color="default"
+              text="수정"
+            />
+            <CustomButton
+              type="button"
+              onClick={() => {
+                handleClick("delete");
+              }}
+              size="medium"
+              variant="contained"
+              color="danger"
+              text="삭제"
+            />
+          </Stack>
+          {/* )} */}
         </MainContainer>
       </ThemeProvider>
     </>

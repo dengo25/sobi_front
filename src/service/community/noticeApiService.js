@@ -68,6 +68,7 @@ export const getNoticeListWithPaging = async (params = {}, token) => {
 };
 
 // 조회수 증가
+/*
 export const incrementNoticeViewCount = async (noticeNo) => {
   try {
     const res = await jwtAxios.patch(
@@ -80,6 +81,7 @@ export const incrementNoticeViewCount = async (noticeNo) => {
     throw error;
   }
 };
+*/
 
 // 전체 게시글 카운트
 export const getTotalCount = async () => {

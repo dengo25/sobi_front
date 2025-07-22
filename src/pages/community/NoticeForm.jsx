@@ -5,10 +5,7 @@ import {
   Stack,
   Typography,
   CardContent,
-  Alert,
-  CircularProgress,
   ThemeProvider,
-  MenuItem,
   Divider,
 } from "@mui/material";
 import {
@@ -22,18 +19,14 @@ import {
   MainContainer,
   HeaderSection,
   FormCard,
-  StyledTextField,
   TitleTextField,
-  ActionButton,
   BackButton,
-  EditorContainer,
 } from "../../assets/styles/sobiThemeReviewWrite";
 import CustomButton from "../../components/input/CustomButton";
 import BasicEditor from "../../components/editor/BasicEditor";
 import {
   insertNoticeList,
   updateNoticeList,
-  deleteNotice,
 } from "../../service/community/noticeApiService";
 import { extractImageUrls } from "../../utils/extractImages";
 import { isEmptyAndAlert, isEditorEmptyAndAlert } from "../../utils/common.js";
@@ -175,13 +168,6 @@ const NoticeForm = () => {
           <FormCard>
             <CardContent sx={{ p: 4 }}>
               <Box component="form" onSubmit={submitEditor}>
-                {/* <input
-                            type="text"
-                            name="noticeTitle"
-                            value={formData.noticeTitle}
-                            onChange={updateInput}
-                            placeholder="제목을 입력해 주세요"/> */}
-
                 <Box sx={{ mb: 3 }}>
                   <Typography
                     variant="subtitle1"

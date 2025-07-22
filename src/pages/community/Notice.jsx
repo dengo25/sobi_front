@@ -7,17 +7,6 @@ import {
   MainContainer,
   HeaderSection,
   FilterSection,
-  BlogCard,
-  AuthorSection,
-  AuthorAvatar,
-  AuthorInfo,
-  PostTitle,
-  PostContent,
-  ThumbnailImage,
-  StatsSection,
-  CategoryChip,
-  WriteButton,
-  FloatingWriteButton,
   StyledTextField,
   StyledTableContainer,
   StyledTable,
@@ -25,8 +14,6 @@ import {
   StyledTableBody,
   NumberTableCell,
   ContentTableCell,
-  // ViewCountCell,
-  // DateTableCell,
 } from "../../assets/styles/sobiThemeReview";
 
 import {
@@ -34,7 +21,6 @@ import {
   Box,
   Button,
   CardContent,
-  TextField,
   Paper,
   Select,
   MenuItem,
@@ -45,7 +31,6 @@ import {
   InputAdornment,
   TableRow,
   TableCell,
-  TableSortLabel,
 } from "@mui/material";
 
 import {
@@ -61,14 +46,19 @@ import BasicPagination from "../../components/list/BasicPagination";
 import {
   getNoticeList,
   getNoticeListWithPaging,
-  incrementNoticeViewCount,
+  // incrementNoticeViewCount,
   getTotalCount,
   getSearchCount,
 } from "../../service/community/noticeApiService";
 import { formatDate } from "../../utils/common";
+import { getContent } from "../../utils/dataCommunity"; // 인라인 데이터용
 
 const Notice = () => {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(
+    getContent('notice')
+  );
+
+  const [filteredList, setFilteredList] = useState([]);
   const [pageInfo, setPageInfo] = useState({
     currentPage: 0,
     totalPages: 0,
@@ -105,9 +95,6 @@ const Notice = () => {
       size: params.size !== undefined ? params.size : pageInfo.pageSize || 10,
       sortBy: params.sortBy || currentSort.sortBy,
       sortDirection: params.sortDirection || currentSort.sortDirection,
-      // size: pageInfo.pageSize,
-      // sortBy: "noticeCreateDate",
-      // sortDirection: "desc",
       ...searchParams,
       ...params,
     };
@@ -115,7 +102,7 @@ const Notice = () => {
     console.log("Request params:", requestParams); // 디버깅용
     const res = await getNoticeListWithPaging(requestParams);
 
-    setList(res.content || []);
+    // setList(res.content || []);
     setPageInfo({
       currentPage: res.currentPage || 0,
       totalPages: res.totalPages || 0,
@@ -138,34 +125,45 @@ const Notice = () => {
 
   // 마운트 시: 목록만 가져와서 totalCount 세팅
   useEffect(() => {
-    // (async () => {
-    //   const resp = await getNoticeListWithPaging({
-    //     page: 0,
-    //     size: pageInfo.pageSize,
-    //   });
-    //   setList(resp.content);
-    //   setPageInfo({
-    //     ...pageInfo,
-    //     currentPage: resp.currentPage,
-    //     totalPages: resp.totalPages,
-    //     totalElements: resp.totalElements,
-    //   });
-    //   setTotalCount(resp.totalElements); // 토탈 카운트 셋팅
-    // })();
+    setFilteredList(list);
 
     // 첫 로드시 페이지 0번 데이터 조회
     fetchNotices({ page: 0, size: 10 });
-  }, []);
+  }, [list]);
+
+
+  // 클라이언트 사이드 검색 함수
+  const performClientSearch = (keyword, searchType) => {
+    if (!keyword.trim()) {
+      return list; // 검색어가 없으면 전체 목록 반환
+    }
+
+    const lowerKeyword = keyword.toLowerCase();
+
+    return list.filter((notice) => {
+      switch (searchType) {
+        case "title":
+          return notice.noticeTitle.toLowerCase().includes(lowerKeyword);
+        case "content":
+          return notice.noticeContent.toLowerCase().includes(lowerKeyword);
+        case "all":
+        default:
+          return (
+            notice.noticeTitle.toLowerCase().includes(lowerKeyword) ||
+            notice.noticeContent.toLowerCase().includes(lowerKeyword)
+          );
+      }
+    });
+  };
 
   // 검색
   const handleSearch = async () => {
-    setPageInfo((p) => ({ ...p, currentPage: 0 }));
-    await fetchNotices({ page: 0 });
-    const cnt = await getSearchCount(
-      searchParams.searchType,
-      searchParams.searchKeyword
+    const results = performClientSearch(
+      searchParams.searchKeyword,
+      searchParams.searchType
     );
-    setSearchCount(cnt); // 검색 엔진 카운트
+    setFilteredList(results);
+    console.log(`검색 결과: ${results.length}건`);
   };
 
   // 검색 초기화
@@ -174,21 +172,7 @@ const Notice = () => {
       searchKeyword: "",
       searchType: "all",
     });
-    const newPageInfo = { ...pageInfo, currentPage: 0 };
-
-    const resp = await getNoticeListWithPaging({
-      page: 0,
-      size: pageInfo.pageSize,
-    });
-    setList(resp.content);
-    setPageInfo({
-      ...pageInfo,
-      currentPage: resp.currentPage,
-      totalPages: resp.totalPages,
-      totalElements: resp.totalElements,
-    });
-    setTotalCount(resp.totalElements); // 초기화 후 다시 전체 카운트
-    setSearchCount(null);
+    setFilteredList(originalList);
   };
 
   // 페이지 변경
@@ -199,15 +183,20 @@ const Notice = () => {
     fetchNotices({ page: pageNumber });
   };
 
+  // 엔터키로 검색
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   const handleClick = (e) => {
     if (e === "insert") {
       navigate("/notice/insert");
     }
   };
 
-  // 조회수 증가
   const handleNoticeClick = async (noticeNo) => {
-    await incrementNoticeViewCount(noticeNo);
     navigate(`/notice/${noticeNo}`);
   };
 
@@ -216,11 +205,18 @@ const Notice = () => {
     return (
       <TableRow key={notice.noticeNo}>
         <NumberTableCell>{notice.noticeNo}</NumberTableCell>
-        <ContentTableCell onClick={() => handleNoticeClick(notice.noticeNo)} sx={{ cursor: "pointer" }}>
-            {notice.noticeTitle}
+        <ContentTableCell
+          onClick={() => handleNoticeClick(notice.noticeNo)}
+          sx={{ cursor: "pointer" }}
+        >
+          {notice.noticeTitle}
         </ContentTableCell>
-        <ContentTableCell sx={{ textAlign: "center" }}>{notice.count}</ContentTableCell>
-        <ContentTableCell sx={{ textAlign: "center" }}>{formatDate(notice.noticeCreateDate)}</ContentTableCell>
+        <ContentTableCell sx={{ textAlign: "center" }}>
+          {notice.count}
+        </ContentTableCell>
+        <ContentTableCell sx={{ textAlign: "center" }}>
+          {formatDate(notice.noticeCreateDate)}
+        </ContentTableCell>
       </TableRow>
     );
   });
@@ -283,7 +279,7 @@ const Notice = () => {
                         searchKeyword: e.target.value,
                       }))
                     }
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                    onKeyPress={handleKeyPress}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -303,29 +299,6 @@ const Notice = () => {
                       ),
                     }}
                   />
-                  {/* <TextField
-                    size="small"
-                    placeholder="검색어를 입력하세요"
-                    value={searchParams.searchKeyword}
-                    onChange={(e) =>
-                      setSearchParams((prev) => ({
-                        ...prev,
-                        searchKeyword: e.target.value,
-                      }))
-                    }
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                    sx={{ minWidth: 200 }}
-                  /> */}
-
-                  {/* <CustomButton
-                    type="button"
-                    onClick={handleSearch}
-                    size="small"
-                    variant="contained"
-                    color="primary"
-                    text="검색"
-                  /> */}
-
                   <CustomButton
                     type="button"
                     onClick={handleSearchReset}
@@ -339,16 +312,19 @@ const Notice = () => {
                 <Box
                   sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: "divider" }}
                 >
-                  {/* sx={{ mb: 2, display: "flex", gap: 4, alignItems: "center" }}
-                > */}
                   {/* 검색 키워드 없으면 전체, 있으면 검색 건수 API 결과 */}
                   {!searchParams.searchKeyword ? (
                     <Typography variant="body2" color="text.secondary">
-                      전체 게시글 수: <strong>{totalCount}</strong> 건
+                      전체 게시글 수: <strong>{list.length}</strong> 건
                     </Typography>
                   ) : (
                     <Typography variant="body2" color="text.secondary">
-                      검색 결과: <strong>{searchCount}</strong> 건
+                      검색 결과: <strong>{filteredList.length}</strong> 건
+                      {filteredList.length > 0 && (
+                        <span style={{ marginLeft: "8px", color: "#1976d2" }}>
+                          ('{searchParams.searchKeyword}' 검색)
+                        </span>
+                      )}
                     </Typography>
                   )}
                 </Box>
@@ -379,24 +355,6 @@ const Notice = () => {
             </StyledTable>
           </StyledTableContainer>
 
-          {/* <table>
-            <colgroup>
-              <col width={"90px"}></col>
-              <col width={"300px"}></col>
-              <col width={"100px"}></col>
-              <col width={"200px"}></col>
-            </colgroup>
-            <thead>
-              <tr>
-                <th>글번호</th>
-                <th>제목</th>
-                <th>조회수</th>
-                <th>작성일</th>
-              </tr>
-            </thead>
-            <tbody>{dataList}</tbody>
-          </table> */}
-
           {/* 페이징 컴포넌트 */}
           {pageInfo.totalPages > 1 && (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
@@ -415,20 +373,20 @@ const Notice = () => {
             </Box>
           )}
 
-          {member?.role === "ROLE_ADMIN" && (
-            <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
-              <CustomButton
-                type="button"
-                onClick={() => {
-                  handleClick("insert");
-                }}
-                size="medium"
-                variant="contained"
-                color="success"
-                text="새글 등록"
-              />
-            </Stack>
-          )}
+          {/* {member?.role === "ROLE_ADMIN" && ( */}
+          <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
+            <CustomButton
+              type="button"
+              onClick={() => {
+                handleClick("insert");
+              }}
+              size="medium"
+              variant="contained"
+              color="success"
+              text="새글 등록"
+            />
+          </Stack>
+          {/* )} */}
         </MainContainer>
       </ThemeProvider>
     </>

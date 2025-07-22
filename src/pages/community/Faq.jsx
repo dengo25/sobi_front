@@ -6,52 +6,28 @@ import {
   Box,
   Typography,
   ThemeProvider,
-  InputAdornment,
-  TableRow,
-  TableCell,
-  TableSortLabel,
 } from "@mui/material";
 
 import {
   sobiTheme,
   MainContainer,
   HeaderSection,
-  FilterSection,
-  BlogCard,
-  AuthorSection,
-  AuthorAvatar,
-  AuthorInfo,
-  PostTitle,
-  PostContent,
-  ThumbnailImage,
-  StatsSection,
-  CategoryChip,
-  WriteButton,
-  FloatingWriteButton,
-  StyledTextField,
-  StyledTableContainer,
-  StyledTable,
-  StyledTableHead,
-  StyledTableBody,
-  NumberTableCell,
-  ContentTableCell,
-  // ViewCountCell,
-  // DateTableCell,
 } from "../../assets/styles/sobiThemeReview";
 
 import CNTAccordion from "../../components/list/ControlledAccordions";
 import CustomButton from "../../components/input/CustomButton";
 import BasicPagination from "../../components/list/BasicPagination";
 import {
-  getFaqList,
   deleteFaq,
   getFaqListWithPaging,
 } from "../../service/community/faqApiService";
-import { CollectionsBookmarkRounded } from "@mui/icons-material";
+import { getContent } from "../../utils/dataCommunity"; // 인라인 데이터용
 
 const Faq = () => {
   const [selectedFaqs, setSelectedFaqs] = useState([]);
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(
+    getContent('faq')
+  );
   const [pageInfo, setPageInfo] = useState({
     currentPage: 0,
     totalPages: 0,
@@ -101,7 +77,7 @@ const Faq = () => {
     console.log("Request params:", requestParams); // 디버깅용
     const res = await getFaqListWithPaging(requestParams);
 
-    setList(res.content || []);
+    // setList(res.content || []);
     setPageInfo({
       currentPage: res.currentPage || 0,
       totalPages: res.totalPages || 0,
@@ -119,17 +95,14 @@ const Faq = () => {
       sortDirection: requestParams.sortDirection,
     });
   };
+  
 
   // 초기 로드
   useEffect(() => {
-    // getFaqList().then((data) => {
-    //     setList(data);
-    //     console.log("api 통신 데이터 : ",data);
-    // })
-
     // 첫 로드시 페이지 0번 데이터 조회
     fetchFaqs({ page: 0, size: 10 });
   }, []);
+
 
   // 페이지 변경
   const handlePageChange = (e, newPage) => {
@@ -240,7 +213,7 @@ const Faq = () => {
               />
             </Box>
           )}
-          {member?.role === "ROLE_ADMIN" && (
+          {/* {member?.role === "ROLE_ADMIN" && ( */}
             <Stack direction="row" spacing={1} sx={{ justifyContent: "right" }}>
               <CustomButton
                 type="button"
@@ -273,7 +246,7 @@ const Faq = () => {
                 text="삭제"
               />
             </Stack>
-          )}
+          {/* )} */}
         </MainContainer>
       </ThemeProvider>
     </>

@@ -26,7 +26,7 @@ const ControlledAccordions = ({
         aria-controls={`${name}bh-content`}
         id={`${name}bh-header`}
       >
-        {isAdmin && (
+        {/* {isAdmin && ( */}
           <CustomCheckbox
             checked={isChecked}
             onChange={() => onCheckToggle(faqNo)}
@@ -35,7 +35,7 @@ const ControlledAccordions = ({
             size="medium"
             color="success"
           />
-        )}
+        {/* )} */}
         <img src={faqIconQ} />
         {title}
       </AccordionSummary>
