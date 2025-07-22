@@ -1,12 +1,35 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+sobi 포트폴리오 기록용 브랜치입니다.  
+팀원별 결과물을 GitHub Pages에 배포하여 보관하고 있습니다.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 👥 팀원 소개
 
-## Expanding the ESLint configuration
+| 이름   | 배포 주소 |
+|--------|-----------|
+| 완빈   | 준비 중      |
+| 창진   | [👉 바로가기](https://dengo25.github.io/final/) |
+| 시은   | [👉 바로가기](https://alo-wang.github.io/final/) |
+| 지원   | 준비 중      |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 📁 브랜치 개요
+
+이 브랜치는 **팀원 개개인의 포트폴리오 작업 결과물**을 저장하고,  
+**GitHub Pages를 활용한 정적 배포**를 통해 공유 가능한 형태로 구성되어 있습니다.
+
+각자의 `final` 폴더에 독립적인 결과물이 정리되어 있으며,  
+해당 결과물을 통해 디자인 및 기능 구현 역량을 확인할 수 있습니다.
+
+---
+
+## 📌 참고 사항
+
+- 배포 시 Vite의 `base` 경로는 반드시 `/final`로 설정되어야 정상 작동합니다.
+- 정적 리소스(`images`, `assets` 등)는 각자 프로젝트 내부에서 관리합니다.
+
+---
+
+> 🔧 이 브랜치는 수정 없이 보존되며, 새로운 작업은 각자 별도의 브랜치에서 진행됩니다.
